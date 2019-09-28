@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2232B64C233F6C1800358B05 /* TOFileSystemNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232B64B233F6C1800358B05 /* TOFileSystemNotificationToken.m */; };
+		2232B64F233FA19C00358B05 /* TOFileSystemChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232B64E233FA19C00358B05 /* TOFileSystemChanges.m */; };
+		2232B654233FAFF700358B05 /* TOFileSystemNotificationTarget.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232B653233FAFF700358B05 /* TOFileSystemNotificationTarget.m */; };
 		223A893D233F13CA008FFE1A /* TOAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A893C233F13CA008FFE1A /* TOAppDelegate.m */; };
 		223A8943233F13CA008FFE1A /* TOViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A8942233F13CA008FFE1A /* TOViewController.m */; };
 		223A8948233F13CA008FFE1A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 223A8947233F13CA008FFE1A /* Assets.xcassets */; };
@@ -19,6 +22,12 @@
 
 /* Begin PBXFileReference section */
 		0D963DD85AA86DAC2EF78BAD /* libPods-TOFileSystemObserverExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TOFileSystemObserverExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2232B64A233F6C1800358B05 /* TOFileSystemNotificationToken.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemNotificationToken.h; sourceTree = "<group>"; };
+		2232B64B233F6C1800358B05 /* TOFileSystemNotificationToken.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemNotificationToken.m; sourceTree = "<group>"; };
+		2232B64D233FA19C00358B05 /* TOFileSystemChanges.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemChanges.h; sourceTree = "<group>"; };
+		2232B64E233FA19C00358B05 /* TOFileSystemChanges.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemChanges.m; sourceTree = "<group>"; };
+		2232B652233FAFF700358B05 /* TOFileSystemNotificationTarget.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemNotificationTarget.h; sourceTree = "<group>"; };
+		2232B653233FAFF700358B05 /* TOFileSystemNotificationTarget.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemNotificationTarget.m; sourceTree = "<group>"; };
 		223A8938233F13CA008FFE1A /* TOFileSystemObserverExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TOFileSystemObserverExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		223A893B233F13CA008FFE1A /* TOAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOAppDelegate.h; sourceTree = "<group>"; };
 		223A893C233F13CA008FFE1A /* TOAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOAppDelegate.m; sourceTree = "<group>"; };
@@ -48,6 +57,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2232B649233F6BF900358B05 /* Notifications */ = {
+			isa = PBXGroup;
+			children = (
+				2232B652233FAFF700358B05 /* TOFileSystemNotificationTarget.h */,
+				2232B653233FAFF700358B05 /* TOFileSystemNotificationTarget.m */,
+				2232B64A233F6C1800358B05 /* TOFileSystemNotificationToken.h */,
+				2232B64B233F6C1800358B05 /* TOFileSystemNotificationToken.m */,
+			);
+			path = Notifications;
+			sourceTree = "<group>";
+		};
+		2232B651233FAFC000358B05 /* Changes */ = {
+			isa = PBXGroup;
+			children = (
+				2232B64D233FA19C00358B05 /* TOFileSystemChanges.h */,
+				2232B64E233FA19C00358B05 /* TOFileSystemChanges.m */,
+			);
+			path = Changes;
+			sourceTree = "<group>";
+		};
 		223A892F233F13C9008FFE1A = {
 			isa = PBXGroup;
 			children = (
@@ -87,6 +116,8 @@
 			children = (
 				223A8955233F4AB0008FFE1A /* TOFileSystemObserver.h */,
 				223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */,
+				2232B651233FAFC000358B05 /* Changes */,
+				2232B649233F6BF900358B05 /* Notifications */,
 				223A8958233F4AB5008FFE1A /* Entities */,
 			);
 			path = TOFileSystemObserver;
@@ -214,8 +245,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				223A895B233F4B3B008FFE1A /* TOFileSystemItem.m in Sources */,
+				2232B64C233F6C1800358B05 /* TOFileSystemNotificationToken.m in Sources */,
+				2232B654233FAFF700358B05 /* TOFileSystemNotificationTarget.m in Sources */,
 				223A8943233F13CA008FFE1A /* TOViewController.m in Sources */,
 				223A8957233F4AB0008FFE1A /* TOFileSystemObserver.m in Sources */,
+				2232B64F233FA19C00358B05 /* TOFileSystemChanges.m in Sources */,
 				223A893D233F13CA008FFE1A /* TOAppDelegate.m in Sources */,
 				223A894E233F13CA008FFE1A /* main.m in Sources */,
 			);
