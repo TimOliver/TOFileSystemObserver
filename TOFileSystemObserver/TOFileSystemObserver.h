@@ -38,6 +38,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSArray<NSURL *> *excludedItems;
 
 /**
+ Optionally, the number of directoy levels down that the observer will recursively traverse from the base target.
+ This is useful to avoid performance overhead in instances such as if your app only has one level of directories. (Default is 0).
+ */
+@property (nonatomic, assign) NSInteger includedDirectoryLevels;
+
+/**
  The name of the snapshots database on disk.
  It may only be changed when the observer isn't running.
  The default value is "{AppBundleIdentifier}.fileSystemSnapshots.realm".
