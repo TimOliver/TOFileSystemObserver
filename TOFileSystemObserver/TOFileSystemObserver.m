@@ -8,10 +8,7 @@
 
 #import "TOFileSystemObserver.h"
 
-@interface <#class name#> : <#superclass#>
-
-@end
-
+#import "TOFileSystemItem.h"
 
 @implementation TOFileSystemObserver
 

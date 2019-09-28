@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 #import <Realm/Realm.h>
 
+@class TOFileSystemBase;
+
 // The different types of items stored in the file system
 typedef NS_ENUM(NSInteger, TOFileSystemItemType) {
     TOFileSystemItemTypeFile, // A standard file
@@ -52,7 +54,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL isCopying;
 
 /** If a directory, the child items inside it. */
-@property (nonatomic, strong) RLMArray<TOFileSystemItem *><TOFileSystemItem> *childItems;
+@property (nonatomic, strong, nullable) RLMArray<TOFileSystemItem *><TOFileSystemItem> *childItems;
+
+/** The parent directory, if any that this item belongs to. */
+@property (readonly, nullable) TOFileSystemItem *parentDirectory;
+
+/** Where applicable, the base object at the very top level */
+@property (readonly, nullable) TOFileSystemBase *directoryBase;
 
 @end
 

@@ -1,19 +1,14 @@
 //
-//  TOFileSystemItem.m
+//  TOFileSystemBase.m
 //  TOFileSystemObserverExample
 //
-//  Created by Tim Oliver on 28/9/19.
+//  Created by Tim Oliver on 29/9/19.
 //  Copyright © 2019 Tim Oliver. All rights reserved.
 //
 
-#import "TOFileSystemItem.h"
+#import "TOFileSystemBase.h"
 
-@implementation TOFileSystemItem
-
-+ (NSArray<NSString *> *)indexedProperties
-{
-    return @[@"identifier", @"name"];
-}
+@implementation TOFileSystemBase
 
 // Never automatically include this in the default Realm schema
 // as it may get exposed in the app's own Realm files.

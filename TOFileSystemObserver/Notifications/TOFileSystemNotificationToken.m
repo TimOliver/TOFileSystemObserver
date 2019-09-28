@@ -6,8 +6,8 @@
 //  Copyright © 2019 Tim Oliver. All rights reserved.
 //
 
-#import "TOFileSystemNotificationHandler.h"
+#import "TOFileSystemNotificationToken.h"
 
-@implementation TOFileSystemNotificationHandler
+@implementation TOFileSystemNotificationToken
 
 @end

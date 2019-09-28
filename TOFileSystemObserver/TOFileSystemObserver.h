@@ -9,6 +9,10 @@
 #import <Foundation/Foundation.h>
 
 #import "TOFileSystemItem.h"
+#import "TOFileSystemBase.h"
+#import "TOFileSystemNotificationToken.h"
+
+@class TOFileSystemObserver;
 
 typedef void (^TOFileSystemNotificationBlock)(TOFileSystemObserver * _Nonnull observer,
                                               TOFileSystemChanges * _Nullable changes);
@@ -27,6 +31,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSURL *directoryURL;
 
 /**
+ Optionally, a list of relative file paths from `directoryURL` to directories that
+ will not be monitored. By default, this includes the 'Inbox' directory in the
+ Documents directory.
+ */
+@property (nonatomic, strong, nullable) NSArray<NSURL *> *excludedItems;
+
+/**
  The name of the snapshots database on disk.
  It may only be changed when the observer isn't running.
  The default value is "{AppBundleIdentifier}.fileSystemSnapshots.realm".
@@ -42,11 +53,23 @@ NS_ASSUME_NONNULL_BEGIN
 /** A singleton instance that can be accessed globally. */
 + (instancetype)sharedObserver;
 
+/** If desired, promotes a locally created and configured observer to the singleton. */
++ (instancetype)setSharedObserver:(TOFileSystemObserver *)observer;
+
 /** Starts the file system observer monitoring the target directory for changes. */
 - (void)start;
 
 /** Suspends the file system observer from monitoring any file system changes. */
 - (void)stop;
+
+/**
+ Registers a new notification block that will be triggered each time an update is detected.
+ It is your responsibility to strongly retain the token object, and release it only
+ when you wish to stop receiving notifications.
+
+ @param block A block that will be called each time a file system event is detected.
+*/
+- (TOFileSystemNotificationToken *)addNotificationBlock:(TOFileSystemNotificationBlock)block;
 
 /**
  Registers a target object that will receive events when the file system changes.

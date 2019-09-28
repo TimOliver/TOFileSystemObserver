@@ -16,7 +16,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface TOFileSystemNotificationTarget : NSObject
 
+/** The target object that the selector will be sent to. */
+@property (nonatomic, weak) id target;
 
+/** The selector belonging to the target object that will be called. */
+@property (nonatomic, assign) SEL selector;
 
 @end
 
