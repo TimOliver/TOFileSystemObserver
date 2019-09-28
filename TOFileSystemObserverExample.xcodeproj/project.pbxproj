@@ -12,6 +12,8 @@
 		223A8948233F13CA008FFE1A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 223A8947233F13CA008FFE1A /* Assets.xcassets */; };
 		223A894B233F13CA008FFE1A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 223A8949233F13CA008FFE1A /* LaunchScreen.storyboard */; };
 		223A894E233F13CA008FFE1A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A894D233F13CA008FFE1A /* main.m */; };
+		223A8957233F4AB0008FFE1A /* TOFileSystemObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */; };
+		223A895B233F4B3B008FFE1A /* TOFileSystemItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */; };
 		87800716004A3B429A615773 /* libPods-TOFileSystemObserverExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D963DD85AA86DAC2EF78BAD /* libPods-TOFileSystemObserverExample.a */; };
 /* End PBXBuildFile section */
 
@@ -26,6 +28,10 @@
 		223A894A233F13CA008FFE1A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		223A894C233F13CA008FFE1A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		223A894D233F13CA008FFE1A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		223A8955233F4AB0008FFE1A /* TOFileSystemObserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemObserver.h; sourceTree = "<group>"; };
+		223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemObserver.m; sourceTree = "<group>"; };
+		223A8959233F4B3B008FFE1A /* TOFileSystemItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemItem.h; sourceTree = "<group>"; };
+		223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemItem.m; sourceTree = "<group>"; };
 		93017B7D5ADFD2D3681F12E4 /* Pods-TOFileSystemObserverExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TOFileSystemObserverExample.debug.xcconfig"; path = "Target Support Files/Pods-TOFileSystemObserverExample/Pods-TOFileSystemObserverExample.debug.xcconfig"; sourceTree = "<group>"; };
 		E4F449698A6C2F152710D4B6 /* Pods-TOFileSystemObserverExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TOFileSystemObserverExample.release.xcconfig"; path = "Target Support Files/Pods-TOFileSystemObserverExample/Pods-TOFileSystemObserverExample.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -45,6 +51,7 @@
 		223A892F233F13C9008FFE1A = {
 			isa = PBXGroup;
 			children = (
+				223A8954233F4A99008FFE1A /* TOFileSystemObserver */,
 				223A893A233F13CA008FFE1A /* TOFileSystemObserverExample */,
 				223A8939233F13CA008FFE1A /* Products */,
 				83E6F6A1977EF05EE5BA87E3 /* Pods */,
@@ -75,6 +82,25 @@
 			path = TOFileSystemObserverExample;
 			sourceTree = "<group>";
 		};
+		223A8954233F4A99008FFE1A /* TOFileSystemObserver */ = {
+			isa = PBXGroup;
+			children = (
+				223A8955233F4AB0008FFE1A /* TOFileSystemObserver.h */,
+				223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */,
+				223A8958233F4AB5008FFE1A /* Entities */,
+			);
+			path = TOFileSystemObserver;
+			sourceTree = "<group>";
+		};
+		223A8958233F4AB5008FFE1A /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+				223A8959233F4B3B008FFE1A /* TOFileSystemItem.h */,
+				223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */,
+			);
+			path = Entities;
+			sourceTree = "<group>";
+		};
 		4F8DA90D4D2EFBA090963DD9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -89,7 +115,6 @@
 				93017B7D5ADFD2D3681F12E4 /* Pods-TOFileSystemObserverExample.debug.xcconfig */,
 				E4F449698A6C2F152710D4B6 /* Pods-TOFileSystemObserverExample.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -188,7 +213,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				223A895B233F4B3B008FFE1A /* TOFileSystemItem.m in Sources */,
 				223A8943233F13CA008FFE1A /* TOViewController.m in Sources */,
+				223A8957233F4AB0008FFE1A /* TOFileSystemObserver.m in Sources */,
 				223A893D233F13CA008FFE1A /* TOAppDelegate.m in Sources */,
 				223A894E233F13CA008FFE1A /* main.m in Sources */,
 			);
