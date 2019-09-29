@@ -28,14 +28,14 @@ NS_ASSUME_NONNULL_BEGIN
  The absolute file path to the directory that will be observed.
  It may only be set while the observer isn't running. (Default is the Documents directory).
  */
-@property (nonatomic, strong) NSURL *directoryURL;
+@property (nonatomic, strong) NSURL *targetDirectoryURL;
 
 /**
  Optionally, a list of relative file paths from `directoryURL` to directories that
  will not be monitored. By default, this includes the 'Inbox' directory in the
  Documents directory.
  */
-@property (nonatomic, strong, nullable) NSArray<NSURL *> *excludedItems;
+@property (nonatomic, strong, nullable) NSArray<NSString *> *excludedItems;
 
 /**
  Optionally, the number of directoy levels down that the observer will recursively traverse from the base target.
@@ -53,8 +53,23 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The file route to the directory holding the snapshots database file on disk.
  It may only be changed when the observer isn't running.
- The default value is the application `Caches` directory. */
+ The default value is the application `Caches` directory.
+ */
 @property (nonatomic, copy) NSURL *databaseDirectoryURL;
+
+/**
+ The item that represents the target directory
+ that was set to this file observer.
+ (The default is the Documents directory)
+ */
+@property (nonatomic, readonly) TOFileSystemItem *targetDirectoryItem;
+
+/**
+ At any given time, the fully up-to-date list of items
+ that has been captured by the file system observer,
+ starting from within the top-level directory.
+ */
+@property (nonatomic, readonly, nullable) RLMArray<TOFileSystemItem *> *items;
 
 /** A singleton instance that can be accessed globally. */
 + (instancetype)sharedObserver;
