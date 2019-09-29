@@ -28,6 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** The default database file name. */
 + (NSString *)defaultDatabaseFileName;
 
+/** Takes an absolute URL, and strips off the sandbox portion, making it relative. */
++ (NSString *)relativePathWithPath:(NSURL *)fileURL;
+
 @end
 
 NS_ASSUME_NONNULL_END

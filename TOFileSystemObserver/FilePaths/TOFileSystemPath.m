@@ -33,4 +33,25 @@
     return [NSString stringWithFormat:@"%@.fileSystemSnapshots.realm", bundleIdentifier];
 }
 
++ (NSString *)relativePathWithPath:(NSURL *)fileURL
+{
+    NSString *sandboxPath = [TOFileSystemPath applicationSandboxURL].path;
+    NSString *path = fileURL.path;
+
+    // Replace the sandbox portion with an empty string.
+    path = [path stringByReplacingOccurrencesOfString:sandboxPath withString:@""];
+
+    // Remove leading slashes
+    if ([[path substringToIndex:1] isEqualToString:@"/"]) {
+        path = [path substringFromIndex:1];
+    }
+
+    // Remove trailing slashes
+    if ([[path substringFromIndex:path.length - 1] isEqualToString:@"/"]) {
+        path = [path substringToIndex:path.length - 2];
+    }
+
+    return path;
+}
+
 @end
