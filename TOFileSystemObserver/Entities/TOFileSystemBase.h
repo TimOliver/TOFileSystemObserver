@@ -20,11 +20,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface TOFileSystemBase : RLMObject
 
-/** From the top of the app sandbox, the path to the directory containing our target. */
+/** From the top of the app sandbox, the path to the directory we are targeting. */
 @property (nonatomic, copy) NSString *filePath;
 
-/** The graph of all observed objects, starting with the target directory. */
-@property (nonatomic, strong) RLMArray<TOFileSystemItem *><TOFileSystemItem> *items;
+/** The subsequent item representing the directory we are targeting. */
+@property (nonatomic, strong) TOFileSystemItem *item;
+
+/** If an object already exists in realm, it returns the existing object, else it creates a new one */
++ (instancetype)baseObjectInRealm:(RLMRealm *)realm forItemAtFileURL:(NSURL *)fileURL;
 
 @end
 
