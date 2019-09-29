@@ -36,13 +36,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) TOFileSystemItemType type;
 
 /** The unique ID number assigned to this item by the file system. */
-@property (nonatomic, assign) NSInteger identifier;
+@property (nonatomic, copy) NSString *uuid;
 
 /** The name on disk of the item. */
 @property (nonatomic, copy) NSString *name;
 
 /** The size (in bytes) of this item. (0 for directories). */
-@property (nonatomic, assign) NSUInteger size;
+@property (nonatomic, assign) long long size;
 
 /** The creation date of the item. */
 @property (nonatomic, strong) NSDate *creationDate;
@@ -61,6 +61,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** Where applicable, the base object at the very top level */
 @property (readonly, nullable) TOFileSystemBase *directoryBase;
+
+/** Create a new instance to represent the file at the given URL. */
+- (instancetype)initWithItemAtFileURL:(NSURL *)fileURL;
+
+/** Refresh the properties of the item against the file at the given URL. */
+- (void)updateWithItemAtFileURL:(NSURL *)fileURL;
 
 @end
 
