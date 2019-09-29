@@ -7,8 +7,11 @@
 //
 
 #import "TOViewController.h"
+#import "TOFileSystemObserver.h"
 
 @interface TOViewController ()
+
+@property (nonatomic, strong) TOFileSystemObserver *observer;
 
 @end
 
