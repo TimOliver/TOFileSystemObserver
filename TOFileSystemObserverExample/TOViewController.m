@@ -22,6 +22,9 @@
     
     self.title = @"TOFileSystemObserver";
 
+    self.observer = [[TOFileSystemObserver alloc] init];
+    [self.observer start];
+
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
