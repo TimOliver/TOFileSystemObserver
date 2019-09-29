@@ -68,6 +68,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** Suspends the file system observer from monitoring any file system changes. */
 - (void)stop;
 
+/** Deletes all of the data related to directory being monitored by this observer. */
+- (void)reset;
+
 /**
  Registers a new notification block that will be triggered each time an update is detected.
  It is your responsibility to strongly retain the token object, and release it only
@@ -95,8 +98,35 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)removeTarget:(id)target;
 
-/** Deletes all of the data related to directory being monitored by this observer. */
-- (void)reset;
+/**
+ When the app itself is performing an operation to add a new item, this method
+ can be used to disable the observer briefly while adding these items to
+ avoid triggering a full scan in the process.
+
+ @param itemURLs A list of all of the paths to the files that will be added.
+ @param addAction Perfom the actual file add operations in this block. Scanning will be disabled for its duration.
+ */
+- (void)addItemsWithURLs:(NSArray<NSURL *> *)itemURLs addAction:(void (^)(void))addAction;
+
+/**
+When the app itself is performing an operation to more or rename an existing item, this method
+can be used to disable the observer briefly while modifying these items to
+avoid triggering a full scan in the process.
+
+@param itemURLs A dictionary where the key is the old location, and the value is the new location of each item
+@param moveAction Perfom the actual file move operations in this block. Scanning will be disabled for its duration.
+*/
+- (void)moveItemsWithURLs:(NSDictionary<NSURL *, NSURL *> *)itemURLs moveAction:(void (^)(void))moveAction;
+
+/**
+When the app itself is performing an operation to delete items, this method
+can be used to disable the observer briefly while the deletion is in progress to
+avoid triggering a full scan.
+
+@param itemURLs A list of all of the paths to the files that will be added.
+@param deleteAction Perfom the actual file move operations in this block. Scanning will be disabled for its duration.
+*/
+- (void)deleteItemsWithURLs:(NSArray<NSURL *> *)itemURLs moveAction:(void (^)(void))deleteAction;
 
 @end
 
