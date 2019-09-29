@@ -61,6 +61,10 @@ NS_ASSUME_NONNULL_BEGIN
  The item that represents the target directory
  that was set to this file observer.
  (The default is the Documents directory)
+
+ (This item will be refetched from the database each time it is called,
+ so it is completely thread-safe. Like all Realm items, please ensure it
+ is kept in an auto-release pool in dispatch queues.)
  */
 @property (nonatomic, readonly) TOFileSystemItem *targetDirectoryItem;
 
@@ -68,6 +72,10 @@ NS_ASSUME_NONNULL_BEGIN
  At any given time, the fully up-to-date list of items
  that has been captured by the file system observer,
  starting from within the top-level directory.
+
+ (This item will be refetched from the database each time it is called,
+ so it is completely thread-safe. Like all Realm items, please ensure it
+ is kept in an auto-release pool in dispatch queues.)
  */
 @property (nonatomic, readonly, nullable) RLMArray<TOFileSystemItem *> *items;
 
