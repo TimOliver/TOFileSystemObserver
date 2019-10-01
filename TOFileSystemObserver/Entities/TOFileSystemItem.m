@@ -7,7 +7,16 @@
 //
 
 #import "TOFileSystemItem.h"
+#import "TOFileSystemBase.h"
+#import "TOFileSystemPath.h"
 #import "NSURL+TOFileSystemUUID.h"
+
+@interface TOFileSystemItem ()
+
+@property (readonly) RLMLinkingObjects *parentItems;
+@property (readonly) RLMLinkingObjects *parentBases;
+
+@end
 
 @implementation TOFileSystemItem
 
@@ -29,8 +38,10 @@
     // Copy the name of the item
     self.name = [fileURL lastPathComponent];
 
-    // Get its on-disk ID
-    self.uuid = [fileURL to_fileSystemUUID];
+    // Get its on-disk ID (Only if we're not already persisted)
+    if (!self.realm) {
+        self.uuid = [fileURL to_fileSystemUUID];
+    }
 
     // Check if it is a file or directory
     NSNumber *isDirectory;
@@ -55,11 +66,61 @@
     self.modificationDate = modificationDate;
 }
 
+- (NSURL *)absoluteFileURL
+{
+    NSString *filePath = @"";
+
+    // Prepend each parent directory name
+    TOFileSystemItem *item = self;
+    while ((item = item.parentDirectory)) {
+        // Because the directory base points directly to our file in the sandbox,
+        // don't prepend the top level item, as it would then be prepended twice
+        if (item.directoryBase == nil) {
+            filePath = [NSString stringWithFormat:@"%@/%@", item.name, filePath];
+        }
+    }
+
+    // Determine the parent item with the base directory parent
+    item = self;
+    while (item.directoryBase == nil) {
+        item = item.parentDirectory;
+    }
+
+    // Prepend the rest of the directory
+    if (item.directoryBase.filePath.length > 0) {
+        filePath = [NSString stringWithFormat:@"%@/%@", item.directoryBase.filePath, filePath];
+    }
+
+    // Prepend the rest of the Sandbox
+    NSURL *url = [TOFileSystemPath applicationSandboxURL];
+    return [url URLByAppendingPathComponent:filePath];
+}
+
+- (TOFileSystemItem *)parentDirectory
+{
+    return self.parentItems.firstObject;
+}
+
+- (TOFileSystemBase *)directoryBase
+{
+    return self.parentBases.firstObject;
+}
+
 #pragma mark - Realm Properties -
+
++ (NSString *)primaryKey { return @"uuid"; }
 
 + (NSArray<NSString *> *)indexedProperties
 {
-    return @[@"uuid", @"name"];
+    return @[@"name"];
+}
+
++ (NSDictionary *)linkingObjectsProperties
+{
+    return @{
+        @"parentItems": [RLMPropertyDescriptor descriptorWithClass:TOFileSystemItem.class propertyName:@"childItems"],
+        @"parentBases": [RLMPropertyDescriptor descriptorWithClass:TOFileSystemBase.class propertyName:@"item"],
+    };
 }
 
 // Never automatically include this in the default Realm schema

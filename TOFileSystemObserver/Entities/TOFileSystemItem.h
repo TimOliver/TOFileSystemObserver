@@ -62,6 +62,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** Where applicable, the base object at the very top level */
 @property (readonly, nullable) TOFileSystemBase *directoryBase;
 
+/** Generates an absolute URL path to this item. */
+@property (nonatomic, readonly) NSURL *absoluteFileURL;
+
 /** Create a new instance to represent the file at the given URL. */
 - (instancetype)initWithItemAtFileURL:(NSURL *)fileURL;
 
