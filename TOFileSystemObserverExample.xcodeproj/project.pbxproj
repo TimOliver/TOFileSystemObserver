@@ -168,10 +168,10 @@
 		2254ED2B2340EF0F00331B47 /* Operation */ = {
 			isa = PBXGroup;
 			children = (
-				2254ED2C2340F04800331B47 /* TOFileSystemScanOperation.h */,
-				2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */,
 				2254ED332341019300331B47 /* TOFileSystemSetupOperation.h */,
 				2254ED342341019300331B47 /* TOFileSystemSetupOperation.m */,
+				2254ED2C2340F04800331B47 /* TOFileSystemScanOperation.h */,
+				2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */,
 			);
 			path = Operation;
 			sourceTree = "<group>";
