@@ -10,6 +10,7 @@
 
 #import "TOFileSystemPath.h"
 #import "TOFileSystemRealmConfiguration.h"
+#import "TOFileSystemScanOperation.h"
 
 @interface TOFileSystemObserver()
 
@@ -74,10 +75,11 @@
     self.realmConfiguration = [TOFileSystemRealmConfiguration
                                fileSystemConfigurationWithFileURL:databaseFileURL];
 
-    [self baseObject];
+    // Try creating the database for potentially the first time
+    if (self.realm == nil) { return NO; }
 
-    // Try creating the database for the first time
-    return (self.realm != nil);
+    // Then try creating the base object for our taget folder for the first time
+    return (self.baseObject != nil);
 }
 
 #pragma mark - Observer Lifecycle -
@@ -89,18 +91,25 @@
     // Set the running state
     self.isRunning = YES;
 
-    // Attempt to set up and configure the database
+    // Set up and configure our backing data store
     if (![self configureDatabase]) {
         [self stop];
         return;
     }
 
-    
-
-
+    // Perform the first full-length initial scan
+    [self performInitialScan];
 }
 
 #pragma mark - Scanning -
+
+- (void)performInitialScan
+{
+    TOFileSystemScanOperation *scanOperation = nil;
+    scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryItem:self.baseObject.item
+                                                          realmConfiguration:self.realmConfiguration];
+    [self.operationQueue addOperation:scanOperation];
+}
 
 - (void)installObserver
 {
