@@ -75,6 +75,9 @@
     self.realmConfiguration = [TOFileSystemRealmConfiguration
                                fileSystemConfigurationWithFileURL:databaseFileURL];
 
+    // Remove the database while we're developing
+    [[NSFileManager defaultManager] removeItemAtURL:self.realmConfiguration.fileURL error:nil];
+
     // Try creating the database for potentially the first time
     if (self.realm == nil) { return NO; }
 
