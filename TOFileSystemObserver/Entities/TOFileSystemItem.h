@@ -71,6 +71,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** Refresh the properties of the item against the file at the given URL. */
 - (void)updateWithItemAtFileURL:(NSURL *)fileURL;
 
+/** Compares the meta-data in the DB against the file on disk*/
+- (BOOL)hasChangesComparedToItemAtURL:(NSURL *)itemURL;
+
 @end
 
 NS_ASSUME_NONNULL_END

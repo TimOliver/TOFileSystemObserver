@@ -40,7 +40,9 @@
 
     // Get its on-disk ID (Only if we're not already persisted)
     if (!self.realm) {
-        self.uuid = [fileURL to_fileSystemUUID];
+        NSString *uuid = [fileURL to_fileSystemUUID];
+        if (!uuid) { uuid = [fileURL to_generateUUID]; }
+        self.uuid = uuid;
     }
 
     // Check if it is a file or directory
@@ -64,6 +66,40 @@
     NSDate *modificationDate;
     [fileURL getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:nil];
     self.modificationDate = modificationDate;
+}
+
+- (BOOL)hasChangesComparedToItemAtURL:(NSURL *)itemURL
+{
+    // File name
+    if (![self.name isEqualToString:itemURL.lastPathComponent]) { return YES; }
+
+    // On-disk UUID
+    if (![self.uuid isEqualToString:[itemURL to_fileSystemUUID]]) { return YES; }
+
+    // File type
+    NSNumber *isDirectory;
+    [itemURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
+    TOFileSystemItemType type = isDirectory.boolValue ? TOFileSystemItemTypeDirectory : TOFileSystemItemTypeFile;
+    if (self.type != type) { return YES; }
+
+    // File size
+    if (self.type == TOFileSystemItemTypeFile) {
+        NSNumber *fileSize;
+        [itemURL getResourceValue:&fileSize forKey:NSURLFileSizeKey error:nil];
+        if(self.size != fileSize.intValue) { return YES; }
+    }
+
+    // Creation date
+    NSDate *creationDate;
+    [itemURL getResourceValue:&creationDate forKey:NSURLCreationDateKey error:nil];
+    if (![self.creationDate isEqual:creationDate]) { return YES; }
+
+    // Get its modification date
+    NSDate *modificationDate;
+    [itemURL getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:nil];
+    if (![self.modificationDate isEqual:modificationDate]) { return YES; }
+
+    return NO;
 }
 
 - (NSURL *)absoluteFileURL
