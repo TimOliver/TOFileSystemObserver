@@ -18,8 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface TOFileSystemScanOperation : NSOperation
 
-/** From the target directory, how many levels down to scan (0 is all of them). */
-@property (nonatomic, assign) NSInteger directoryLevels;
+/** From the target directory, how many levels down to scan (-1 is all of them). */
+@property (nonatomic, assign) NSInteger subDirectoryLevelLimit;
 
 /** Create a new instance based off the item representing the directory where we want to start */
 - (instancetype)initWithDirectoryItem:(TOFileSystemItem *)directoryItem
