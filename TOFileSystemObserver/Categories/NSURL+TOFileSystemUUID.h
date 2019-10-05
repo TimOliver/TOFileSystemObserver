@@ -21,10 +21,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NSURL (TOFileSystemUUID)
 
 /** Returns the unique UUID value assigned to this file, or creates a new one otherwise. */
-- (NSString *)to_fileSystemUUID;
+- (nullable NSString *)to_fileSystemUUID;
 
 /** Regardless of whether one exists or not, generates a new UUID for this item. */
-- (NSString *)to_regenerateUUID;
+- (NSString *)to_generateUUID;
 
 @end
 

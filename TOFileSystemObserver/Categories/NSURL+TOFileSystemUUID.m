@@ -31,10 +31,10 @@ static NSString * const kTOFileSystemAttributeKey = @"dev.tim.fileSystemObserver
         return uuid;
     }
 
-    return [self to_regenerateUUID];
+    return nil;
 }
 
-- (NSString *)to_regenerateUUID
+- (NSString *)to_generateUUID
 {
     const char *filePath = [self.path fileSystemRepresentation];
     const char *keyName = kTOFileSystemAttributeKey.UTF8String;
