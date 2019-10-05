@@ -23,6 +23,9 @@
 /** The dispatch sources in charge of all directories we are observing. */
 @property (nonatomic, strong) NSDictionary<NSString *, dispatch_source_t> *dispatchSources;
 
+/** A barrier queue to ensure thread-safe access to the sources dictionary */
+@property (nonatomic, copy) dispatch_queue_t sourcesBarrierQueue;
+
 /** The operation queue we will perform our scanning on. */
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
 
@@ -120,7 +123,12 @@
     [self.operationQueue addOperation:scanOperation];
 }
 
-- (void)installObserver
+- (void)installDispatchSourceForDirectoryAtURL:(NSURL *)url
+{
+
+}
+
+- (void)removeDispatchSourceForDirectoryAtURL:(NSURL *)url
 {
 
 }
