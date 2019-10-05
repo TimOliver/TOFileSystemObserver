@@ -20,6 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface TOFileSystemBase : RLMObject
 
+/** A unique identifier we can use to ensure this object is unique */
+@property (nonatomic, strong) NSString *uuid;
+
 /** From the top of the app sandbox, the path to the directory we are targeting. */
 @property (nonatomic, copy) NSString *filePath;
 

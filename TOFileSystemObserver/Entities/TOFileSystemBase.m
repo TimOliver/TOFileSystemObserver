@@ -39,9 +39,16 @@
 
 #pragma mark - Realm Properties -
 
++ (NSString *)primaryKey { return @"uuid"; }
+
 + (NSArray<NSString *> *)indexedProperties
 {
     return @[@"filePath"];
+}
+
++ (NSDictionary *)defaultPropertyValues
+{
+    return @{@"uuid" : [NSUUID UUID].UUIDString };
 }
 
 // Never automatically include this in the default Realm schema
