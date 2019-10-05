@@ -21,7 +21,7 @@
 @property (nonatomic, assign) BOOL skipEvents;
 
 /** The dispatch sources in charge of all directories we are observing. */
-@property (nonatomic, strong) NSDictionary<NSNumber *, dispatch_source_t> *dispatchSources;
+@property (nonatomic, strong) NSDictionary<NSString *, dispatch_source_t> *dispatchSources;
 
 /** The operation queue we will perform our scanning on. */
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
@@ -58,6 +58,7 @@
     _targetDirectoryURL = [TOFileSystemPath documentsDirectoryURL];
     _databaseFileName = [TOFileSystemPath defaultDatabaseFileName];
     _databaseDirectoryURL = [TOFileSystemPath cachesDirectoryURL];
+    _dispatchSources = [NSDictionary dictionary];
 
     // Set-up the operation queue
     _operationQueue = [[NSOperationQueue alloc] init];
@@ -102,6 +103,11 @@
 
     // Perform the first full-length initial scan
     [self performInitialScan];
+}
+
+- (void)stop
+{
+    
 }
 
 #pragma mark - Scanning -
