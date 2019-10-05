@@ -33,8 +33,8 @@
 /** The file system item representing the base directory. */
 @property (nonatomic, readonly) TOFileSystemItem *item;
 
-/** Lazily makes a URL enumerator at the base URL */
-@property (nonatomic, strong) NSDirectoryEnumerator<NSURL *> *urlEnumerator;
+/** When iterating through all the files, this array stores pending directories that need scanning*/
+@property (nonatomic, strong) NSMutableArray *pendingDirectories;
 
 @end
 
@@ -51,6 +51,7 @@
         _directoryURL = directoryItem.absoluteFileURL;
         _subDirectoryLevelLimit = -1;
         _fileManager = [[NSFileManager alloc] init];
+        _pendingDirectories = [NSMutableArray array];
     }
 
     return self;
@@ -60,75 +61,85 @@
 
 - (void)main
 {
-    // Start scanning every item we've discovered
-    for (NSURL *url in self.urlEnumerator) {
-        [self scanItemAtURL:url];
+    NSMutableArray *pendingDirectories = self.pendingDirectories;
+
+    // Start scanning every item in our base directory
+    NSDirectoryEnumerator *enumerator = [self urlEnumeratorForURL:self.directoryURL];
+    for (NSURL *url in enumerator) {
+        [self scanItemAtURL:url pendingDirectories:pendingDirectories];
+    }
+
+    // If there were any directories in the base, start a flat loop to scan
+    // all subdirectories too (Avoiding potential stack overflows!)
+    while (pendingDirectories.count > 0) {
+        // Extract the item, and then remove it from the pending list
+        NSURL *url = pendingDirectories.firstObject;
+        [pendingDirectories removeObjectAtIndex:0];
+
+        // Create a new enumerator for it
+        enumerator = [self urlEnumeratorForURL:url];
+        for (NSURL *url in enumerator) {
+            [self scanItemAtURL:url pendingDirectories:pendingDirectories];
+        }
     }
 }
 
-- (void)scanItemAtURL:(NSURL *)url
+- (void)scanItemAtURL:(NSURL *)url pendingDirectories:(NSMutableArray *)pendingDirectories
 {
-    [self parentDirectoryItemForItemAtURL:url];
+    // Obtain a thread safe reference to Realm
+    RLMRealm *realm = self.realm;
 
     // Check if we've already assigned an on-disk UUID
     NSString *uuid = [url to_fileSystemUUID];
+    TOFileSystemItem *item = [TOFileSystemItem objectInRealm:realm forPrimaryKey:uuid];
 
-    // If UUID is nil, it must be a new file
-    if (uuid == nil) {
-        // Create a new on-disk ID for it
-        [url to_generateUUID];
-
+    // If UUID is nil, or if it's not already in the DB, insert it
+    if (uuid == nil || item == nil) {
         // Add the item to the database
-        [self addNewItemAtURL:url];
+        item = [self addNewItemAtURL:url];
+    }
+    else {
+
+    }
+
+    // If the item is a directory, add it to pending so we know to scan it as well
+    if (item.type == TOFileSystemItemTypeDirectory) {
+        [pendingDirectories addObject:url];
     }
 }
 
-- (TOFileSystemItem *)parentDirectoryItemForItemAtURL:(NSURL *)url
+- (TOFileSystemItem *)itemForParentOfItemAtURL:(NSURL *)url
 {
-    NSURL *topDirectory = self.directoryURL;
+    NSString *uuid = [url.URLByDeletingLastPathComponent to_fileSystemUUID];
+    NSAssert(uuid.length > 0, @"The parent item should always exist before children");
 
-    // Build an array of all of the folders between our item, and the top
-    NSMutableArray *directories = [NSMutableArray array];
+    TOFileSystemItem *item = [TOFileSystemItem objectInRealm:self.realm forPrimaryKey:uuid];
+    NSAssert(item != nil, @"Parent should already exist at this point");
 
-    NSURL *parentItem = url;
-    while (1) {
-        // Loop up the file path until we reach the base directory where we started
-        parentItem = parentItem.URLByDeletingLastPathComponent;
-
-        // If we somehow miss the directory and continue up to the root of the device,
-        // detect when we go over and just terminate
-        if ([parentItem.lastPathComponent isEqualToString:@".."]) { break; }
-
-        // If we reach the base directory from where we started, terminate
-        if ([[parentItem to_fileSystemUUID] isEqualToString:self.directoryUUID]) {
-            break;
-        }
-
-        // Save the directory name
-        [directories insertObject:parentItem.lastPathComponent atIndex:0];
-    }
-
-    // Build
-
-    return nil;
+    return item;
 }
 
-- (void)addNewItemAtURL:(NSURL *)newItemURL
+- (TOFileSystemItem *)addNewItemAtURL:(NSURL *)newItemURL
 {
-    // Create a new object for this item
+    // Get a reference to the parent directory
+    TOFileSystemItem *parentItem = [self itemForParentOfItemAtURL:newItemURL];
+
+    // Create a new object for this item (and assign its parent)
     TOFileSystemItem *item = [[TOFileSystemItem alloc] initWithItemAtFileURL:newItemURL];
+
+    // Add the item to Realm, and assign it as a child to the parent
     [self.realm transactionWithBlock:^{
         [self.realm addOrUpdateObject:item];
+        [parentItem.childItems addObject:item];
     }];
 
+    return item;
 }
 
 #pragma mark - File System Handling -
 
 - (NSDirectoryEnumerator<NSURL *> *)urlEnumeratorForURL:(NSURL *)url
 {
-    if (_urlEnumerator) { return _urlEnumerator; }
-
     // Set the keys for the properties we wish to capture
     NSArray *keys = @[NSURLIsDirectoryKey,
                       NSURLFileSizeKey,
@@ -139,11 +150,12 @@
     NSDirectoryEnumerationOptions options = NSDirectoryEnumerationSkipsHiddenFiles |
                                             NSDirectoryEnumerationSkipsSubdirectoryDescendants;
 
-    _urlEnumerator = [self.fileManager enumeratorAtURL:url
-                            includingPropertiesForKeys:keys
-                                               options:options
-                                          errorHandler:nil];
-    return _urlEnumerator;
+    // Create the enumerator
+    NSDirectoryEnumerator<NSURL *> *urlEnumerator = [self.fileManager enumeratorAtURL:url
+                                                           includingPropertiesForKeys:keys
+                                                                              options:options
+                                                                         errorHandler:nil];
+    return urlEnumerator;
 }
 
 #pragma mark - Convenience Accessors -
