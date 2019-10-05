@@ -51,7 +51,7 @@
     // Get its file size
     if (self.type == TOFileSystemItemTypeFile) {
         NSNumber *fileSize;
-        [fileURL getResourceValue:&fileURL forKey:NSURLFileSizeKey error:nil];
+        [fileURL getResourceValue:&fileSize forKey:NSURLFileSizeKey error:nil];
         self.size = fileSize.intValue;
     }
 
