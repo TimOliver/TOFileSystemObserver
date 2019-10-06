@@ -138,13 +138,13 @@
 				223A8955233F4AB0008FFE1A /* TOFileSystemObserver.h */,
 				223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */,
 				2254ED392341060000331B47 /* Categories */,
-				227533A82349035C0019DB91 /* Collections */,
 				2232B651233FAFC000358B05 /* Changes */,
+				227533A82349035C0019DB91 /* Collections */,
 				2254ED2F2340F27300331B47 /* Database */,
 				223A8958233F4AB5008FFE1A /* Entities */,
 				2254ED27234055BB00331B47 /* FilePaths */,
-				2254ED2B2340EF0F00331B47 /* Operations */,
 				2232B649233F6BF900358B05 /* Notifications */,
+				2254ED2B2340EF0F00331B47 /* Operations */,
 			);
 			path = TOFileSystemObserver;
 			sourceTree = "<group>";
