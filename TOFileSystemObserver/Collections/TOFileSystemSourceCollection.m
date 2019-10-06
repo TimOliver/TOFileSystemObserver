@@ -77,11 +77,11 @@
 
 #pragma mark - Internal -
 
-- (void)didObserverChangeAtURL:(NSURL *)url forUUID:(NSString *)uuid
+- (void)didObserverChangeForItemWithUUID:(NSString *)uuid
 {
     // Trigger the block
     if (self.itemChangedHandler) {
-        self.itemChangedHandler(uuid, url);
+        self.itemChangedHandler(uuid);
     }
 }
 
@@ -92,7 +92,7 @@
     if (fd == -1) { return nil; }
 
     // Get the lowest priority queue to work on
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+    dispatch_queue_t queue = dispatch_get_main_queue(); //dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
     dispatch_source_t dispatchSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE,
                                                               fd,
                                                               DISPATCH_VNODE_WRITE,
@@ -102,7 +102,7 @@
     // Set the event handler
     __weak typeof(self) weakSelf = self;
     dispatch_source_set_event_handler(dispatchSource, ^{
-        [weakSelf didObserverChangeAtURL:url forUUID:uuid];
+        [weakSelf didObserverChangeForItemWithUUID:uuid];
     });
 
     // Set a cancel handler

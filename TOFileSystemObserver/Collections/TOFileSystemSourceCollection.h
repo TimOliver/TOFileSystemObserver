@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
  A handler called whenever it is detected the
  contents of the particular item had changed.
 */
-@property (nonatomic, copy) void (^itemChangedHandler)(NSString *uuid, NSURL *url);
+@property (nonatomic, copy) void (^itemChangedHandler)(NSString *uuid);
 
 /**
  Create a new dispatch source off the directory
