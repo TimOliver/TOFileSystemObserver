@@ -54,9 +54,7 @@
 
     // Get its on-disk ID (Only if we're not already persisted)
     if (!self.realm) {
-        NSString *uuid = [fileURL to_fileSystemUUID];
-        if (!uuid) { uuid = [fileURL to_generateUUID]; }
-        self.uuid = uuid;
+        [fileURL to_setFileSystemUUID:self.uuid];
     }
 
     // Check if it is a file or directory
@@ -163,6 +161,11 @@
 + (NSArray<NSString *> *)indexedProperties
 {
     return @[@"name"];
+}
+
++ (NSDictionary *)defaultPropertyValues
+{
+    return @{@"uuid": [NSUUID UUID].UUIDString};
 }
 
 + (NSDictionary *)linkingObjectsProperties
