@@ -89,12 +89,21 @@
         [self scanItemAtURL:url pendingDirectories:pendingDirectories];
     }
 
+    // If we were only scanning the immediate contents of the base directory, exit here
+    if (self.subDirectoryLevelLimit == 0) { return; }
+
     // If there were any directories in the base, start a flat loop to scan
     // all subdirectories too (Avoiding potential stack overflows!)
     while (pendingDirectories.count > 0) {
         // Extract the item, and then remove it from the pending list
         NSURL *url = pendingDirectories.firstObject;
         [pendingDirectories removeObjectAtIndex:0];
+
+        // Exit out if we've gone deeper than the specified limit
+        if (self.subDirectoryLevelLimit > 0) {
+            NSInteger levels = [self numberOfDirectoryLevelsToURL:url];
+            if (levels > self.subDirectoryLevelLimit) { continue; }
+        }
 
         // Create a new enumerator for it
         enumerator = [self urlEnumeratorForURL:url];
@@ -119,7 +128,7 @@
         item = [self addNewItemAtURL:url];
     }
     else {
-
+        
     }
 
     // If the item is a directory
@@ -141,6 +150,39 @@
     NSAssert(item != nil, @"Parent should already exist at this point");
 
     return item;
+}
+
+- (NSInteger)numberOfDirectoryLevelsToURL:(NSURL *)url
+{
+    RLMRealm *realm = self.realm;
+    NSInteger levels = 0;
+    NSString *uuid = [url to_fileSystemUUID];
+
+    // Loop through from the base URL up until we hit the base directory
+    while (1) {
+        // If we've reached the base directory, break out now
+        if ([uuid isEqualToString:self.directoryUUID]) { break; }
+
+        // Go up one level above the current directory
+        url = url.URLByDeletingLastPathComponent;
+
+        // If we accidentally somehow go too far, this will stop infinite loops
+        if ([url.lastPathComponent isEqualToString:@".."]) { break; }
+
+        // Try to see if this directory is in the database already
+        TOFileSystemItem *item = [TOFileSystemItem objectInRealm:realm forPrimaryKey:uuid];
+        if (item) {
+            uuid = item.parentDirectory.uuid;
+        }
+        else {
+            // Else we have to hit the file system again
+            uuid = [url to_fileSystemUUID];
+        }
+
+        levels++;
+    }
+
+    return MAX(levels, -1);
 }
 
 - (TOFileSystemItem *)addNewItemAtURL:(NSURL *)newItemURL
