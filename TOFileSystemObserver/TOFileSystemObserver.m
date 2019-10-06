@@ -25,6 +25,7 @@
 #import "TOFileSystemPath.h"
 #import "TOFileSystemRealmConfiguration.h"
 #import "TOFileSystemScanOperation.h"
+#import "TOFileSystemSourceCollection.h"
 
 @interface TOFileSystemObserver()
 
@@ -35,7 +36,7 @@
 @property (nonatomic, assign) BOOL skipEvents;
 
 /** The dispatch sources in charge of all directories we are observing. */
-@property (nonatomic, strong) NSDictionary<NSString *, dispatch_source_t> *dispatchSources;
+@property (nonatomic, strong) TOFileSystemSourceCollection *sourcesCollection;
 
 /** A barrier queue to ensure thread-safe access to the sources dictionary */
 @property (nonatomic, copy) dispatch_queue_t sourcesBarrierQueue;
@@ -75,7 +76,7 @@
     _targetDirectoryURL = [TOFileSystemPath documentsDirectoryURL];
     _databaseFileName = [TOFileSystemPath defaultDatabaseFileName];
     _databaseDirectoryURL = [TOFileSystemPath cachesDirectoryURL];
-    _dispatchSources = [NSDictionary dictionary];
+    _sourcesCollection = [[TOFileSystemSourceCollection alloc] init];
 
     // Set-up the operation queue
     _operationQueue = [[NSOperationQueue alloc] init];
@@ -146,33 +147,6 @@
 {
 
 }
-
-//- (void)installDispatchSourceForDirectoryAtURL
-//{
-//    NSURL *filePath = [self.targetDirectoryURL URLByAppendingPathComponent:@"Test"];
-//
-//    // Get our target directory handle
-//    int fd = open(filePath.path.UTF8String, O_EVTONLY);
-//    if (fd == -1) { return; }
-//
-//    // Get the lowest priority queue to work on
-//    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
-//    dispatch_source_t dispatchSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, fd, DISPATCH_VNODE_WRITE|DISPATCH_VNODE_EXTEND|DISPATCH_VNODE_RENAME|DISPATCH_VNODE_FUNLOCK, queue);
-//    if (self.dispatchSource == NULL) { return; }
-//
-//    // Set the event handler
-//    dispatch_source_set_event_handler(self.dispatchSource, ^{
-//        NSLog(@"Change detected!");
-//    });
-//
-//    // Set a cancel handler
-//    dispatch_source_set_cancel_handler(self.dispatchSource, ^{
-//        close(fd);
-//    });
-//
-//    // Start observing
-//    dispatch_resume(self.dispatchSource);
-//}
 
 #pragma mark - Convenience Accessors -
 
