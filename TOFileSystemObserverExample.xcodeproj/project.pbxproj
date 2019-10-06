@@ -21,7 +21,6 @@
 		2254ED2A2340588F00331B47 /* TOFileSystemPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED292340588F00331B47 /* TOFileSystemPath.m */; };
 		2254ED2E2340F04800331B47 /* TOFileSystemScanOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */; };
 		2254ED322340F29500331B47 /* TOFileSystemRealmConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED312340F29500331B47 /* TOFileSystemRealmConfiguration.m */; };
-		2254ED352341019300331B47 /* TOFileSystemSetupOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED342341019300331B47 /* TOFileSystemSetupOperation.m */; };
 		2254ED3C2341060000331B47 /* NSURL+TOFileSystemUUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */; };
 		227533AB2349038A0019DB91 /* TOFileSystemSourceCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 227533AA2349038A0019DB91 /* TOFileSystemSourceCollection.m */; };
 		87800716004A3B429A615773 /* libPods-TOFileSystemObserverExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D963DD85AA86DAC2EF78BAD /* libPods-TOFileSystemObserverExample.a */; };
@@ -56,8 +55,6 @@
 		2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemScanOperation.m; sourceTree = "<group>"; };
 		2254ED302340F29500331B47 /* TOFileSystemRealmConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemRealmConfiguration.h; sourceTree = "<group>"; };
 		2254ED312340F29500331B47 /* TOFileSystemRealmConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemRealmConfiguration.m; sourceTree = "<group>"; };
-		2254ED332341019300331B47 /* TOFileSystemSetupOperation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemSetupOperation.h; sourceTree = "<group>"; };
-		2254ED342341019300331B47 /* TOFileSystemSetupOperation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemSetupOperation.m; sourceTree = "<group>"; };
 		2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURL+TOFileSystemUUID.m"; sourceTree = "<group>"; };
 		2254ED3B2341060000331B47 /* NSURL+TOFileSystemUUID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURL+TOFileSystemUUID.h"; sourceTree = "<group>"; };
 		227533A92349038A0019DB91 /* TOFileSystemSourceCollection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemSourceCollection.h; sourceTree = "<group>"; };
@@ -172,8 +169,6 @@
 		2254ED2B2340EF0F00331B47 /* Operations */ = {
 			isa = PBXGroup;
 			children = (
-				2254ED332341019300331B47 /* TOFileSystemSetupOperation.h */,
-				2254ED342341019300331B47 /* TOFileSystemSetupOperation.m */,
 				2254ED2C2340F04800331B47 /* TOFileSystemScanOperation.h */,
 				2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */,
 			);
@@ -331,7 +326,6 @@
 				223A8957233F4AB0008FFE1A /* TOFileSystemObserver.m in Sources */,
 				2232B64F233FA19C00358B05 /* TOFileSystemChanges.m in Sources */,
 				223A893D233F13CA008FFE1A /* TOAppDelegate.m in Sources */,
-				2254ED352341019300331B47 /* TOFileSystemSetupOperation.m in Sources */,
 				2232B657233FB63000358B05 /* TOFileSystemBase.m in Sources */,
 				223A894E233F13CA008FFE1A /* main.m in Sources */,
 			);
