@@ -37,6 +37,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** Returns the unique UUID value assigned to this file, or creates a new one otherwise. */
 - (nullable NSString *)to_fileSystemUUID;
 
+/** Sets a predetermined UUID to be the value of the file. */
+- (void)to_setFileSystemUUID:(NSString *)uuid;
+
 /** Regardless of whether one exists or not, generates a new UUID for this item. */
 - (NSString *)to_generateUUID;
 

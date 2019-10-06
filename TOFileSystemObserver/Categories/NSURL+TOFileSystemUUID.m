@@ -48,18 +48,29 @@ static NSString * const kTOFileSystemAttributeKey = @"dev.tim.fileSystemObserver
     return nil;
 }
 
-- (NSString *)to_generateUUID
+- (void)to_setFileSystemUUID:(NSString *)uuid
 {
+    if (uuid.length > 0 && uuid.length != 36) {
+        @throw [NSException exceptionWithName:NSInternalInconsistencyException
+                                       reason:@"UUID must be 36 characters long!"
+                                     userInfo:nil];
+    }
+
+    // Determine the file path and destination key
     const char *filePath = [self.path fileSystemRepresentation];
     const char *keyName = kTOFileSystemAttributeKey.UTF8String;
 
-    // Generate a new UUID
-    NSString *uuid = [NSUUID UUID].UUIDString;
+    // Convert the string to a C byte string
     const char *uuidString = [uuid cStringUsingEncoding:NSUTF8StringEncoding];
 
     // Save it to this file
     setxattr(filePath, keyName, uuidString, strlen(uuidString), 0, 0);
+}
 
+- (NSString *)to_generateUUID
+{
+    NSString *uuid = [NSUUID UUID].UUIDString;
+    [self to_setFileSystemUUID:uuid];
     return uuid;
 }
 
