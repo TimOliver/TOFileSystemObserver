@@ -36,10 +36,11 @@ NS_ASSUME_NONNULL_BEGIN
 /** From the target directory, how many levels down to scan (-1 is all of them). */
 @property (nonatomic, assign) NSInteger subDirectoryLevelLimit;
 
-/** Create a new instance based off the item representing the directory where we want to start */
-- (instancetype)initWithDirectoryItem:(TOFileSystemItem *)directoryItem
-                   realmConfiguration:(RLMRealmConfiguration *)realmConfiguration
-                    sourcesCollection:(TOFileSystemSourceCollection *)sourcesCollection;
+/** Create a new instance based off the directory where we want to start */
+- (instancetype)initWithDirectoryAtURL:(NSURL *)directoryURL
+                                  uuid:(NSString *)uuid
+                    realmConfiguration:(RLMRealmConfiguration *)realmConfiguration
+                     sourcesCollection:(TOFileSystemSourceCollection *)sourcesCollection;
 
 @end
 

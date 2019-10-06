@@ -60,14 +60,15 @@
 
 #pragma - Class Lifecycle -
 
-- (instancetype)initWithDirectoryItem:(TOFileSystemItem *)directoryItem
-                   realmConfiguration:(RLMRealmConfiguration *)realmConfiguration
-                    sourcesCollection:(TOFileSystemSourceCollection *)sourcesCollection
+- (instancetype)initWithDirectoryAtURL:(NSURL *)directoryURL
+                                  uuid:(NSString *)uuid
+                    realmConfiguration:(RLMRealmConfiguration *)realmConfiguration
+                     sourcesCollection:(TOFileSystemSourceCollection *)sourcesCollection
 {
     if (self = [super init]) {
-        _directoryUUID = directoryItem.uuid;
+        _directoryUUID = uuid;
         _realmConfiguration = realmConfiguration;
-        _directoryURL = directoryItem.absoluteFileURL;
+        _directoryURL = directoryURL;
         _subDirectoryLevelLimit = -1;
         _fileManager = [[NSFileManager alloc] init];
         _pendingDirectories = [NSMutableArray array];
@@ -128,7 +129,9 @@
         item = [self addNewItemAtURL:url];
     }
     else {
-        
+        // If it has an entry in the database, check to see if it has changed at all
+        BOOL hasChanged = [item hasChangesComparedToItemAtURL:url];
+
     }
 
     // If the item is a directory
