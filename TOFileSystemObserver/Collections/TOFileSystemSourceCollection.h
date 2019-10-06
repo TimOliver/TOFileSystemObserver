@@ -54,6 +54,9 @@ NS_ASSUME_NONNULL_BEGIN
 */
 - (void)removeDirectoryWithUUID:(NSString *)uuid;
 
+/** Remove all Directories from observation. */
+- (void)removeAllDirectories;
+
 @end
 
 NS_ASSUME_NONNULL_END

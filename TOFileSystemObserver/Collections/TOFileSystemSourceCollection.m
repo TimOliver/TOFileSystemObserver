@@ -70,6 +70,11 @@
     [self removeDispatchSourceForUUID:uuid];
 }
 
+- (void)removeAllDirectories
+{
+    [self removeAllDispatchSources];
+}
+
 #pragma mark - Internal -
 
 - (void)didObserverChangeAtURL:(NSURL *)url forUUID:(NSString *)uuid
@@ -90,10 +95,7 @@
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
     dispatch_source_t dispatchSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE,
                                                               fd,
-                                                              DISPATCH_VNODE_WRITE|
-                                                              DISPATCH_VNODE_EXTEND|
-                                                              DISPATCH_VNODE_RENAME|
-                                                              DISPATCH_VNODE_FUNLOCK,
+                                                              DISPATCH_VNODE_WRITE,
                                                               queue);
     if (dispatchSource == NULL) { return nil; }
 
