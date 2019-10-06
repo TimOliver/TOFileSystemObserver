@@ -104,6 +104,14 @@
     return (self.baseObject != nil);
 }
 
+- (void)beginObserveBaseDirectory
+{
+    // Attach the root directory to the observer
+    NSString *uuid = self.baseObject.item.uuid;
+    NSURL *url = self.targetDirectoryURL;
+    [self.sourcesCollection addDirectoryAtURL:url uuid:uuid];
+}
+
 #pragma mark - Observer Lifecycle -
 
 - (void)start
@@ -118,6 +126,9 @@
         [self stop];
         return;
     }
+
+    // Set up observer for the top level directory
+    [self beginObserveBaseDirectory];
 
     // Perform the first full-length initial scan
     [self performInitialScan];
@@ -134,7 +145,8 @@
 {
     TOFileSystemScanOperation *scanOperation = nil;
     scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryItem:self.baseObject.item
-                                                          realmConfiguration:self.realmConfiguration];
+                                                          realmConfiguration:self.realmConfiguration
+                                                           sourcesCollection:self.sourcesCollection];
     [self.operationQueue addOperation:scanOperation];
 }
 
