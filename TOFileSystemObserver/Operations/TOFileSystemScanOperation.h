@@ -24,6 +24,7 @@
 
 @class TOFileSystemItem;
 @class RLMRealmConfiguration;
+@class TOFileSystemSourceCollection;
 
 NS_ASSUME_NONNULL_BEGIN
 /**
@@ -37,7 +38,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** Create a new instance based off the item representing the directory where we want to start */
 - (instancetype)initWithDirectoryItem:(TOFileSystemItem *)directoryItem
-                   realmConfiguration:(RLMRealmConfiguration *)realmConfiguration;
+                   realmConfiguration:(RLMRealmConfiguration *)realmConfiguration
+                    sourcesCollection:(TOFileSystemSourceCollection *)sourcesCollection;
 
 @end
 
