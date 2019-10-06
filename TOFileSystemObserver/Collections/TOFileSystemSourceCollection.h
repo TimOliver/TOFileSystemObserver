@@ -29,14 +29,14 @@ NS_ASSUME_NONNULL_BEGIN
  and stores references to all of the Dispatch
  Source objects used to track when the user
  makes a change in the file system
- */
+*/
 @interface TOFileSystemSourceCollection : NSObject
 
 /**
  A handler called whenever it is detected the
  contents of the particular item had changed.
- */
-@property (nonatomic, copy) void (^itemChangedHandler)(NSString *uuid);
+*/
+@property (nonatomic, copy) void (^itemChangedHandler)(NSString *uuid, NSURL *url);
 
 /**
  Create a new dispatch source off the directory
@@ -44,14 +44,14 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param url The file URL to the target directory
  @param uuid The UUID representing this item
- */
+*/
 - (void)addDirectoryAtURL:(NSURL *)url uuid:(NSString *)uuid;
 
 /**
- Remove a directory from this collection
+ Remove a directory from this collection.
 
  @param uuid The UUID of the item to remove
- */
+*/
 - (void)removeDirectoryWithUUID:(NSString *)uuid;
 
 @end
