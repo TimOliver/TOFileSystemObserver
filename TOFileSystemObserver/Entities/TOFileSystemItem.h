@@ -67,6 +67,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** Whether the item is still being copied into the app container. */
 @property (nonatomic, assign) BOOL isCopying;
 
+/** If the file is no longer on disk, this flag is used to confirm if it was moved or deleted. */
+@property (nonatomic, assign) BOOL isPendingDeletion;
+
 /** If a directory, the child items inside it. */
 @property (nonatomic, strong, nullable) RLMArray<TOFileSystemItem *><TOFileSystemItem> *childItems;
 
