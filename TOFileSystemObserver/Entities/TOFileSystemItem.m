@@ -52,7 +52,8 @@
     // Copy the name of the item
     self.name = [fileURL lastPathComponent];
 
-    // Get its on-disk ID (Only if we're not already persisted)
+    // Before we're persisted, ensure the on-disk file
+    // has the same UUID as this object
     if (!self.realm) {
         [fileURL to_setFileSystemUUID:self.uuid];
     }
