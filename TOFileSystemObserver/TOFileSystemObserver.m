@@ -107,8 +107,8 @@
 - (void)configureDispatchSourceEventHandler
 {
     __weak typeof(self) weakSelf = self;
-    id changedEventHandler = ^(NSString *uuid, NSURL *url) {
-        [weakSelf performScanForItemWithUUID:uuid url:url];
+    id changedEventHandler = ^(NSString *uuid) {
+        [weakSelf performFullSystemScan];
     };
     self.sourcesCollection.itemChangedHandler = changedEventHandler;
 }
@@ -143,7 +143,7 @@
     [self beginObservingBaseDirectory];
 
     // Perform the first full-length initial scan
-    [self performInitialScan];
+    [self performFullSystemScan];
 }
 
 - (void)stop
@@ -159,25 +159,19 @@
 
 #pragma mark - Scanning -
 
-- (void)performInitialScan
+- (void)performFullSystemScan
 {
+    // Cancel any in progress operations since we'll be starting again
+    [self.operationQueue cancelAllOperations];
+
+    // Create a new scan operation
     TOFileSystemScanOperation *scanOperation = nil;
     scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:self.baseObject.item.absoluteFileURL
                                                                          uuid:self.baseObject.item.uuid
                                                            realmConfiguration:self.realmConfiguration
                                                             sourcesCollection:self.sourcesCollection];
 
-    [self.operationQueue addOperation:scanOperation];
-}
-
-- (void)performScanForItemWithUUID:(NSString *)uuid url:(NSURL *)url
-{
-    TOFileSystemScanOperation *scanOperation = nil;
-    scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:url
-                                                                         uuid:uuid
-                                                           realmConfiguration:self.realmConfiguration
-                                                            sourcesCollection:self.sourcesCollection];
-    scanOperation.subDirectoryLevelLimit = 0;
+    // Begin asynchronous execution
     [self.operationQueue addOperation:scanOperation];
 }
 
