@@ -104,7 +104,16 @@
     return (self.baseObject != nil);
 }
 
-- (void)beginObserveBaseDirectory
+- (void)configureDispatchSourceEventHandler
+{
+    __weak typeof(self) weakSelf = self;
+    id changedEventHandler = ^(NSString *uuid, NSURL *url) {
+        [weakSelf performScanForItemWithUUID:uuid url:url];
+    };
+    self.sourcesCollection.itemChangedHandler = changedEventHandler;
+}
+
+- (void)beginObservingBaseDirectory
 {
     // Attach the root directory to the observer
     NSString *uuid = self.baseObject.item.uuid;
@@ -127,8 +136,11 @@
         return;
     }
 
+    // Configure the source observer to send change events to us
+    [self configureDispatchSourceEventHandler];
+
     // Set up observer for the top level directory
-    [self beginObserveBaseDirectory];
+    [self beginObservingBaseDirectory];
 
     // Perform the first full-length initial scan
     [self performInitialScan];
@@ -136,7 +148,13 @@
 
 - (void)stop
 {
-    
+    if (!self.isRunning) { return; }
+
+    // Set the running state to off
+    self.isRunning = NO;
+
+    // Remove all of the observers
+    [self.sourcesCollection removeAllDirectories];
 }
 
 #pragma mark - Scanning -
@@ -144,20 +162,23 @@
 - (void)performInitialScan
 {
     TOFileSystemScanOperation *scanOperation = nil;
-    scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryItem:self.baseObject.item
-                                                          realmConfiguration:self.realmConfiguration
-                                                           sourcesCollection:self.sourcesCollection];
+    scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:self.baseObject.item.absoluteFileURL
+                                                                         uuid:self.baseObject.item.uuid
+                                                           realmConfiguration:self.realmConfiguration
+                                                            sourcesCollection:self.sourcesCollection];
+
     [self.operationQueue addOperation:scanOperation];
 }
 
-- (void)installDispatchSourceForDirectoryAtURL:(NSURL *)url
+- (void)performScanForItemWithUUID:(NSString *)uuid url:(NSURL *)url
 {
-
-}
-
-- (void)removeDispatchSourceForDirectoryAtURL:(NSURL *)url
-{
-
+    TOFileSystemScanOperation *scanOperation = nil;
+    scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:url
+                                                                         uuid:uuid
+                                                           realmConfiguration:self.realmConfiguration
+                                                            sourcesCollection:self.sourcesCollection];
+    scanOperation.subDirectoryLevelLimit = 0;
+    [self.operationQueue addOperation:scanOperation];
 }
 
 #pragma mark - Convenience Accessors -
