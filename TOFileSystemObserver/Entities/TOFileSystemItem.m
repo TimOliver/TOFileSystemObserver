@@ -112,6 +112,10 @@
     [itemURL getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:nil];
     if (![self.modificationDate isEqual:modificationDate]) { return YES; }
 
+    // Parent directory
+    NSString *parentUUID = [itemURL.URLByDeletingLastPathComponent to_fileSystemUUID];
+    if (![parentUUID isEqualToString:self.parentDirectory.uuid]) { return YES; }
+
     return NO;
 }
 
