@@ -10,7 +10,45 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface TOFileSystemPresenter : NSObject
+/**
+ This file presenter object works in conjunction
+ with the system `NSFileCoordinator` object to receive
+ events whenever any of the sub-directories or files inside
+ the base directory change.
+ */
+@interface TOFileSystemPresenter : NSObject <NSFilePresenter>
+
+/** The presenter is actively listening for events. */
+@property (nonatomic, readonly) BOOL isRunning;
+
+/** The presenter is paused, so it will ignore any new events. */
+@property (nonatomic, readonly) BOOL isPaused;
+
+/**
+ Since multiple events can come through, a timer is used to
+ coalesce batchs of events and trigger an update periodically.
+ (Default is 100 miliseconds)
+*/
+@property (nonatomic, assign) NSTimeInterval timerInterval;
+
+/**
+ A block that will be called with all of the collected events.
+ It will be called on the same operation queue as managed by this class,
+ so the logic contained should be thread-safe.
+*/
+@property (nonatomic, copy) void (^itemsDidChangeHandler)(NSArray<NSURL *> *itemURLs);
+
+/** Create a new file presenter object for the target URL */
+- (instancetype)initWithDirectoryURL:(NSURL *)directoryURL;
+
+/** Start listening for file events in the target directory. */
+- (void)start;
+
+/** Pause listening, ignoring any events that happen in the meantime. */
+- (void)pause;
+
+/** Stop listening and cancel any pending timer events. */
+- (void)stop;
 
 @end
 
