@@ -22,7 +22,7 @@
 		2254ED2E2340F04800331B47 /* TOFileSystemScanOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */; };
 		2254ED322340F29500331B47 /* TOFileSystemRealmConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED312340F29500331B47 /* TOFileSystemRealmConfiguration.m */; };
 		2254ED3C2341060000331B47 /* NSURL+TOFileSystemUUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */; };
-		227533AB2349038A0019DB91 /* TOFileSystemSourceCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 227533AA2349038A0019DB91 /* TOFileSystemSourceCollection.m */; };
+		22D601C923657FA500275AD9 /* TOFileSystemPresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */; };
 		87800716004A3B429A615773 /* libPods-TOFileSystemObserverExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D963DD85AA86DAC2EF78BAD /* libPods-TOFileSystemObserverExample.a */; };
 /* End PBXBuildFile section */
 
@@ -57,8 +57,8 @@
 		2254ED312340F29500331B47 /* TOFileSystemRealmConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemRealmConfiguration.m; sourceTree = "<group>"; };
 		2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURL+TOFileSystemUUID.m"; sourceTree = "<group>"; };
 		2254ED3B2341060000331B47 /* NSURL+TOFileSystemUUID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURL+TOFileSystemUUID.h"; sourceTree = "<group>"; };
-		227533A92349038A0019DB91 /* TOFileSystemSourceCollection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemSourceCollection.h; sourceTree = "<group>"; };
-		227533AA2349038A0019DB91 /* TOFileSystemSourceCollection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemSourceCollection.m; sourceTree = "<group>"; };
+		22D601C723657FA500275AD9 /* TOFileSystemPresenter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemPresenter.h; sourceTree = "<group>"; };
+		22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemPresenter.m; sourceTree = "<group>"; };
 		93017B7D5ADFD2D3681F12E4 /* Pods-TOFileSystemObserverExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TOFileSystemObserverExample.debug.xcconfig"; path = "Target Support Files/Pods-TOFileSystemObserverExample/Pods-TOFileSystemObserverExample.debug.xcconfig"; sourceTree = "<group>"; };
 		E4F449698A6C2F152710D4B6 /* Pods-TOFileSystemObserverExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TOFileSystemObserverExample.release.xcconfig"; path = "Target Support Files/Pods-TOFileSystemObserverExample/Pods-TOFileSystemObserverExample.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -136,9 +136,9 @@
 				223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */,
 				2254ED392341060000331B47 /* Categories */,
 				2232B651233FAFC000358B05 /* Changes */,
-				227533A82349035C0019DB91 /* Collections */,
 				2254ED2F2340F27300331B47 /* Database */,
 				223A8958233F4AB5008FFE1A /* Entities */,
+				22D601C623657F5B00275AD9 /* FilePresenter */,
 				2254ED27234055BB00331B47 /* FilePaths */,
 				2232B649233F6BF900358B05 /* Notifications */,
 				2254ED2B2340EF0F00331B47 /* Operations */,
@@ -193,13 +193,13 @@
 			path = Categories;
 			sourceTree = "<group>";
 		};
-		227533A82349035C0019DB91 /* Collections */ = {
+		22D601C623657F5B00275AD9 /* FilePresenter */ = {
 			isa = PBXGroup;
 			children = (
-				227533A92349038A0019DB91 /* TOFileSystemSourceCollection.h */,
-				227533AA2349038A0019DB91 /* TOFileSystemSourceCollection.m */,
+				22D601C723657FA500275AD9 /* TOFileSystemPresenter.h */,
+				22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */,
 			);
-			path = Collections;
+			path = FilePresenter;
 			sourceTree = "<group>";
 		};
 		4F8DA90D4D2EFBA090963DD9 /* Frameworks */ = {
@@ -315,13 +315,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				2254ED2E2340F04800331B47 /* TOFileSystemScanOperation.m in Sources */,
-				227533AB2349038A0019DB91 /* TOFileSystemSourceCollection.m in Sources */,
 				2254ED2A2340588F00331B47 /* TOFileSystemPath.m in Sources */,
 				2254ED3C2341060000331B47 /* NSURL+TOFileSystemUUID.m in Sources */,
 				223A895B233F4B3B008FFE1A /* TOFileSystemItem.m in Sources */,
 				2232B64C233F6C1800358B05 /* TOFileSystemNotificationToken.m in Sources */,
 				2254ED322340F29500331B47 /* TOFileSystemRealmConfiguration.m in Sources */,
 				2232B654233FAFF700358B05 /* TOFileSystemNotificationTarget.m in Sources */,
+				22D601C923657FA500275AD9 /* TOFileSystemPresenter.m in Sources */,
 				223A8943233F13CA008FFE1A /* TOViewController.m in Sources */,
 				223A8957233F4AB0008FFE1A /* TOFileSystemObserver.m in Sources */,
 				2232B64F233FA19C00358B05 /* TOFileSystemChanges.m in Sources */,

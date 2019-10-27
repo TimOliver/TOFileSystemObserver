@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  A convenience category that wraps the ability
- to assign a special extended attribute
+ to assign a specific extended attribute
  to the file, so we can uniquely track it.
 
  Thanks to NSHipster for highlighting this technique.
