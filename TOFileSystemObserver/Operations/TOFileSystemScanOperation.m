@@ -83,14 +83,14 @@
 - (void)main
 {
     // Terminate out if this operation was cancelled before it started
-    if (self.isCancelled) { NSLog(@"Cancel"); return; }
+    // Once it's started however, we need to see it through to completion
+    if (self.isCancelled) { return; }
 
     NSMutableArray *pendingDirectories = self.pendingDirectories;
 
     // Start scanning every item in our base directory
     NSDirectoryEnumerator *enumerator = [self urlEnumeratorForURL:self.directoryURL];
     for (NSURL *url in enumerator) {
-        if (self.isCancelled) { break; }
         [self scanItemAtURL:url pendingDirectories:pendingDirectories];
     }
 
@@ -100,8 +100,6 @@
     // If there were any directories in the base, start a flat loop to scan
     // all subdirectories too (Avoiding potential stack overflows!)
     while (pendingDirectories.count > 0) {
-        if (self.isCancelled) { break; }
-
         // Extract the item, and then remove it from the pending list
         NSURL *url = pendingDirectories.firstObject;
         [pendingDirectories removeObjectAtIndex:0];
@@ -115,7 +113,6 @@
         // Create a new enumerator for it
         enumerator = [self urlEnumeratorForURL:url];
         for (NSURL *url in enumerator) {
-            if (self.isCancelled) { break; }
             [self scanItemAtURL:url pendingDirectories:pendingDirectories];
         }
     }
