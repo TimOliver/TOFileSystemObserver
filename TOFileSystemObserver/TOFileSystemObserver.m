@@ -25,7 +25,7 @@
 #import "TOFileSystemPath.h"
 #import "TOFileSystemRealmConfiguration.h"
 #import "TOFileSystemScanOperation.h"
-#import "TOFileSystemSourceCollection.h"
+#import "TOFileSystemPresenter.h"
 
 @interface TOFileSystemObserver()
 
@@ -35,11 +35,8 @@
 /** Temporarily skip an event if we're explicitly touching the file system. */
 @property (nonatomic, assign) BOOL skipEvents;
 
-/** The dispatch sources in charge of all directories we are observing. */
-@property (nonatomic, strong) TOFileSystemSourceCollection *sourcesCollection;
-
-/** A barrier queue to ensure thread-safe access to the sources dictionary */
-@property (nonatomic, copy) dispatch_queue_t sourcesBarrierQueue;
+/** A file presenter object that will observe our file system */
+@property (nonatomic, strong) TOFileSystemPresenter *fileSystemPresenter;
 
 /** The operation queue we will perform our scanning on. */
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
@@ -76,12 +73,14 @@
     _targetDirectoryURL = [TOFileSystemPath documentsDirectoryURL];
     _databaseFileName = [TOFileSystemPath defaultDatabaseFileName];
     _databaseDirectoryURL = [TOFileSystemPath cachesDirectoryURL];
-    _sourcesCollection = [[TOFileSystemSourceCollection alloc] init];
 
     // Set-up the operation queue
     _operationQueue = [[NSOperationQueue alloc] init];
     _operationQueue.maxConcurrentOperationCount = 1;
     _operationQueue.qualityOfService = NSQualityOfServiceBackground;
+
+    // Set up the file system presenter
+    _fileSystemPresenter = [[TOFileSystemPresenter alloc] init];
 }
 
 #pragma mark - Observer Setup -
@@ -104,21 +103,21 @@
     return (self.baseObject != nil);
 }
 
-- (void)configureDispatchSourceEventHandler
+- (void)configureFilePresenter
 {
     __weak typeof(self) weakSelf = self;
-    id changedEventHandler = ^(NSString *uuid) {
-        [weakSelf performFullSystemScan];
+    id changedEventHandler = ^(NSArray<NSURL *> *items) {
+        NSLog(@"%@", items);
     };
-    self.sourcesCollection.itemChangedHandler = changedEventHandler;
+    self.fileSystemPresenter.itemsDidChangeHandler = changedEventHandler;
 }
 
 - (void)beginObservingBaseDirectory
 {
     // Attach the root directory to the observer
-    NSString *uuid = self.baseObject.item.uuid;
     NSURL *url = self.targetDirectoryURL;
-    [self.sourcesCollection addDirectoryAtURL:url uuid:uuid];
+    self.fileSystemPresenter.directoryURL = url;
+    [self.fileSystemPresenter start];
 }
 
 #pragma mark - Observer Lifecycle -
@@ -137,7 +136,7 @@
     }
 
     // Configure the source observer to send change events to us
-    [self configureDispatchSourceEventHandler];
+    [self configureFilePresenter];
 
     // Set up observer for the top level directory
     [self beginObservingBaseDirectory];
@@ -154,7 +153,7 @@
     self.isRunning = NO;
 
     // Remove all of the observers
-    [self.sourcesCollection removeAllDirectories];
+    [self.fileSystemPresenter stop];
 }
 
 #pragma mark - Scanning -
@@ -168,8 +167,7 @@
     TOFileSystemScanOperation *scanOperation = nil;
     scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:self.baseObject.item.absoluteFileURL
                                                                          uuid:self.baseObject.item.uuid
-                                                           realmConfiguration:self.realmConfiguration
-                                                            sourcesCollection:self.sourcesCollection];
+                                                           realmConfiguration:self.realmConfiguration];
 
     // Begin asynchronous execution
     [self.operationQueue addOperation:scanOperation];

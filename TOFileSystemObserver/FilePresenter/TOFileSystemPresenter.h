@@ -18,6 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface TOFileSystemPresenter : NSObject <NSFilePresenter>
 
+/** The directory that will be observed by this presenter object */
+@property (nonatomic, strong) NSURL *directoryURL;
+
 /** The presenter is actively listening for events. */
 @property (nonatomic, readonly) BOOL isRunning;
 
@@ -37,9 +40,6 @@ NS_ASSUME_NONNULL_BEGIN
  so the logic contained should be thread-safe.
 */
 @property (nonatomic, copy) void (^itemsDidChangeHandler)(NSArray<NSURL *> *itemURLs);
-
-/** Create a new file presenter object for the target URL */
-- (instancetype)initWithDirectoryURL:(NSURL *)directoryURL;
 
 /** Start listening for file events in the target directory. */
 - (void)start;

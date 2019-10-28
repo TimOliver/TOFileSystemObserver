@@ -23,15 +23,12 @@
 #import "TOFileSystemScanOperation.h"
 #import "TOFileSystemItem.h"
 #import "TOFileSystemRealmConfiguration.h"
-#import "TOFileSystemSourceCollection.h"
+
 #import "NSURL+TOFileSystemUUID.h"
 
 #import <Realm/Realm.h>
 
 @interface TOFileSystemScanOperation ()
-
-/** The sources object that stores all of the dispatch source objects. */
-@property (nonatomic, strong) TOFileSystemSourceCollection *sourcesCollection;
 
 /** A thread-safe reference to the Realm file holding our state */
 @property (nonatomic, strong) RLMRealmConfiguration *realmConfiguration;
@@ -63,7 +60,6 @@
 - (instancetype)initWithDirectoryAtURL:(NSURL *)directoryURL
                                   uuid:(NSString *)uuid
                     realmConfiguration:(RLMRealmConfiguration *)realmConfiguration
-                     sourcesCollection:(TOFileSystemSourceCollection *)sourcesCollection
 {
     if (self = [super init]) {
         _directoryUUID = uuid;
@@ -72,7 +68,6 @@
         _subDirectoryLevelLimit = -1;
         _fileManager = [[NSFileManager alloc] init];
         _pendingDirectories = [NSMutableArray array];
-        _sourcesCollection = sourcesCollection;
     }
 
     return self;
@@ -142,9 +137,6 @@
     if (item.type == TOFileSystemItemTypeDirectory) {
         // Add it to the pending list so we can start scanning it after this
         [pendingDirectories addObject:url];
-
-        // Register it for observable changes
-        [self.sourcesCollection addDirectoryAtURL:url uuid:uuid];
     }
 }
 
