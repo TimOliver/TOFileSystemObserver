@@ -23,7 +23,6 @@
 #import <Foundation/Foundation.h>
 
 #import "TOFileSystemItem.h"
-#import "TOFileSystemBase.h"
 #import "TOFileSystemNotificationToken.h"
 
 @class TOFileSystemObserver;
@@ -42,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
  The absolute file path to the directory that will be observed.
  It may only be set while the observer isn't running. (Default is the Documents directory).
  */
-@property (nonatomic, strong) NSURL *targetDirectoryURL;
+@property (nonatomic, strong) NSURL *baseDirectoryURL;
 
 /**
  Optionally, a list of relative file paths from `directoryURL` to directories that
@@ -93,7 +92,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly, nullable) RLMArray<TOFileSystemItem *> *items;
 
-/** A singleton instance that can be accessed globally. */
+/** Create a new instance of the observer with the base URL that will be observed. */
+- (instancetype)initWithBaseDirectoryURL:(NSURL *)baseDirectoryURL;
+
+/** A singleton instance that can be accessed globally. It is created the first time this is called. */
 + (instancetype)sharedObserver;
 
 /** If desired, promotes a locally created and configured observer to the singleton. */

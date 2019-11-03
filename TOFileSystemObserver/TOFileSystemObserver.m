@@ -117,6 +117,14 @@
     // Attach the root directory to the observer
     NSURL *url = self.targetDirectoryURL;
     self.fileSystemPresenter.directoryURL = url;
+
+    // Set the detect handler
+    __weak typeof(self) weakSelf = self;
+    self.fileSystemPresenter.itemsDidChangeHandler = ^(NSArray *itemURLs) {
+        [weakSelf performScanWithItems:itemURLs];
+    };
+
+    // Start the handler
     [self.fileSystemPresenter start];
 }
 
@@ -140,9 +148,6 @@
 
     // Set up observer for the top level directory
     [self beginObservingBaseDirectory];
-
-    // Perform the first full-length initial scan
-    [self performFullSystemScan];
 }
 
 - (void)stop
@@ -158,19 +163,21 @@
 
 #pragma mark - Scanning -
 
-- (void)performFullSystemScan
+- (void)performScanWithItems:(NSArray *)itemsList
 {
-    // Cancel any in progress operations since we'll be starting again
-    [self.operationQueue cancelAllOperations];
+    NSLog(@"%@", itemsList);
 
-    // Create a new scan operation
-    TOFileSystemScanOperation *scanOperation = nil;
-    scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:self.baseObject.item.absoluteFileURL
-                                                                         uuid:self.baseObject.item.uuid
-                                                           realmConfiguration:self.realmConfiguration];
-
-    // Begin asynchronous execution
-    [self.operationQueue addOperation:scanOperation];
+//    // Cancel any in progress operations since we'll be starting again
+//    [self.operationQueue cancelAllOperations];
+//
+//    // Create a new scan operation
+//    TOFileSystemScanOperation *scanOperation = nil;
+//    scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:self.baseObject.item.absoluteFileURL
+//                                                                         uuid:self.baseObject.item.uuid
+//                                                           realmConfiguration:self.realmConfiguration];
+//
+//    // Begin asynchronous execution
+//    [self.operationQueue addOperation:scanOperation];
 }
 
 #pragma mark - Convenience Accessors -
@@ -192,13 +199,13 @@
     return realm;
 }
 
-- (TOFileSystemBase *)baseObject
-{
-    // The database won't be configured yet.
-    if (!self.isRunning) { return nil; }
-
-    // Return either a newly created object, or one previously stored in Realm
-    return [TOFileSystemBase baseObjectInRealm:self.realm forItemAtFileURL:self.targetDirectoryURL];
-}
+//- (TOFileSystemBase *)baseObject
+//{
+//    // The database won't be configured yet.
+//    if (!self.isRunning) { return nil; }
+//
+//    // Return either a newly created object, or one previously stored in Realm
+//    return [TOFileSystemBase baseObjectInRealm:self.realm forItemAtFileURL:self.targetDirectoryURL];
+//}
 
 @end
