@@ -1,7 +1,7 @@
 PODS:
-  - Realm (3.19.0):
-    - Realm/Headers (= 3.19.0)
-  - Realm/Headers (3.19.0)
+  - Realm (3.20.0):
+    - Realm/Headers (= 3.20.0)
+  - Realm/Headers (3.20.0)
 
 DEPENDENCIES:
   - Realm
@@ -11,7 +11,7 @@ SPEC REPOS:
     - Realm
 
 SPEC CHECKSUMS:
-  Realm: 995d585bcf699aaff226715886c849a29dd3d07f
+  Realm: 8b2ca5bc6479a91f379b6b42b5922e396cd5ba5a
 
 PODFILE CHECKSUM: 3fa3cf033fdf0856f55fb75bfcdd258d82e13b4e
 
