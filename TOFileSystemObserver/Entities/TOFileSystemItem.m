@@ -21,7 +21,6 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import "TOFileSystemItem.h"
-#import "TOFileSystemBase.h"
 #import "TOFileSystemPath.h"
 #import "NSURL+TOFileSystemUUID.h"
 
@@ -119,35 +118,35 @@
     return NO;
 }
 
-- (NSURL *)absoluteFileURL
-{
-    NSString *filePath = @"";
-
-    // Prepend each parent directory name
-    TOFileSystemItem *item = self;
-    while ((item = item.parentDirectory)) {
-        // Because the directory base points directly to our file in the sandbox,
-        // don't prepend the top level item, as it would then be prepended twice
-        if (item.directoryBase == nil) {
-            filePath = [NSString stringWithFormat:@"%@/%@", item.name, filePath];
-        }
-    }
-
-    // Determine the parent item with the base directory parent
-    item = self;
-    while (item.directoryBase == nil) {
-        item = item.parentDirectory;
-    }
-
-    // Prepend the rest of the directory
-    if (item.directoryBase.filePath.length > 0) {
-        filePath = [NSString stringWithFormat:@"%@/%@", item.directoryBase.filePath, filePath];
-    }
-
-    // Prepend the rest of the Sandbox
-    NSURL *url = [TOFileSystemPath applicationSandboxURL];
-    return [url URLByAppendingPathComponent:filePath];
-}
+//- (NSURL *)absoluteFileURL
+//{
+//    NSString *filePath = @"";
+//
+//    // Prepend each parent directory name
+//    TOFileSystemItem *item = self;
+//    while ((item = item.parentDirectory)) {
+//        // Because the directory base points directly to our file in the sandbox,
+//        // don't prepend the top level item, as it would then be prepended twice
+//        if (item.directoryBase == nil) {
+//            filePath = [NSString stringWithFormat:@"%@/%@", item.name, filePath];
+//        }
+//    }
+//
+//    // Determine the parent item with the base directory parent
+//    item = self;
+//    while (item.directoryBase == nil) {
+//        item = item.parentDirectory;
+//    }
+//
+//    // Prepend the rest of the directory
+//    if (item.directoryBase.filePath.length > 0) {
+//        filePath = [NSString stringWithFormat:@"%@/%@", item.directoryBase.filePath, filePath];
+//    }
+//
+//    // Prepend the rest of the Sandbox
+//    NSURL *url = [TOFileSystemPath applicationSandboxURL];
+//    return [url URLByAppendingPathComponent:filePath];
+//}
 
 - (TOFileSystemItem *)parentDirectory
 {
@@ -177,7 +176,7 @@
 {
     return @{
         @"parentItems": [RLMPropertyDescriptor descriptorWithClass:TOFileSystemItem.class propertyName:@"childItems"],
-        @"parentBases": [RLMPropertyDescriptor descriptorWithClass:TOFileSystemBase.class propertyName:@"item"],
+        /*@"parentBases": [RLMPropertyDescriptor descriptorWithClass:TOFileSystemBase.class propertyName:@"item"],*/
     };
 }
 

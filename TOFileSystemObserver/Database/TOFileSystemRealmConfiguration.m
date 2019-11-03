@@ -22,7 +22,6 @@
 
 #import "TOFileSystemRealmConfiguration.h"
 
-#import "TOFileSystemBase.h"
 #import "TOFileSystemItem.h"
 
 @implementation TOFileSystemRealmConfiguration
@@ -31,7 +30,7 @@
 {
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
     configuration.fileURL = fileURL;
-    configuration.objectClasses = @[TOFileSystemBase.class, TOFileSystemItem.class];
+    configuration.objectClasses = @[TOFileSystemItem.class];
     configuration.deleteRealmIfMigrationNeeded = YES;
     configuration.shouldCompactOnLaunch = ^BOOL(NSUInteger totalBytes, NSUInteger bytesUsed) {
         return (bytesUsed / totalBytes) < 0.9f; // Co

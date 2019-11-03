@@ -80,7 +80,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) TOFileSystemBase *directoryBase;
 
 /** Generates an absolute URL path to this item. */
-@property (nonatomic, readonly) NSURL *absoluteFileURL;
+//@property (nonatomic, readonly) NSURL *absoluteFileURL;
 
 /** Create a new instance to represent the file at the given URL. */
 - (instancetype)initWithItemAtFileURL:(NSURL *)fileURL;
