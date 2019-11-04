@@ -24,9 +24,6 @@ NS_ASSUME_NONNULL_BEGIN
 /** The presenter is actively listening for events. */
 @property (nonatomic, readonly) BOOL isRunning;
 
-/** The presenter is paused, so it will ignore any new events. */
-@property (nonatomic, readonly) BOOL isPaused;
-
 /**
  Since multiple events can come through, a timer is used to
  coalesce batchs of events and trigger an update periodically.
@@ -44,8 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
 /** Start listening for file events in the target directory. */
 - (void)start;
 
-/** Pause listening, ignoring any events that happen in the meantime. */
-- (void)pause;
+/** Pause listening, execute the provided block, and then resume. */
+- (void)pauseWhileExecutingBlock:(void (^)(void))block;
 
 /** Stop listening and cancel any pending timer events. */
 - (void)stop;

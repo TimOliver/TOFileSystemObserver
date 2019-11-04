@@ -27,7 +27,6 @@
 @interface TOFileSystemItem ()
 
 @property (readonly) RLMLinkingObjects *parentItems;
-@property (readonly) RLMLinkingObjects *parentBases;
 
 @end
 

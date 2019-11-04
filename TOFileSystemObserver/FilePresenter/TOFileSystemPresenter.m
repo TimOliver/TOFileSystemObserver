@@ -13,9 +13,6 @@
 /** The presenter is actively listening for events. */
 @property (nonatomic, assign, readwrite) BOOL isRunning;
 
-/** The presenter is paused, so it will ignore any new events. */
-@property (nonatomic, assign, readwrite) BOOL isPaused;
-
 /** The operation queue that will receive all of the file events*/
 @property (nonatomic, strong) NSOperationQueue *eventsOperationQueue;
 
@@ -27,6 +24,9 @@
 
 /** Whether a timer has been set yet or not */
 @property (nonatomic, assign) BOOL isTiming;
+
+/** A dispatch semaphore used to serialize execution when paused. */
+@property (nonatomic, strong) dispatch_semaphore_t pausingSemaphore;
 
 @end
 
@@ -64,6 +64,9 @@
 
     // Create the dispatch queue for the items
     _itemListAccessQueue = dispatch_queue_create("dev.tim.itemListAccessQueue", DISPATCH_QUEUE_SERIAL);
+
+    // Create the dispatch semaphore when seriazling paused work
+    _pausingSemaphore = dispatch_semaphore_create(1);
 
     // Default time interval
     _timerInterval = 0.1f;
@@ -118,29 +121,35 @@
 
 - (void)start
 {
-    if (self.isRunning && !self.isPaused) { return; }
-
+    if (self.isRunning) { return; }
     [NSFileCoordinator addFilePresenter:self];
     self.isRunning = YES;
-    self.isPaused = NO;
 }
 
-- (void)pause
+- (void)pauseWhileExecutingBlock:(void (^)(void))block
 {
-    if (!self.isRunning || self.isPaused) { return; }
+    // If not running, just execute the block and terminate
+    if (!self.isRunning) {
+        if (block) { block(); }
+        return;
+    }
+
+    // Pause and wait for the semaphore to complete
+    dispatch_semaphore_wait(self.pausingSemaphore, DISPATCH_TIME_FOREVER);
 
     [NSFileCoordinator removeFilePresenter:self];
-    self.isPaused = YES;
-    self.isRunning = YES;
+    if (block) { block(); }
+    [NSFileCoordinator addFilePresenter:self];
+
+    // Resume the semaphore
+    dispatch_semaphore_signal(self.pausingSemaphore);
 }
 
 - (void)stop
 {
     if (!self.isRunning) { return; }
-
     [NSFileCoordinator removeFilePresenter:self];
     self.isRunning = NO;
-    self.isPaused = NO;
 }
 
 #pragma mark - NSFilePresenter Delegate Events -
