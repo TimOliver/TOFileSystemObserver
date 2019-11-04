@@ -23,6 +23,7 @@
 #import "TOFileSystemScanOperation.h"
 #import "TOFileSystemItem.h"
 #import "TOFileSystemRealmConfiguration.h"
+#import "TOFileSystemPresenter.h"
 
 #import "NSURL+TOFileSystemUUID.h"
 
@@ -32,6 +33,9 @@
 
 /** A thread-safe reference to the Realm file holding our state */
 @property (nonatomic, strong) RLMRealmConfiguration *realmConfiguration;
+
+/** A reference to the file system presenter object so we may pause when causing file writes. */
+@property (nonatomic, strong) TOFileSystemPresenter *filePresenter;
 
 /** A copy of the base item UUID so it can be accessed on separate threads */
 @property (nonatomic, copy) NSString *directoryUUID;
@@ -59,12 +63,14 @@
 
 - (instancetype)initWithDirectoryAtURL:(NSURL *)directoryURL
                                   uuid:(NSString *)uuid
+                         filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
                     realmConfiguration:(RLMRealmConfiguration *)realmConfiguration
 {
     if (self = [super init]) {
         _directoryUUID = uuid;
         _realmConfiguration = realmConfiguration;
         _directoryURL = directoryURL;
+        _filePresenter = filePresenter;
         _subDirectoryLevelLimit = -1;
         _fileManager = [[NSFileManager alloc] init];
         _pendingDirectories = [NSMutableArray array];
@@ -120,12 +126,14 @@
 
     // Check if we've already assigned an on-disk UUID
     NSString *uuid = [url to_fileSystemUUID];
-    TOFileSystemItem *item = [TOFileSystemItem objectInRealm:realm forPrimaryKey:uuid];
+    __block TOFileSystemItem *item = [TOFileSystemItem objectInRealm:realm forPrimaryKey:uuid];
 
     // If UUID is nil, or if it's not already in the DB, insert it
     if (uuid == nil || item == nil) {
         // Add the item to the database
-        item = [self addNewItemAtURL:url];
+        [self.filePresenter pauseWhileExecutingBlock:^{
+            item = [self addNewItemAtURL:url];
+        }];
     }
     else {
         // If it has an entry in the database, check to see if it has changed at all

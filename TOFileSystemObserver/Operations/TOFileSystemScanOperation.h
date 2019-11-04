@@ -23,6 +23,7 @@
 #import <Foundation/Foundation.h>
 
 @class TOFileSystemItem;
+@class TOFileSystemPresenter;
 @class RLMRealmConfiguration;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -38,6 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** Create a new instance based off the directory where we want to start */
 - (instancetype)initWithDirectoryAtURL:(NSURL *)directoryURL
                                   uuid:(NSString *)uuid
+                         filePresenter:(TOFileSystemPresenter *)filePresenter
                     realmConfiguration:(RLMRealmConfiguration *)realmConfiguration;
 
 @end
