@@ -28,17 +28,22 @@
 
 NS_ASSUME_NONNULL_BEGIN
 /**
- An operation that scans all items in a directory,
- and adds/updates them in the database as needed.
+ An operation that will either scan all
+ child items of a directory, or a list of items
+ and update their snapshot if they have changed.
  */
 @interface TOFileSystemScanOperation : NSOperation
 
-/** From the target directory, how many levels down to scan (-1 is all of them). */
+/** When scanning hierarchies, the numbers deep to scan (-1 is all of them) */
 @property (nonatomic, assign) NSInteger subDirectoryLevelLimit;
 
-/** Create a new instance based off the directory where we want to start */
+/** Create a new instance that will scan all of the child items of the provided directory */
 - (instancetype)initWithDirectoryAtURL:(NSURL *)directoryURL
-                                  uuid:(NSString *)uuid
+                         filePresenter:(TOFileSystemPresenter *)filePresenter
+                    realmConfiguration:(RLMRealmConfiguration *)realmConfiguration;
+
+/** Create a new instance that will scan all of the files/folders provided. */
+- (instancetype)initWithItemURLs:(NSArray<NSURL *> *)itemURLs
                          filePresenter:(TOFileSystemPresenter *)filePresenter
                     realmConfiguration:(RLMRealmConfiguration *)realmConfiguration;
 

@@ -31,26 +31,23 @@
 
 @interface TOFileSystemScanOperation ()
 
+/** When scanning folder hierarchy, this is the top level directory */
+@property (nonatomic, strong) NSURL *directoryURL;
+
+/** A flat list of file URLs to scan. */
+@property (nonatomic, strong) NSArray *itemURLs;
+
 /** A thread-safe reference to the Realm file holding our state */
 @property (nonatomic, strong) RLMRealmConfiguration *realmConfiguration;
 
 /** A reference to the file system presenter object so we may pause when causing file writes. */
 @property (nonatomic, strong) TOFileSystemPresenter *filePresenter;
 
-/** A copy of the base item UUID so it can be accessed on separate threads */
-@property (nonatomic, copy) NSString *directoryUUID;
-
-/** The URL to the base directory */
-@property (nonatomic, strong) NSURL *directoryURL;
-
 /** A local file manager object we can use for retrieving disk contents. */
 @property (nonatomic, strong) NSFileManager *fileManager;
 
 /** Generate a thread safe instance of the Realm object */
 @property (nonatomic, readonly) RLMRealm *realm;
-
-/** The file system item representing the base directory. */
-@property (nonatomic, readonly) TOFileSystemItem *item;
 
 /** When iterating through all the files, this array stores pending directories that need scanning*/
 @property (nonatomic, strong) NSMutableArray *pendingDirectories;
@@ -62,21 +59,38 @@
 #pragma - Class Lifecycle -
 
 - (instancetype)initWithDirectoryAtURL:(NSURL *)directoryURL
-                                  uuid:(NSString *)uuid
                          filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
                     realmConfiguration:(RLMRealmConfiguration *)realmConfiguration
 {
     if (self = [super init]) {
-        _directoryUUID = uuid;
         _realmConfiguration = realmConfiguration;
         _directoryURL = directoryURL;
         _filePresenter = filePresenter;
-        _subDirectoryLevelLimit = -1;
-        _fileManager = [[NSFileManager alloc] init];
         _pendingDirectories = [NSMutableArray array];
+        [self commonInit];
     }
 
     return self;
+}
+
+- (instancetype)initWithItemURLs:(NSArray<NSURL *> *)itemURLs
+                   filePresenter:(TOFileSystemPresenter *)filePresenter
+              realmConfiguration:(RLMRealmConfiguration *)realmConfiguration
+{
+    if (self = [super init]) {
+        _realmConfiguration = realmConfiguration;
+        _filePresenter = filePresenter;
+        _itemURLs = itemURLs;
+        [self commonInit];
+    }
+
+    return self;
+}
+
+- (void)commonInit
+{
+    _subDirectoryLevelLimit = -1;
+    _fileManager = [[NSFileManager alloc] init];
 }
 
 #pragma mark - Scanning Implementation -
@@ -85,18 +99,57 @@
 {
     // Terminate out if this operation was cancelled before it started
     // Once it's started however, we need to see it through to completion
+    // to prevent leaving things in an inconsistent state.
     if (self.isCancelled) { return; }
 
-    NSMutableArray *pendingDirectories = self.pendingDirectories;
+    // Depending on if a base directory,
+    // or a flat list of files was provided, perform
+    // different scan patterns
+    if (self.directoryURL) {
+        [self scanAllSubdirectoriesFromBaseURL];
+    }
+    else if (self.itemURLs) {
+        [self scanItemURLsList];
+    }
+}
 
+#pragma mark - Deep Hierarcy Directory Scan -
+
+- (void)scanAllSubdirectoriesFromBaseURL
+{
     // Start scanning every item in our base directory
-    NSDirectoryEnumerator *enumerator = [self urlEnumeratorForURL:self.directoryURL];
-    for (NSURL *url in enumerator) {
-        [self scanItemAtURL:url pendingDirectories:pendingDirectories];
+    NSArray *childItemURLs = [self urlEnumeratorForURL:self.directoryURL].allObjects;
+    if (childItemURLs.count == 0) { return; }
+
+    // Due to some interesting behavior on behalf of the iOS
+    // file system, the absolute path to the base directory
+    // provided to this class can potentially be different
+    // to the file paths provided by the enumerators.
+    // (One contains '/private/' and one does not)
+    //
+    // In order to compare the base directory URL to
+    // items found by the enumerator, re-fetch the
+    // base URL as the parent of the top level items
+    // and re-set it.
+    self.directoryURL = [childItemURLs.firstObject URLByDeletingLastPathComponent];
+
+    // Scan all of the items in the base directory
+    for (NSURL *url in childItemURLs) {
+        [self scanItemAtURL:url pendingDirectories:self.pendingDirectories];
     }
 
-    // If we were only scanning the immediate contents of the base directory, exit here
+    // If we were only scanning the immediate contents
+    // of the base directory, we can exit here
     if (self.subDirectoryLevelLimit == 0) { return; }
+
+    // Otherwise, scan all of the directories discovered in the base
+    // directory (and then scan their directories).
+    [self scanPendingSubdirectories];
+}
+
+- (void)scanPendingSubdirectories
+{
+    NSMutableArray *pendingDirectories = self.pendingDirectories;
 
     // If there were any directories in the base, start a flat loop to scan
     // all subdirectories too (Avoiding potential stack overflows!)
@@ -112,12 +165,21 @@
         }
 
         // Create a new enumerator for it
-        enumerator = [self urlEnumeratorForURL:url];
+        NSDirectoryEnumerator *enumerator = [self urlEnumeratorForURL:url];
         for (NSURL *url in enumerator) {
             [self scanItemAtURL:url pendingDirectories:pendingDirectories];
         }
     }
 }
+
+#pragma mark - Flat File List Scan -
+
+- (void)scanItemURLsList
+{
+
+}
+
+#pragma mark - Shared Scanning Logic -
 
 - (void)scanItemAtURL:(NSURL *)url pendingDirectories:(NSMutableArray *)pendingDirectories
 {
@@ -161,31 +223,14 @@
 
 - (NSInteger)numberOfDirectoryLevelsToURL:(NSURL *)url
 {
-    RLMRealm *realm = self.realm;
     NSInteger levels = 0;
-    NSString *uuid = [url to_fileSystemUUID];
 
-    // Loop through from the base URL up until we hit the base directory
+    // Loop up from the URL to the base
+    // directory to see how many levels deep it is.
     while (1) {
-        // If we've reached the base directory, break out now
-        if ([uuid isEqualToString:self.directoryUUID]) { break; }
-
-        // Go up one level above the current directory
-        url = url.URLByDeletingLastPathComponent;
-
-        // If we accidentally somehow go too far, this will stop infinite loops
-        if ([url.lastPathComponent isEqualToString:@".."]) { break; }
-
-        // Try to see if this directory is in the database already
-        TOFileSystemItem *item = [TOFileSystemItem objectInRealm:realm forPrimaryKey:uuid];
-        if (item) {
-            uuid = item.parentDirectory.uuid;
-        }
-        else {
-            // Else we have to hit the file system again
-            uuid = [url to_fileSystemUUID];
-        }
-
+        url = [url URLByDeletingLastPathComponent];
+        if ([url.lastPathComponent isEqualToString:@".."]) { break; } // To prevent infinite loops
+        if ([url isEqual:self.directoryURL]) { break; }
         levels++;
     }
 
@@ -201,10 +246,13 @@
     TOFileSystemItem *item = [[TOFileSystemItem alloc] initWithItemAtFileURL:newItemURL];
 
     // Add the item to Realm, and assign it as a child to the parent
-    [self.realm transactionWithBlock:^{
-        [self.realm addOrUpdateObject:item];
-        [parentItem.childItems addObject:item];
-    }];
+    @autoreleasepool {
+        RLMRealm *realm = self.realm;
+        [realm transactionWithBlock:^{
+            [realm addOrUpdateObject:item];
+            [parentItem.childItems addObject:item];
+        }];
+    }
 
     return item;
 }
@@ -236,11 +284,6 @@
 - (RLMRealm *)realm
 {
     return [RLMRealm realmWithConfiguration:self.realmConfiguration error:nil];
-}
-
-- (TOFileSystemItem *)item
-{
-    return [TOFileSystemItem objectInRealm:self.realm forPrimaryKey:self.directoryUUID];
 }
 
 @end
