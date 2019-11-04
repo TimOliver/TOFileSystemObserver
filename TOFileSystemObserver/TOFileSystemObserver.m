@@ -32,6 +32,9 @@
 /** The absolute path to our observed directory's super directory so we can build paths. */
 @property (nonatomic, strong) NSURL *parentDirectoryURL;
 
+/** The UUID of the observed directory on disk, so we can easily access it in scans. */
+@property (nonatomic, copy) NSString *baseDirectoryUUID;
+
 /** Read-write access for the running state */
 @property (nonatomic, assign, readwrite) BOOL isRunning;
 
@@ -83,7 +86,6 @@
     _excludedItems = @[@"Inbox"];
     _databaseFileName = [TOFileSystemPath defaultDatabaseFileName];
     _databaseDirectoryURL = [TOFileSystemPath cachesDirectoryURL];
-    _parentDirectoryURL = [_directoryURL URLByDeletingLastPathComponent];
     
     // Set-up the operation queue
     _operationQueue = [[NSOperationQueue alloc] init];
@@ -121,6 +123,7 @@
 {
     __weak typeof(self) weakSelf = self;
     self.fileSystemPresenter.itemsDidChangeHandler = ^(NSArray *itemURLs) {
+        NSLog(@"%@", itemURLs);
         //[weakSelf performScanWithItems:itemURLs];
     };
 }
@@ -153,11 +156,18 @@
         return;
     }
 
+    // Lock in the properties of the base directory
+    _parentDirectoryURL = [_directoryURL URLByDeletingLastPathComponent];
+    _baseDirectoryUUID = self.directoryItem.uuid;
+
     // Configure the source observer to send change events to us
     [self configureFilePresenter];
 
-    // Set up observer for the top level directory
+    // Start the observer to watch for any system level changes
     [self beginObservingBaseDirectory];
+
+    // Kick off an initial scan of the entire file hierarchy
+    [self performFullDirectoryScan];
 }
 
 - (void)stop
@@ -181,7 +191,8 @@
     // Create a new scan operation
     TOFileSystemScanOperation *scanOperation = nil;
     scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:self.directoryURL
-                                                                         uuid:self.baseObject.item.uuid
+                                                                         uuid:self.baseDirectoryUUID
+                                                                filePresenter:self.fileSystemPresenter
                                                            realmConfiguration:self.realmConfiguration];
 
     // Begin asynchronous execution
