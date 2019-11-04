@@ -82,7 +82,10 @@ NS_ASSUME_NONNULL_BEGIN
 /** Generates an absolute URL path to this item. */
 //@property (nonatomic, readonly) NSURL *absoluteFileURL;
 
-/** Create a new instance to represent the file at the given URL. */
+/** Fetches a file item from the supplied Realm. Returns nil if it can't be found. */
++ (nullable TOFileSystemItem *)itemInRealm:(RLMRealm *)realm forItemAtURL:(NSURL *)itemURL;
+
+/** Create a new, unmanaged instance to represent the file at the given URL. */
 - (instancetype)initWithItemAtFileURL:(NSURL *)fileURL;
 
 /** Refresh the properties of the item against the file at the given URL. */

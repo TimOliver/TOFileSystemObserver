@@ -48,7 +48,7 @@
 @property (nonatomic, readonly) RLMRealm *realm;
 
 /** Gets the base object from Realm, or creates it on the first time. */
-@property (nonatomic, readonly) TOFileSystemBase *baseObject;
+@property (nonatomic, readonly) TOFileSystemItem *rootDirectoryItem;
 
 @end
 
@@ -59,6 +59,17 @@
 - (instancetype)init
 {
     if (self = [super init]) {
+        _directoryURL = [TOFileSystemPath documentsDirectoryURL];
+        [self setUp];
+    }
+
+    return self;
+}
+
+- (instancetype)initWithDirectoryURL:(NSURL *)directoryURL
+{
+    if (self = [super init]) {
+        _directoryURL = directoryURL;
         [self setUp];
     }
 
@@ -70,7 +81,6 @@
     // Set-up default property values
     _isRunning = NO;
     _excludedItems = @[@"Inbox"];
-    _targetDirectoryURL = [TOFileSystemPath documentsDirectoryURL];
     _databaseFileName = [TOFileSystemPath defaultDatabaseFileName];
     _databaseDirectoryURL = [TOFileSystemPath cachesDirectoryURL];
 
@@ -100,29 +110,25 @@
     if (self.realm == nil) { return NO; }
 
     // Then try creating the base object for our taget folder for the first time
-    return (self.baseObject != nil);
+    return (self.rootDirectoryItem != nil);
 }
 
 - (void)configureFilePresenter
 {
     __weak typeof(self) weakSelf = self;
-    id changedEventHandler = ^(NSArray<NSURL *> *items) {
-        NSLog(@"%@", items);
+    self.fileSystemPresenter.itemsDidChangeHandler = ^(NSArray *itemURLs) {
+        //[weakSelf performScanWithItems:itemURLs];
     };
-    self.fileSystemPresenter.itemsDidChangeHandler = changedEventHandler;
 }
 
 - (void)beginObservingBaseDirectory
 {
     // Attach the root directory to the observer
-    NSURL *url = self.targetDirectoryURL;
+    NSURL *url = self.directoryURL;
     self.fileSystemPresenter.directoryURL = url;
 
     // Set the detect handler
-    __weak typeof(self) weakSelf = self;
-    self.fileSystemPresenter.itemsDidChangeHandler = ^(NSArray *itemURLs) {
-        [weakSelf performScanWithItems:itemURLs];
-    };
+
 
     // Start the handler
     [self.fileSystemPresenter start];
@@ -163,21 +169,19 @@
 
 #pragma mark - Scanning -
 
-- (void)performScanWithItems:(NSArray *)itemsList
+- (void)performFullDirectoryScan
 {
-    NSLog(@"%@", itemsList);
+    // Cancel any in progress operations since we'll be starting again
+    [self.operationQueue cancelAllOperations];
 
-//    // Cancel any in progress operations since we'll be starting again
-//    [self.operationQueue cancelAllOperations];
-//
-//    // Create a new scan operation
-//    TOFileSystemScanOperation *scanOperation = nil;
-//    scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:self.baseObject.item.absoluteFileURL
-//                                                                         uuid:self.baseObject.item.uuid
-//                                                           realmConfiguration:self.realmConfiguration];
-//
-//    // Begin asynchronous execution
-//    [self.operationQueue addOperation:scanOperation];
+    // Create a new scan operation
+    TOFileSystemScanOperation *scanOperation = nil;
+    scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:self.directoryURL
+                                                                         uuid:self.baseObject.item.uuid
+                                                           realmConfiguration:self.realmConfiguration];
+
+    // Begin asynchronous execution
+    [self.operationQueue addOperation:scanOperation];
 }
 
 #pragma mark - Convenience Accessors -
@@ -199,13 +203,13 @@
     return realm;
 }
 
-//- (TOFileSystemBase *)baseObject
-//{
-//    // The database won't be configured yet.
-//    if (!self.isRunning) { return nil; }
-//
-//    // Return either a newly created object, or one previously stored in Realm
-//    return [TOFileSystemBase baseObjectInRealm:self.realm forItemAtFileURL:self.targetDirectoryURL];
-//}
+- (TOFileSystemItem *)rootDirectoryItem
+{
+    // The database isn't created until the observer has been started
+    if (!self.isRunning) { return nil; }
+
+    // Return either a newly created object, or one previously stored in Realm
+    return [TOFileSystemItem itemInRealm:self.realm forItemAtFileURL:self.targetDirectoryURL];
+}
 
 @end

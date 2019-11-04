@@ -38,10 +38,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL isRunning;
 
 /**
- The absolute file path to the directory that will be observed.
+ The absolute file path to the directory that is being observed.
  It may only be set while the observer isn't running. (Default is the Documents directory).
  */
-@property (nonatomic, strong) NSURL *baseDirectoryURL;
+@property (nonatomic, strong) NSURL *directoryURL;
 
 /**
  Optionally, a list of relative file paths from `directoryURL` to directories that
@@ -71,20 +71,19 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSURL *databaseDirectoryURL;
 
 /**
- The item that represents the target directory
- that was set to this file observer.
- (The default is the Documents directory)
+ The item that represents the base directory that was set to be observed
+ by this file system observer.
 
  (This item will be refetched from the database each time it is called,
  so it is completely thread-safe. Like all Realm items, please ensure it
  is kept in an auto-release pool in dispatch queues.)
  */
-@property (nonatomic, readonly) TOFileSystemItem *targetDirectoryItem;
+@property (nonatomic, readonly) TOFileSystemItem *directoryItem;
 
 /**
- At any given time, the fully up-to-date list of items
- that has been captured by the file system observer,
- starting from within the top-level directory.
+ At any given time, the fully up-to-date list of items that have
+ been captured by the file system observer, starting from within
+ the observed directory.
 
  (This item will be refetched from the database each time it is called,
  so it is completely thread-safe. Like all Realm items, please ensure it
@@ -93,7 +92,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nullable) RLMArray<TOFileSystemItem *> *items;
 
 /** Create a new instance of the observer with the base URL that will be observed. */
-- (instancetype)initWithBaseDirectoryURL:(NSURL *)baseDirectoryURL;
+- (instancetype)initWithDirectoryURL:(NSURL *)directoryURL;
 
 /** A singleton instance that can be accessed globally. It is created the first time this is called. */
 + (instancetype)sharedObserver;

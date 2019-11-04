@@ -44,6 +44,16 @@
     return self;
 }
 
++ (nullable TOFileSystemItem *)itemInRealm:(RLMRealm *)realm forItemAtURL:(NSURL *)itemURL
+{
+    // Fetch the on-disk UUID for this file item.
+    NSString *uuid = [itemURL to_fileSystemUUID];
+    if (uuid == nil) { return nil; }
+
+    // Query for the item with that UUID in the database
+    return [TOFileSystemItem objectInRealm:realm forPrimaryKey:uuid];
+}
+
 #pragma mark - Update Properties -
 
 - (void)updateWithItemAtFileURL:(NSURL *)fileURL
