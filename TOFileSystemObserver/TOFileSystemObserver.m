@@ -191,7 +191,6 @@
     // Create a new scan operation
     TOFileSystemScanOperation *scanOperation = nil;
     scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:self.directoryURL
-                                                                         uuid:self.baseDirectoryUUID
                                                                 filePresenter:self.fileSystemPresenter
                                                            realmConfiguration:self.realmConfiguration];
 
