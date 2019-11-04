@@ -23,8 +23,6 @@
 #import <UIKit/UIKit.h>
 #import <Realm/Realm.h>
 
-@class TOFileSystemBase;
-
 // The different types of items stored in the file system
 typedef NS_ENUM(NSInteger, TOFileSystemItemType) {
     TOFileSystemItemTypeFile, // A standard file
@@ -75,9 +73,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** The parent directory, if any that this item belongs to. */
 @property (readonly, nullable) TOFileSystemItem *parentDirectory;
-
-/** Where applicable, the base object at the very top level */
-@property (readonly, nullable) TOFileSystemBase *directoryBase;
 
 /** Generates an absolute URL path to this item. */
 //@property (nonatomic, readonly) NSURL *absoluteFileURL;

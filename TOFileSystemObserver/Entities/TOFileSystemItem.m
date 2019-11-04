@@ -163,11 +163,6 @@
     return self.parentItems.firstObject;
 }
 
-- (TOFileSystemBase *)directoryBase
-{
-    return self.parentBases.firstObject;
-}
-
 #pragma mark - Realm Properties -
 
 + (NSString *)primaryKey { return @"uuid"; }

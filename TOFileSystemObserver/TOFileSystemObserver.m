@@ -29,6 +29,9 @@
 
 @interface TOFileSystemObserver()
 
+/** The absolute path to our observed directory's super directory so we can build paths. */
+@property (nonatomic, strong) NSURL *parentDirectoryURL;
+
 /** Read-write access for the running state */
 @property (nonatomic, assign, readwrite) BOOL isRunning;
 
@@ -46,9 +49,6 @@
 
 /** Gets a new copy of the Realm database backing this observer. */
 @property (nonatomic, readonly) RLMRealm *realm;
-
-/** Gets the base object from Realm, or creates it on the first time. */
-@property (nonatomic, readonly) TOFileSystemItem *rootDirectoryItem;
 
 @end
 
@@ -83,7 +83,8 @@
     _excludedItems = @[@"Inbox"];
     _databaseFileName = [TOFileSystemPath defaultDatabaseFileName];
     _databaseDirectoryURL = [TOFileSystemPath cachesDirectoryURL];
-
+    _parentDirectoryURL = [_directoryURL URLByDeletingLastPathComponent];
+    
     // Set-up the operation queue
     _operationQueue = [[NSOperationQueue alloc] init];
     _operationQueue.maxConcurrentOperationCount = 1;
@@ -109,8 +110,11 @@
     // Try creating the database for potentially the first time
     if (self.realm == nil) { return NO; }
 
-    // Then try creating the base object for our taget folder for the first time
-    return (self.rootDirectoryItem != nil);
+    // Then try creating our base item for our taget folder for the first time
+    TOFileSystemItem *baseItem = self.directoryItem;
+    if (baseItem == nil) { return NO; }
+    
+    return YES;
 }
 
 - (void)configureFilePresenter
@@ -128,7 +132,7 @@
     self.fileSystemPresenter.directoryURL = url;
 
     // Set the detect handler
-
+    [self configureFilePresenter];
 
     // Start the handler
     [self.fileSystemPresenter start];
@@ -203,13 +207,25 @@
     return realm;
 }
 
-- (TOFileSystemItem *)rootDirectoryItem
+- (TOFileSystemItem *)directoryItem
 {
     // The database isn't created until the observer has been started
     if (!self.isRunning) { return nil; }
 
-    // Return either a newly created object, or one previously stored in Realm
-    return [TOFileSystemItem itemInRealm:self.realm forItemAtFileURL:self.targetDirectoryURL];
+    // Grab a local instance of Realm to save recreating it for each
+    RLMRealm *realm = self.realm;
+    
+    // See if there already exists an item for this directory in Realm
+    TOFileSystemItem *item = [TOFileSystemItem itemInRealm:self.realm forItemAtURL:self.directoryURL];
+    
+    // If not, create a new one and persist it
+    if (item == nil) {
+        item = [[TOFileSystemItem alloc] initWithItemAtFileURL:self.directoryURL];
+        id block = ^{ [realm addObject:item]; };
+        [realm transactionWithBlock:block];
+    }
+    
+    return item;
 }
 
 @end
