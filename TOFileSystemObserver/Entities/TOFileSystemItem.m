@@ -26,8 +26,6 @@
 
 @interface TOFileSystemItem ()
 
-@property (readonly) RLMLinkingObjects *parentItems;
-
 @end
 
 @implementation TOFileSystemItem
@@ -37,56 +35,79 @@
 - (instancetype)initWithItemAtFileURL:(NSURL *)fileURL
 {
     if (self = [super init]) {
-        [self updateWithItemAtFileURL:fileURL];
+        [self configureFileSystemUUIDForItemAtURL:fileURL];
+        [self refreshFromItemAtURL:fileURL];
     }
 
     return self;
 }
 
-+ (nullable TOFileSystemItem *)itemInRealm:(RLMRealm *)realm forItemAtURL:(NSURL *)itemURL
-{
-    // Fetch the on-disk UUID for this file item.
-    NSString *uuid = [itemURL to_fileSystemUUID];
-    if (uuid == nil) { return nil; }
-
-    // Query for the item with that UUID in the database
-    return [TOFileSystemItem objectInRealm:realm forPrimaryKey:uuid];
-}
-
 #pragma mark - Update Properties -
 
-- (void)updateWithItemAtFileURL:(NSURL *)fileURL
+- (void)configureFileSystemUUIDForItemAtURL:(NSURL *)url
 {
-    // Copy the name of the item
-    self.name = [fileURL lastPathComponent];
+    // Attempt to load any existing UUID
+    NSString *uuid = [url to_fileSystemUUID];
+    
+    // Create a brand new one if it doesn't exist
+    if (uuid == nil) {
+        self.uuid = [url to_generateUUID];
+        return;
+    }
+    
+    // Check to see if the UUID matches the UUID format
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\b(a|b)(c|d)\\b"
+                                                                           options:NSRegularExpressionCaseInsensitive
+                                                                             error:nil];
+}
 
-    // Before we're persisted, ensure the on-disk file
-    // has the same UUID as this object
-    if (!self.realm) {
-        [fileURL to_setFileSystemUUID:self.uuid];
+- (BOOL)refreshFromItemAtURL:(NSURL *)url
+{
+    BOOL hasChanges = NO;
+    
+    // Copy the name of the item
+    NSString *name = [url lastPathComponent];
+    if (self.name.length == 0 || ![name isEqualToString:self.name]) {
+        self.name = name;
+        hasChanges = YES;
     }
 
     // Check if it is a file or directory
     NSNumber *isDirectory;
-    [fileURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
-    self.type = isDirectory.boolValue ? TOFileSystemItemTypeDirectory : TOFileSystemItemTypeFile;
-
-    // Get its file size
-    if (self.type == TOFileSystemItemTypeFile) {
-        NSNumber *fileSize;
-        [fileURL getResourceValue:&fileSize forKey:NSURLFileSizeKey error:nil];
-        self.size = fileSize.intValue;
+    [url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
+    TOFileSystemItemType type = isDirectory.boolValue ? TOFileSystemItemTypeDirectory : TOFileSystemItemTypeFile;
+    if (type != self.type) {
+        self.type = type;
+        hasChanges = YES;
     }
 
     // Get its creation date
     NSDate *creationDate;
-    [fileURL getResourceValue:&creationDate forKey:NSURLCreationDateKey error:nil];
-    self.creationDate = creationDate;
-
+    [url getResourceValue:&creationDate forKey:NSURLCreationDateKey error:nil];
+    if (![self.creationDate isEqualToDate:creationDate]) {
+        self.creationDate = creationDate;
+        hasChanges = YES;
+    }
+    
     // Get its modification date
     NSDate *modificationDate;
-    [fileURL getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:nil];
-    self.modificationDate = modificationDate;
+    [url getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:nil];
+    if (![self.modificationDate isEqualToDate:modificationDate]) {
+        self.modificationDate = modificationDate;
+        hasChanges = YES;
+    }
+    
+    // If the type is a file, fetch its size
+    if (self.type == TOFileSystemItemTypeFile) {
+        NSNumber *fileSize;
+        [url getResourceValue:&fileSize forKey:NSURLFileSizeKey error:nil];
+        if (fileSize.longLongValue != self.size) {
+            self.size = fileSize.longLongValue;
+            hasChanges = YES;
+        }
+    }
+    
+    return hasChanges;
 }
 
 - (BOOL)hasChangesComparedToItemAtURL:(NSURL *)itemURL
@@ -107,7 +128,7 @@
     if (self.type == TOFileSystemItemTypeFile) {
         NSNumber *fileSize;
         [itemURL getResourceValue:&fileSize forKey:NSURLFileSizeKey error:nil];
-        if(self.size != fileSize.intValue) { return YES; }
+        if(self.size != fileSize.longLongValue) { return YES; }
     }
 
     // Creation date
@@ -119,10 +140,6 @@
     NSDate *modificationDate;
     [itemURL getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:nil];
     if (![self.modificationDate isEqual:modificationDate]) { return YES; }
-
-    // Parent directory
-    NSString *parentUUID = [itemURL.URLByDeletingLastPathComponent to_fileSystemUUID];
-    if (![parentUUID isEqualToString:self.parentDirectory.uuid]) { return YES; }
 
     return NO;
 }
@@ -156,36 +173,5 @@
 //    NSURL *url = [TOFileSystemPath applicationSandboxURL];
 //    return [url URLByAppendingPathComponent:filePath];
 //}
-
-- (TOFileSystemItem *)parentDirectory
-{
-    return self.parentItems.firstObject;
-}
-
-#pragma mark - Realm Properties -
-
-+ (NSString *)primaryKey { return @"uuid"; }
-
-+ (NSArray<NSString *> *)indexedProperties
-{
-    return @[@"name"];
-}
-
-+ (NSDictionary *)defaultPropertyValues
-{
-    return @{@"uuid": [NSUUID UUID].UUIDString};
-}
-
-+ (NSDictionary *)linkingObjectsProperties
-{
-    return @{
-        @"parentItems": [RLMPropertyDescriptor descriptorWithClass:TOFileSystemItem.class propertyName:@"childItems"],
-        /*@"parentBases": [RLMPropertyDescriptor descriptorWithClass:TOFileSystemBase.class propertyName:@"item"],*/
-    };
-}
-
-// Never automatically include this in the default Realm schema
-// as it may get exposed in the app's own Realm files.
-+ (BOOL)shouldIncludeInDefaultSchema { return NO; }
 
 @end
