@@ -21,7 +21,6 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
-#import <Realm/Realm.h>
 
 // The different types of items stored in the file system
 typedef NS_ENUM(NSInteger, TOFileSystemItemType) {
@@ -31,7 +30,6 @@ typedef NS_ENUM(NSInteger, TOFileSystemItemType) {
 
 // Forward declaration so that the item may be used in an array
 @class TOFileSystemItem;
-RLM_ARRAY_TYPE(TOFileSystemItem)
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -42,12 +40,12 @@ NS_ASSUME_NONNULL_BEGIN
  This is then compared with the current file system
  to determine when something has changed.
  */
-@interface TOFileSystemItem : RLMObject
+@interface TOFileSystemItem : NSObject
 
 /** The type of the item (either a file or folder) */
 @property (nonatomic, assign) TOFileSystemItemType type;
 
-/** The unique ID number assigned to this item by the file system. */
+/** The unique UUID that was assigned to the file by this library. */
 @property (nonatomic, copy) NSString *uuid;
 
 /** The name on disk of the item. */
@@ -65,30 +63,17 @@ NS_ASSUME_NONNULL_BEGIN
 /** Whether the item is still being copied into the app container. */
 @property (nonatomic, assign) BOOL isCopying;
 
-/** Set to YES when the file is no longer where it should be,
- but isn't confirmed to be deleted or just moved. */
-@property (nonatomic, assign) BOOL isPendingDeletion;
-
-/** If a directory, the child items inside it. */
-@property (nonatomic, strong, nullable) RLMArray<TOFileSystemItem *><TOFileSystemItem> *childItems;
-
-/** The parent directory, if any that this item belongs to. */
-@property (readonly, nullable) TOFileSystemItem *parentDirectory;
-
 /** Generates an absolute URL path to this item. */
-//@property (nonatomic, readonly) NSURL *absoluteFileURL;
+@property (nonatomic, readonly) NSURL *absoluteFileURL;
 
 /** Fetches a file item from the supplied Realm. Returns nil if it can't be found. */
-+ (nullable TOFileSystemItem *)itemInRealm:(RLMRealm *)realm forItemAtURL:(NSURL *)itemURL;
+//+ (nullable TOFileSystemItem *)itemInRealm:(RLMRealm *)realm forItemAtURL:(NSURL *)itemURL;
 
 /** Create a new, unmanaged instance to represent the file at the given URL. */
 - (instancetype)initWithItemAtFileURL:(NSURL *)fileURL;
 
 /** Refresh the properties of the item against the file at the given URL. */
-- (void)updateWithItemAtFileURL:(NSURL *)fileURL;
-
-/** Compares the meta-data in the DB against the file on disk*/
-- (BOOL)hasChangesComparedToItemAtURL:(NSURL *)itemURL;
+- (BOOL)refreshFromItemAtURL:(NSURL *)url;
 
 @end
 

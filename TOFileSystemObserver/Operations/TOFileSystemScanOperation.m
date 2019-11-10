@@ -22,12 +22,9 @@
 
 #import "TOFileSystemScanOperation.h"
 #import "TOFileSystemItem.h"
-#import "TOFileSystemRealmConfiguration.h"
 #import "TOFileSystemPresenter.h"
 
 #import "NSURL+TOFileSystemUUID.h"
-
-#import <Realm/Realm.h>
 
 @interface TOFileSystemScanOperation ()
 
@@ -37,17 +34,11 @@
 /** A flat list of file URLs to scan. */
 @property (nonatomic, strong) NSArray *itemURLs;
 
-/** A thread-safe reference to the Realm file holding our state */
-@property (nonatomic, strong) RLMRealmConfiguration *realmConfiguration;
-
 /** A reference to the file system presenter object so we may pause when causing file writes. */
 @property (nonatomic, strong) TOFileSystemPresenter *filePresenter;
 
 /** A local file manager object we can use for retrieving disk contents. */
 @property (nonatomic, strong) NSFileManager *fileManager;
-
-/** Generate a thread safe instance of the Realm object */
-@property (nonatomic, readonly) RLMRealm *realm;
 
 /** When iterating through all the files, this array stores pending directories that need scanning*/
 @property (nonatomic, strong) NSMutableArray *pendingDirectories;
@@ -60,10 +51,8 @@
 
 - (instancetype)initWithDirectoryAtURL:(NSURL *)directoryURL
                          filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
-                    realmConfiguration:(RLMRealmConfiguration *)realmConfiguration
 {
     if (self = [super init]) {
-        _realmConfiguration = realmConfiguration;
         _directoryURL = directoryURL;
         _filePresenter = filePresenter;
         _pendingDirectories = [NSMutableArray array];
@@ -75,10 +64,8 @@
 
 - (instancetype)initWithItemURLs:(NSArray<NSURL *> *)itemURLs
                    filePresenter:(TOFileSystemPresenter *)filePresenter
-              realmConfiguration:(RLMRealmConfiguration *)realmConfiguration
 {
     if (self = [super init]) {
-        _realmConfiguration = realmConfiguration;
         _filePresenter = filePresenter;
         _itemURLs = itemURLs;
         [self commonInit];
@@ -183,28 +170,16 @@
 
 - (void)scanItemAtURL:(NSURL *)url pendingDirectories:(NSMutableArray *)pendingDirectories
 {
-    // Obtain a thread safe reference to Realm
-    RLMRealm *realm = self.realm;
-
     // Check if we've already assigned an on-disk UUID
     NSString *uuid = [url to_fileSystemUUID];
-    __block TOFileSystemItem *item = [TOFileSystemItem objectInRealm:realm forPrimaryKey:uuid];
 
-    // If UUID is nil, or if it's not already in the DB, insert it
-    if (uuid == nil || item == nil) {
-        // Add the item to the database
-        [self.filePresenter pauseWhileExecutingBlock:^{
-            item = [self addNewItemAtURL:url];
-        }];
-    }
-    else {
-        // If it has an entry in the database, check to see if it has changed at all
-        BOOL hasChanged = [item hasChangesComparedToItemAtURL:url];
-
-    }
-
+    NSLog(@"%@", url);
+    
+    NSNumber *isDirectory;
+    [url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
+    
     // If the item is a directory
-    if (item.type == TOFileSystemItemTypeDirectory) {
+    if (isDirectory.boolValue) {
         // Add it to the pending list so we can start scanning it after this
         [pendingDirectories addObject:url];
     }
@@ -212,13 +187,7 @@
 
 - (TOFileSystemItem *)itemForParentOfItemAtURL:(NSURL *)url
 {
-    NSString *uuid = [url.URLByDeletingLastPathComponent to_fileSystemUUID];
-    NSAssert(uuid.length > 0, @"The parent item should always exist before children");
-
-    TOFileSystemItem *item = [TOFileSystemItem objectInRealm:self.realm forPrimaryKey:uuid];
-    NSAssert(item != nil, @"Parent should already exist at this point");
-
-    return item;
+    return nil;
 }
 
 - (NSInteger)numberOfDirectoryLevelsToURL:(NSURL *)url
@@ -235,26 +204,6 @@
     }
 
     return MAX(levels, -1);
-}
-
-- (TOFileSystemItem *)addNewItemAtURL:(NSURL *)newItemURL
-{
-    // Get a reference to the parent directory
-    TOFileSystemItem *parentItem = [self itemForParentOfItemAtURL:newItemURL];
-
-    // Create a new object for this item (and assign its parent)
-    TOFileSystemItem *item = [[TOFileSystemItem alloc] initWithItemAtFileURL:newItemURL];
-
-    // Add the item to Realm, and assign it as a child to the parent
-    @autoreleasepool {
-        RLMRealm *realm = self.realm;
-        [realm transactionWithBlock:^{
-            [realm addOrUpdateObject:item];
-            [parentItem.childItems addObject:item];
-        }];
-    }
-
-    return item;
 }
 
 #pragma mark - File System Handling -
@@ -277,13 +226,6 @@
                                                                               options:options
                                                                          errorHandler:nil];
     return urlEnumerator;
-}
-
-#pragma mark - Convenience Accessors -
-
-- (RLMRealm *)realm
-{
-    return [RLMRealm realmWithConfiguration:self.realmConfiguration error:nil];
 }
 
 @end

@@ -23,7 +23,6 @@
 #import "TOFileSystemObserver.h"
 
 #import "TOFileSystemPath.h"
-#import "TOFileSystemRealmConfiguration.h"
 #import "TOFileSystemScanOperation.h"
 #import "TOFileSystemPresenter.h"
 
@@ -46,12 +45,6 @@
 
 /** The operation queue we will perform our scanning on. */
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
-
-/** The configuration for the Realm database we'll be using. */
-@property (nonatomic, strong) RLMRealmConfiguration *realmConfiguration;
-
-/** Gets a new copy of the Realm database backing this observer. */
-@property (nonatomic, readonly) RLMRealm *realm;
 
 @end
 
@@ -84,8 +77,6 @@
     // Set-up default property values
     _isRunning = NO;
     _excludedItems = @[@"Inbox"];
-    _databaseFileName = [TOFileSystemPath defaultDatabaseFileName];
-    _databaseDirectoryURL = [TOFileSystemPath cachesDirectoryURL];
     
     // Set-up the operation queue
     _operationQueue = [[NSOperationQueue alloc] init];
@@ -97,27 +88,6 @@
 }
 
 #pragma mark - Observer Setup -
-
-- (BOOL)configureDatabase
-{
-    // Create the Realm configuration
-    NSURL *databaseFileURL = [self.databaseDirectoryURL
-                                URLByAppendingPathComponent:self.databaseFileName];
-    self.realmConfiguration = [TOFileSystemRealmConfiguration
-                               fileSystemConfigurationWithFileURL:databaseFileURL];
-
-    // Remove the database while we're developing
-    [[NSFileManager defaultManager] removeItemAtURL:self.realmConfiguration.fileURL error:nil];
-
-    // Try creating the database for potentially the first time
-    if (self.realm == nil) { return NO; }
-
-    // Then try creating our base item for our taget folder for the first time
-    TOFileSystemItem *baseItem = self.directoryItem;
-    if (baseItem == nil) { return NO; }
-    
-    return YES;
-}
 
 - (void)configureFilePresenter
 {
@@ -149,12 +119,6 @@
 
     // Set the running state
     self.isRunning = YES;
-
-    // Set up and configure our backing data store
-    if (![self configureDatabase]) {
-        [self stop];
-        return;
-    }
 
     // Lock in the properties of the base directory
     _parentDirectoryURL = [_directoryURL URLByDeletingLastPathComponent];
@@ -191,51 +155,10 @@
     // Create a new scan operation
     TOFileSystemScanOperation *scanOperation = nil;
     scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:self.directoryURL
-                                                                filePresenter:self.fileSystemPresenter
-                                                           realmConfiguration:self.realmConfiguration];
+                                                                filePresenter:self.fileSystemPresenter];
 
     // Begin asynchronous execution
     [self.operationQueue addOperation:scanOperation];
-}
-
-#pragma mark - Convenience Accessors -
-
-- (RLMRealm *)realm
-{
-    if (!self.isRunning) { return nil; }
-
-    // Attempt to create possibly the first instance of this realm
-    NSError *error;
-    RLMRealm *realm = [RLMRealm realmWithConfiguration:self.realmConfiguration error:&error];
-
-    // If an error occurs, log it, and return nil.
-    if (error) {
-        NSLog(@"TOFileSystemObserver: Was unable to start because an error occured in Realm: %@", error.description);
-        return nil;
-    }
-
-    return realm;
-}
-
-- (TOFileSystemItem *)directoryItem
-{
-    // The database isn't created until the observer has been started
-    if (!self.isRunning) { return nil; }
-
-    // Grab a local instance of Realm to save recreating it for each
-    RLMRealm *realm = self.realm;
-    
-    // See if there already exists an item for this directory in Realm
-    TOFileSystemItem *item = [TOFileSystemItem itemInRealm:self.realm forItemAtURL:self.directoryURL];
-    
-    // If not, create a new one and persist it
-    if (item == nil) {
-        item = [[TOFileSystemItem alloc] initWithItemAtFileURL:self.directoryURL];
-        id block = ^{ [realm addObject:item]; };
-        [realm transactionWithBlock:block];
-    }
-    
-    return item;
 }
 
 @end

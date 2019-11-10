@@ -57,20 +57,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger includedDirectoryLevels;
 
 /**
- The name of the snapshots database on disk.
- It may only be changed when the observer isn't running.
- The default value is "{AppBundleIdentifier}.fileSystemSnapshots.realm".
- */
-@property (nonatomic, copy) NSString *databaseFileName;
-
-/**
- The file route to the directory holding the snapshots database file on disk.
- It may only be changed when the observer isn't running.
- The default value is the application `Caches` directory.
- */
-@property (nonatomic, copy) NSURL *databaseDirectoryURL;
-
-/**
  The item that represents the base directory that was set to be observed
  by this file system observer.
 
@@ -89,7 +75,7 @@ NS_ASSUME_NONNULL_BEGIN
  so it is completely thread-safe. Like all Realm items, please ensure it
  is kept in an auto-release pool in dispatch queues.)
  */
-@property (nonatomic, readonly, nullable) RLMArray<TOFileSystemItem *> *items;
+//@property (nonatomic, readonly, nullable) RLMArray<TOFileSystemItem *> *items;
 
 /** Create a new instance of the observer with the base URL that will be observed. */
 - (instancetype)initWithDirectoryURL:(NSURL *)directoryURL;
@@ -106,10 +92,14 @@ NS_ASSUME_NONNULL_BEGIN
 /** Suspends the file system observer from monitoring any file system changes. */
 - (void)stop;
 
-/** Deletes all of the data related to directory being monitored by this observer. */
-- (void)reset;
-
 /**
+ Returns a list of directories and files inside the directory specified.
+ When the file observer is running, this list is live, and will be automatically
+ updated whenever any of the underlying files on disk are changed.
+ */
+
+ 
+ /**
  Registers a new notification block that will be triggered each time an update is detected.
  It is your responsibility to strongly retain the token object, and release it only
  when you wish to stop receiving notifications.
