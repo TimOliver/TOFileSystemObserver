@@ -22,6 +22,15 @@
 
 #import <Foundation/Foundation.h>
 
+@class TOFileSystemItem;
+
+/** The different options for ordering item lists */
+typedef NS_ENUM(NSInteger, TOFileSystemListOrder) {
+    TOFileSystemListOrderAlphanumeric,  // Alphanumeric ordering
+    TOFileSystemListOrderDate,          // Creation date
+    TOFileSystemListOrderSize           // File size
+};
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -35,7 +44,18 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface TOFileSystemList : NSObject
 
+/** The type of ordering of the items. */
+@property (nonatomic, assign) TOFileSystemListOrder listOrder;
 
+/** Whether the list is ascending or descending. (Default is ascending). */
+@property (nonatomic, assign) BOOL isDescending;
+
+/** An array of all of the items in this directory. */
+@property (nonatomic, readonly) NSArray<TOFileSystemItem *> *items;
+
+/** Creates a new instance of a list object with
+    the contents of the provided directory. */
+- (instancetype)initWithDirectoryURL:(NSURL *)directoryURL;
 
 @end
 
