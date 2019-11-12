@@ -25,6 +25,7 @@
 #import "TOFileSystemPresenter.h"
 
 #import "NSURL+TOFileSystemUUID.h"
+#import "NSFileManager+TOFileSystemDirectoryEnumerator.h"
 
 @interface TOFileSystemScanOperation ()
 
@@ -105,7 +106,7 @@
 - (void)scanAllSubdirectoriesFromBaseURL
 {
     // Start scanning every item in our base directory
-    NSArray *childItemURLs = [self urlEnumeratorForURL:self.directoryURL].allObjects;
+    NSArray *childItemURLs = [self.fileManager to_fileSystemEnumeratorForDirectoryAtURL:self.directoryURL].allObjects;
     if (childItemURLs.count == 0) { return; }
 
     // Due to some interesting behavior on behalf of the iOS
@@ -152,7 +153,7 @@
         }
 
         // Create a new enumerator for it
-        NSDirectoryEnumerator *enumerator = [self urlEnumeratorForURL:url];
+        NSDirectoryEnumerator *enumerator = [self.fileManager to_fileSystemEnumeratorForDirectoryAtURL:url];
         for (NSURL *url in enumerator) {
             [self scanItemAtURL:url pendingDirectories:pendingDirectories];
         }
@@ -204,28 +205,6 @@
     }
 
     return MAX(levels, -1);
-}
-
-#pragma mark - File System Handling -
-
-- (NSDirectoryEnumerator<NSURL *> *)urlEnumeratorForURL:(NSURL *)url
-{
-    // Set the keys for the properties we wish to capture
-    NSArray *keys = @[NSURLIsDirectoryKey,
-                      NSURLFileSizeKey,
-                      NSURLCreationDateKey,
-                      NSURLContentModificationDateKey];
-
-    // Set the flags for the enumerator
-    NSDirectoryEnumerationOptions options = NSDirectoryEnumerationSkipsHiddenFiles |
-                                            NSDirectoryEnumerationSkipsSubdirectoryDescendants;
-
-    // Create the enumerator
-    NSDirectoryEnumerator<NSURL *> *urlEnumerator = [self.fileManager enumeratorAtURL:url
-                                                           includingPropertiesForKeys:keys
-                                                                              options:options
-                                                                         errorHandler:nil];
-    return urlEnumerator;
 }
 
 @end

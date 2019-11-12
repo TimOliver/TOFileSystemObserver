@@ -21,6 +21,7 @@
 		22ADAEB92377EDA90088D31E /* TOFileSystemChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232B64E233FA19C00358B05 /* TOFileSystemChanges.m */; };
 		22ADAEBC237815DA0088D31E /* TOFileSystemList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBB237815DA0088D31E /* TOFileSystemList.m */; };
 		22ADAEBD2378177F0088D31E /* TOFileSystemItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */; };
+		22ADAEC0237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */; };
 		22D601C923657FA500275AD9 /* TOFileSystemPresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */; };
 		87800716004A3B429A615773 /* libPods-TOFileSystemObserverExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D963DD85AA86DAC2EF78BAD /* libPods-TOFileSystemObserverExample.a */; };
 /* End PBXBuildFile section */
@@ -54,6 +55,8 @@
 		2254ED3B2341060000331B47 /* NSURL+TOFileSystemUUID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURL+TOFileSystemUUID.h"; sourceTree = "<group>"; };
 		22ADAEBA237815DA0088D31E /* TOFileSystemList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemList.h; sourceTree = "<group>"; };
 		22ADAEBB237815DA0088D31E /* TOFileSystemList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemList.m; sourceTree = "<group>"; };
+		22ADAEBE237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+TOFileSystemDirectoryEnumerator.h"; sourceTree = "<group>"; };
+		22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+TOFileSystemDirectoryEnumerator.m"; sourceTree = "<group>"; };
 		22D601C723657FA500275AD9 /* TOFileSystemPresenter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemPresenter.h; sourceTree = "<group>"; };
 		22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemPresenter.m; sourceTree = "<group>"; };
 		93017B7D5ADFD2D3681F12E4 /* Pods-TOFileSystemObserverExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TOFileSystemObserverExample.debug.xcconfig"; path = "Target Support Files/Pods-TOFileSystemObserverExample/Pods-TOFileSystemObserverExample.debug.xcconfig"; sourceTree = "<group>"; };
@@ -176,6 +179,8 @@
 			children = (
 				2254ED3B2341060000331B47 /* NSURL+TOFileSystemUUID.h */,
 				2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */,
+				22ADAEBE237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.h */,
+				22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -301,6 +306,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22ADAEC0237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */,
 				2254ED2E2340F04800331B47 /* TOFileSystemScanOperation.m in Sources */,
 				2254ED2A2340588F00331B47 /* TOFileSystemPath.m in Sources */,
 				2254ED3C2341060000331B47 /* NSURL+TOFileSystemUUID.m in Sources */,
