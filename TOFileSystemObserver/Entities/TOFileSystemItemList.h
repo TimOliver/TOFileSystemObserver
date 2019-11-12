@@ -63,6 +63,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** Retrieves the item at the requested index. */
 - (TOFileSystemItem *)objectAtIndex:(NSUInteger)index;
 
+/** Allows array-style lookup of items at specific indexes. */
+- (TOFileSystemItem *)objectAtIndexedSubscript:(NSUInteger)index;
+
 - (instancetype)init NS_UNAVAILABLE;
 
 @end

@@ -63,11 +63,40 @@
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSDirectoryEnumerator *enumerator = [fileManager to_fileSystemEnumeratorForDirectoryAtURL:_directoryURL];
     
+    // Build a new list of files from what is currently on disk
     for (NSURL *url in enumerator) {
         TOFileSystemItem *item = [[TOFileSystemItem alloc] initWithItemAtFileURL:url
                                                               fileSystemObserver:self.fileSystemObserver];
         [_items addObject:item];
     }
+    
+    // Sort according to our current sort settings
+    [_items sortUsingDescriptors:@[self.currentSortingDescriptor]];
+}
+
+#pragma mark - Sorting Items -
+
+- (NSSortDescriptor *)currentSortingDescriptor
+{
+    // Sorting alphanumeric
+    if (self.listOrder == TOFileSystemItemListOrderAlphanumeric) {
+        id sortingBlock = ^NSComparisonResult(NSString *obj1, NSString *obj2) {
+            return [obj1 localizedStandardCompare:obj2];
+        };
+        return [NSSortDescriptor sortDescriptorWithKey:@"name"
+                                             ascending:!self.isDescending
+                                            comparator:sortingBlock];
+    }
+    
+    NSString *sortingKey = nil;
+    if (self.listOrder == TOFileSystemItemListOrderDate) {
+        sortingKey = @"creationDate";
+    }
+    else {
+        sortingKey = @"size";
+    }
+    
+    return [NSSortDescriptor sortDescriptorWithKey:sortingKey ascending:!self.isDescending];
 }
 
 #pragma mark - External Item Access -
@@ -77,6 +106,9 @@
     return self.items.count;
 }
 
-
+- (id)objectAtIndexedSubscript:(NSUInteger)index
+{
+    return _items[index];
+}
 
 @end
