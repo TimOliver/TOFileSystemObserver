@@ -22,11 +22,8 @@
 
 #import "TOFileSystemItem.h"
 #import "TOFileSystemPath.h"
+#import "TOFileSystemObserver.h"
 #import "NSURL+TOFileSystemUUID.h"
-
-@interface TOFileSystemItem ()
-
-@end
 
 @implementation TOFileSystemItem
 
@@ -35,6 +32,8 @@
 - (instancetype)initWithItemAtFileURL:(NSURL *)fileURL
 {
     if (self = [super init]) {
+        _observer = observer;
+        _fileURL = fileURL;
         [self configureFileSystemUUIDForItemAtURL:fileURL];
         [self refreshFromItemAtURL:fileURL];
     }
@@ -86,7 +85,8 @@
     // Check if it is a file or directory
     NSNumber *isDirectory;
     [url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
-    TOFileSystemItemType type = isDirectory.boolValue ? TOFileSystemItemTypeDirectory : TOFileSystemItemTypeFile;
+    TOFileSystemItemType type = isDirectory.boolValue ? TOFileSystemItemTypeDirectory :
+                                                        TOFileSystemItemTypeFile;
     if (type != self.type) {
         self.type = type;
         hasChanges = YES;
@@ -154,35 +154,5 @@
 
     return NO;
 }
-
-//- (NSURL *)absoluteFileURL
-//{
-//    NSString *filePath = @"";
-//
-//    // Prepend each parent directory name
-//    TOFileSystemItem *item = self;
-//    while ((item = item.parentDirectory)) {
-//        // Because the directory base points directly to our file in the sandbox,
-//        // don't prepend the top level item, as it would then be prepended twice
-//        if (item.directoryBase == nil) {
-//            filePath = [NSString stringWithFormat:@"%@/%@", item.name, filePath];
-//        }
-//    }
-//
-//    // Determine the parent item with the base directory parent
-//    item = self;
-//    while (item.directoryBase == nil) {
-//        item = item.parentDirectory;
-//    }
-//
-//    // Prepend the rest of the directory
-//    if (item.directoryBase.filePath.length > 0) {
-//        filePath = [NSString stringWithFormat:@"%@/%@", item.directoryBase.filePath, filePath];
-//    }
-//
-//    // Prepend the rest of the Sandbox
-//    NSURL *url = [TOFileSystemPath applicationSandboxURL];
-//    return [url URLByAppendingPathComponent:filePath];
-//}
 
 @end

@@ -28,19 +28,18 @@ typedef NS_ENUM(NSInteger, TOFileSystemItemType) {
     TOFileSystemItemTypeDirectory // A folder
 };
 
-// Forward declaration so that the item may be used in an array
-@class TOFileSystemItem;
+@class TOFileSystemObserver;
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- A Realm managed object model used to track
- a snapshot copy of the current file system.
-
- This is then compared with the current file system
- to determine when something has changed.
+ An object that represents either a file
+ or folder on disk.
  */
 @interface TOFileSystemItem : NSObject
+
+/** The absolute URL path to this item. */
+@property (nonatomic, readonly) NSURL *fileURL;
 
 /** The type of the item (either a file or folder) */
 @property (nonatomic, assign) TOFileSystemItemType type;
@@ -62,12 +61,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** Whether the item is still being copied into the app container. */
 @property (nonatomic, assign) BOOL isCopying;
-
-/** Generates an absolute URL path to this item. */
-@property (nonatomic, readonly) NSURL *absoluteFileURL;
-
-/** Fetches a file item from the supplied Realm. Returns nil if it can't be found. */
-//+ (nullable TOFileSystemItem *)itemInRealm:(RLMRealm *)realm forItemAtURL:(NSURL *)itemURL;
 
 /** Create a new, unmanaged instance to represent the file at the given URL. */
 - (instancetype)initWithItemAtFileURL:(NSURL *)fileURL;
