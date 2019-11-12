@@ -56,9 +56,20 @@
     }
     
     // Check to see if the UUID matches the UUID format
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\b(a|b)(c|d)\\b"
+    NSString *uuidPattern = @"\\A[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}\\Z";
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:uuidPattern
                                                                            options:NSRegularExpressionCaseInsensitive
                                                                              error:nil];
+    NSRange range = [regex rangeOfFirstMatchInString:uuid options:0 range:NSMakeRange(0, uuid.length)];
+    
+    // A valid regex was found.
+    if (range.location != NSNotFound) {
+        self.uuid = uuid;
+        return;
+    }
+    
+    // If not, generate a new UUID and save it to the file
+    self.uuid = [url to_generateUUID];
 }
 
 - (BOOL)refreshFromItemAtURL:(NSURL *)url
