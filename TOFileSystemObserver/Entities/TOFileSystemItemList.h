@@ -22,13 +22,14 @@
 
 #import <Foundation/Foundation.h>
 
+@class TOFileSystemObserver;
 @class TOFileSystemItem;
 
 /** The different options for ordering item lists */
-typedef NS_ENUM(NSInteger, TOFileSystemListOrder) {
-    TOFileSystemListOrderAlphanumeric,  // Alphanumeric ordering
-    TOFileSystemListOrderDate,          // Creation date
-    TOFileSystemListOrderSize           // File size
+typedef NS_ENUM(NSInteger, TOFileSystemItemListOrder) {
+    TOFileSystemItemListOrderAlphanumeric,  // Alphanumeric ordering
+    TOFileSystemItemListOrderDate,          // Creation date
+    TOFileSystemItemListOrderSize           // File size
 };
 
 NS_ASSUME_NONNULL_BEGIN
@@ -42,10 +43,13 @@ NS_ASSUME_NONNULL_BEGIN
  that it is kept up-to-date with any changes that occur on
  the file system.
  */
-@interface TOFileSystemList : NSObject
+@interface TOFileSystemItemList : NSObject
+
+/** The observer object backing this list object. */
+@property (nonatomic, weak, readonly) TOFileSystemObserver *fileSystemObserver;
 
 /** The type of ordering of the items. */
-@property (nonatomic, assign) TOFileSystemListOrder listOrder;
+@property (nonatomic, assign) TOFileSystemItemListOrder listOrder;
 
 /** Whether the list is ascending or descending. (Default is ascending). */
 @property (nonatomic, assign) BOOL isDescending;
