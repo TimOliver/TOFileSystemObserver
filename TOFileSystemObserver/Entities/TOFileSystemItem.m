@@ -25,15 +25,30 @@
 #import "TOFileSystemObserver.h"
 #import "NSURL+TOFileSystemUUID.h"
 
+@interface TOFileSystemItem ()
+
+/** Internal writing overrides for public properties */
+@property (nonatomic, strong, readwrite) NSURL *fileURL;
+@property (nonatomic, assign, readwrite) TOFileSystemItemType type;
+@property (nonatomic, copy,   readwrite) NSString *uuid;
+@property (nonatomic, copy,   readwrite) NSString *name;
+@property (nonatomic, assign, readwrite) long long size;
+@property (nonatomic, strong, readwrite) NSDate *creationDate;
+@property (nonatomic, strong, readwrite) NSDate *modificationDate;
+@property (nonatomic, assign, readwrite) BOOL isCopying;
+
+@end
+
 @implementation TOFileSystemItem
 
 #pragma mark - Class Creation -
 
 - (instancetype)initWithItemAtFileURL:(NSURL *)fileURL
+                   fileSystemObserver:(TOFileSystemObserver *)observer
 {
     if (self = [super init]) {
-        _observer = observer;
         _fileURL = fileURL;
+        _fileSystemObserver = observer;
         [self configureFileSystemUUIDForItemAtURL:fileURL];
         [self refreshFromItemAtURL:fileURL];
     }

@@ -42,31 +42,28 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSURL *fileURL;
 
 /** The type of the item (either a file or folder) */
-@property (nonatomic, assign) TOFileSystemItemType type;
+@property (nonatomic, readonly) TOFileSystemItemType type;
 
 /** The unique UUID that was assigned to the file by this library. */
-@property (nonatomic, copy) NSString *uuid;
+@property (nonatomic, readonly) NSString *uuid;
 
 /** The name on disk of the item. */
-@property (nonatomic, copy) NSString *name;
+@property (nonatomic, readonly) NSString *name;
 
 /** The size (in bytes) of this item. (0 for directories). */
-@property (nonatomic, assign) long long size;
+@property (nonatomic, readonly) long long size;
 
 /** The creation date of the item. */
-@property (nonatomic, strong) NSDate *creationDate;
+@property (nonatomic, readonly) NSDate *creationDate;
 
 /** The last modification date of the item. */
-@property (nonatomic, strong) NSDate *modificationDate;
+@property (nonatomic, readonly) NSDate *modificationDate;
 
 /** Whether the item is still being copied into the app container. */
-@property (nonatomic, assign) BOOL isCopying;
+@property (nonatomic, readonly) BOOL isCopying;
 
-/** Create a new, unmanaged instance to represent the file at the given URL. */
-- (instancetype)initWithItemAtFileURL:(NSURL *)fileURL;
-
-/** Refresh the properties of the item against the file at the given URL. */
-- (BOOL)refreshFromItemAtURL:(NSURL *)url;
+/** The file system observer backing this object. */
+@property (nonatomic, weak, readonly) TOFileSystemObserver *fileSystemObserver;
 
 @end
 
