@@ -25,6 +25,7 @@
 #import "TOFileSystemPath.h"
 #import "TOFileSystemScanOperation.h"
 #import "TOFileSystemPresenter.h"
+#import "TOFileSystemItemList+Private.h"
 
 @interface TOFileSystemObserver()
 
@@ -45,6 +46,9 @@
 
 /** The operation queue we will perform our scanning on. */
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
+
+/** A hash table that weakly holds item list objects */
+@property (nonatomic, strong) NSHashTable *itemListTable;
 
 @end
 
@@ -85,6 +89,9 @@
 
     // Set up the file system presenter
     _fileSystemPresenter = [[TOFileSystemPresenter alloc] init];
+    
+    // Set up the hash table
+    _itemListTable = [[NSHashTable alloc] initWithOptions:NSPointerFunctionsWeakMemory capacity:1];
 }
 
 #pragma mark - Observer Setup -
@@ -159,6 +166,33 @@
 
     // Begin asynchronous execution
     [self.operationQueue addOperation:scanOperation];
+}
+
+#pragma mark - Creating Observing Objects -
+
+- (TOFileSystemItemList *)itemListForDirectoryAtURL:(NSURL *)directoryURL
+{
+    // Default to the base directory if nil is supplied
+    if (directoryURL == nil) {
+        directoryURL = self.directoryURL;
+    }
+    
+    // Due to the fact that the URLs of the list items
+    // can change in the interim, we can't use a map table
+    // to hash the URLs.
+    // Use a hash table to loop through each item and see if
+    // have an item with a matching URL
+    for (TOFileSystemItemList *itemList in self.itemListTable.allObjects) {
+        if ([directoryURL isEqual:itemList.directoryURL]) {
+            return itemList;
+        }
+    }
+    
+    // Create a new one, and save it to the hash table
+    TOFileSystemItemList *itemList = [[TOFileSystemItemList alloc] initWithDirectoryURL:directoryURL
+                                                                     fileSystemObserver:self];
+    [self.itemListTable addObject:itemList];
+    return itemList;
 }
 
 @end

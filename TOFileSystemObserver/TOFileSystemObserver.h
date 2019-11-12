@@ -22,6 +22,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "TOFileSystemItemList.h"
 #import "TOFileSystemItem.h"
 #import "TOFileSystemNotificationToken.h"
 
@@ -96,8 +97,10 @@ NS_ASSUME_NONNULL_BEGIN
  Returns a list of directories and files inside the directory specified.
  When the file observer is running, this list is live, and will be automatically
  updated whenever any of the underlying files on disk are changed.
+ 
+ @param directoryURL The URL to target. Use `nil` for the observer's base directory.
  */
-
+- (TOFileSystemItemList *)itemListForDirectoryAtURL:(nullable NSURL *)directoryURL;
  
  /**
  Registers a new notification block that will be triggered each time an update is detected.
