@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
  that it is kept up-to-date with any changes that occur on
  the file system.
  */
-@interface TOFileSystemItemList : NSObject
+@interface TOFileSystemItemList : NSObject<NSFastEnumeration>
 
 /** The observer object backing this list object. */
 @property (nonatomic, weak, readonly) TOFileSystemObserver *fileSystemObserver;
@@ -54,11 +54,14 @@ NS_ASSUME_NONNULL_BEGIN
 /** Whether the list is ascending or descending. (Default is ascending). */
 @property (nonatomic, assign) BOOL isDescending;
 
-/** An array of all of the items in this directory. */
-@property (nonatomic, readonly) NSArray<TOFileSystemItem *> *items;
+/** The number of items in this list. */
+@property (nonatomic, readonly) NSUInteger count;
 
 /** The absolute URL to this directory containing these items. */
 @property (nonatomic, readonly) NSURL *directoryURL;
+
+/** Retrieves the item at the requested index. */
+- (TOFileSystemItem *)objectAtIndex:(NSUInteger)index;
 
 - (instancetype)init NS_UNAVAILABLE;
 

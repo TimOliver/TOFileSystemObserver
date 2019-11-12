@@ -12,6 +12,7 @@
 @interface TOViewController ()
 
 @property (nonatomic, strong) TOFileSystemObserver *observer;
+@property (nonatomic, strong) TOFileSystemItemList *fileItemList;
 
 @end
 
@@ -22,9 +23,12 @@
     
     self.title = @"TOFileSystemObserver";
 
+    // Create a file system observer and start it
     self.observer = [[TOFileSystemObserver alloc] init];
     [self.observer start];
 
+    // Create a live list of the base folder for this controller
+    self.fileItemList = [self.observer itemListForDirectoryAtURL:nil];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -34,7 +38,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return 10;
+    return self.fileItemList.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -44,8 +48,9 @@
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
     }
-
-    cell.textLabel.text = @"Cell";
+    
+    TOFileSystemItem *fileItem = self.fileItemList[indexPath.row];
+    cell.textLabel.text = fileItem.name;
 
     return cell;
 }
