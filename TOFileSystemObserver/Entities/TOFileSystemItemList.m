@@ -9,18 +9,9 @@
 #import "TOFileSystemItemList.h"
 #import "TOFileSystemItem.h"
 #import "TOFileSystemPath.h"
+#import "TOFileSystemItem+Private.h"
 
 #import "NSFileManager+TOFileSystemDirectoryEnumerator.h"
-
-/** Private interface for creating item objects */
-@interface TOFileSystemItem (Private)
-
-- (instancetype)initWithItemAtFileURL:(NSURL *)fileURL
-                   fileSystemObserver:(TOFileSystemObserver *)observer;
-
-@end
-
-// ------------------------------------------------------
 
 @interface TOFileSystemItemList ()
 
@@ -78,5 +69,14 @@
         [_items addObject:item];
     }
 }
+
+#pragma mark - External Item Access -
+
+- (NSUInteger)count
+{
+    return self.items.count;
+}
+
+
 
 @end
