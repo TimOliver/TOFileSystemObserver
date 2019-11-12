@@ -53,9 +53,10 @@ NS_ASSUME_NONNULL_BEGIN
 /** An array of all of the items in this directory. */
 @property (nonatomic, readonly) NSArray<TOFileSystemItem *> *items;
 
-/** Creates a new instance of a list object with
-    the contents of the provided directory. */
-- (instancetype)initWithDirectoryURL:(NSURL *)directoryURL;
+/** The absolute URL to this directory containing these items. */
+@property (nonatomic, readonly) NSURL *directoryURL;
+
+- (instancetype)init NS_UNAVAILABLE;
 
 @end
 
