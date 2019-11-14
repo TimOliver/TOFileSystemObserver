@@ -27,6 +27,8 @@
 #import "TOFileSystemPresenter.h"
 #import "TOFileSystemItemList+Private.h"
 
+#import "NSURL+TOFileSystemUUID.h"
+
 @interface TOFileSystemObserver()
 
 /** The absolute path to our observed directory's super directory so we can build paths. */
@@ -48,7 +50,7 @@
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
 
 /** A hash table that weakly holds item list objects */
-@property (nonatomic, strong) NSHashTable *itemListTable;
+@property (nonatomic, strong) NSMapTable *itemListTable;
 
 @end
 
@@ -91,7 +93,9 @@
     _fileSystemPresenter = [[TOFileSystemPresenter alloc] init];
     
     // Set up the hash table
-    _itemListTable = [[NSHashTable alloc] initWithOptions:NSPointerFunctionsWeakMemory capacity:1];
+    _itemListTable = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsCopyIn
+                                               valueOptions:NSPointerFunctionsWeakMemory
+                                                   capacity:0];
 }
 
 #pragma mark - Observer Setup -
@@ -177,21 +181,15 @@
         directoryURL = self.directoryURL;
     }
     
-    // Due to the fact that the URLs of the list items
-    // can change in the interim, we can't use a map table
-    // to hash the URLs.
-    // Use a hash table to loop through each item and see if
-    // have an item with a matching URL
-    for (TOFileSystemItemList *itemList in self.itemListTable.allObjects) {
-        if ([directoryURL isEqual:itemList.directoryURL]) {
-            return itemList;
-        }
-    }
+    // Fetch the UUID for this item and see if we've cached it already
+    NSString *uuid = [directoryURL to_fileSystemUUID];
+    TOFileSystemItemList *itemList = [self.itemListTable objectForKey:uuid];
+    if (itemList) { return itemList; }
     
-    // Create a new one, and save it to the hash table
-    TOFileSystemItemList *itemList = [[TOFileSystemItemList alloc] initWithDirectoryURL:directoryURL
+    // Create a new one, and save it to the map table
+    itemList = [[TOFileSystemItemList alloc] initWithDirectoryURL:directoryURL
                                                                      fileSystemObserver:self];
-    [self.itemListTable addObject:itemList];
+    [self.itemListTable setObject:itemList forKey:itemList];
     return itemList;
 }
 
