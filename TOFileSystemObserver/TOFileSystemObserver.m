@@ -93,7 +93,7 @@
     _fileSystemPresenter = [[TOFileSystemPresenter alloc] init];
     
     // Set up the hash table
-    _itemListTable = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsCopyIn
+    _itemListTable = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsStrongMemory
                                                valueOptions:NSPointerFunctionsWeakMemory
                                                    capacity:0];
 }
