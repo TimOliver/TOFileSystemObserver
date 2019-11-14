@@ -130,4 +130,16 @@
                                          count:len];
 }
 
+#pragma mark - Debugging -
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"url = '%@', uuid = '%@', listOrder = %ld, isDescending = %d, items = '%@'",
+            _directoryURL,
+            _uuid,
+            (long)_listOrder,
+            _isDescending,
+            _items];
+}
+
 @end
