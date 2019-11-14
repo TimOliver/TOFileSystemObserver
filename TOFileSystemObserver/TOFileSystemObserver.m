@@ -102,23 +102,22 @@
 
 - (void)configureFilePresenter
 {
+    // Attach the root directory to the observer
+    NSURL *url = self.directoryURL;
+    self.fileSystemPresenter.directoryURL = url;
+    
+    // Set up the callback handler for when changes are detected
     __weak typeof(self) weakSelf = self;
     self.fileSystemPresenter.itemsDidChangeHandler = ^(NSArray *itemURLs) {
-        NSLog(@"%@", itemURLs);
+        //NSLog(@"%@", itemURLs);
         //[weakSelf performScanWithItems:itemURLs];
     };
 }
 
 - (void)beginObservingBaseDirectory
 {
-    // Attach the root directory to the observer
-    NSURL *url = self.directoryURL;
-    self.fileSystemPresenter.directoryURL = url;
-
-    // Set the detect handler
+    // Configure the file presenter and start
     [self configureFilePresenter];
-
-    // Start the handler
     [self.fileSystemPresenter start];
 }
 
@@ -140,9 +139,6 @@
 
     // Start the observer to watch for any system level changes
     [self beginObservingBaseDirectory];
-
-    // Kick off an initial scan of the entire file hierarchy
-    [self performFullDirectoryScan];
 }
 
 - (void)stop
