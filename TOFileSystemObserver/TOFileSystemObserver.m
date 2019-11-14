@@ -109,8 +109,7 @@
     // Set up the callback handler for when changes are detected
     __weak typeof(self) weakSelf = self;
     self.fileSystemPresenter.itemsDidChangeHandler = ^(NSArray *itemURLs) {
-        //NSLog(@"%@", itemURLs);
-        //[weakSelf performScanWithItems:itemURLs];
+        [weakSelf updateObservingObjectsWithChangedItemURLs:itemURLs];
     };
 }
 
@@ -185,8 +184,15 @@
     // Create a new one, and save it to the map table
     itemList = [[TOFileSystemItemList alloc] initWithDirectoryURL:directoryURL
                                                                      fileSystemObserver:self];
-    [self.itemListTable setObject:itemList forKey:itemList];
+    [self.itemListTable setObject:itemList forKey:itemList.uuid];
     return itemList;
+}
+
+#pragma mark - Updating Observing Object -
+
+- (void)updateObservingObjectsWithChangedItemURLs:(NSArray *)itemURLs
+{
+    
 }
 
 @end
