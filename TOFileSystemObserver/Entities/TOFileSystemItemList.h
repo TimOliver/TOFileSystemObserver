@@ -45,6 +45,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface TOFileSystemItemList : NSObject<NSFastEnumeration>
 
+/** The unique UUID string saved in the attributes of this directory. */
+@property (nonatomic, readonly) NSString *uuid;
+
 /** The observer object backing this list object. */
 @property (nonatomic, weak, readonly) TOFileSystemObserver *fileSystemObserver;
 

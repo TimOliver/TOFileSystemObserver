@@ -49,7 +49,7 @@
     if (self = [super init]) {
         _fileURL = fileURL;
         _fileSystemObserver = observer;
-        [self configureFileSystemUUIDForItemAtURL:fileURL];
+        _uuid = [fileURL to_makeFileSystemUUIDIfNeeded];
         [self refreshFromItemAtURL:fileURL];
     }
 
@@ -57,34 +57,6 @@
 }
 
 #pragma mark - Update Properties -
-
-- (void)configureFileSystemUUIDForItemAtURL:(NSURL *)url
-{
-    // Attempt to load any existing UUID
-    NSString *uuid = [url to_fileSystemUUID];
-    
-    // Create a brand new one if it doesn't exist
-    if (uuid == nil) {
-        self.uuid = [url to_generateUUID];
-        return;
-    }
-    
-    // Check to see if the UUID matches the UUID format
-    NSString *uuidPattern = @"\\A[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}\\Z";
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:uuidPattern
-                                                                           options:NSRegularExpressionCaseInsensitive
-                                                                             error:nil];
-    NSRange range = [regex rangeOfFirstMatchInString:uuid options:0 range:NSMakeRange(0, uuid.length)];
-    
-    // A valid regex was found.
-    if (range.location != NSNotFound) {
-        self.uuid = uuid;
-        return;
-    }
-    
-    // If not, generate a new UUID and save it to the file
-    self.uuid = [url to_generateUUID];
-}
 
 - (BOOL)refreshFromItemAtURL:(NSURL *)url
 {

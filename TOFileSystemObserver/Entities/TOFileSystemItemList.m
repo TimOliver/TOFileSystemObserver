@@ -11,9 +11,13 @@
 #import "TOFileSystemPath.h"
 #import "TOFileSystemItem+Private.h"
 
+#import "NSURL+TOFileSystemUUID.h"
 #import "NSFileManager+TOFileSystemDirectoryEnumerator.h"
 
 @interface TOFileSystemItemList ()
+
+/** The UUID string of the directory backing this object */
+@property (nonatomic, copy, readwrite) NSString *uuid;
 
 /** A weak reference to the observer object we were created by. */
 @property (nonatomic, weak, readwrite) TOFileSystemObserver *fileSystemObserver;
@@ -37,6 +41,7 @@
     if (self = [super init]) {
         _fileSystemObserver = observer;
         _directoryURL = directoryURL;
+        _uuid = [directoryURL to_makeFileSystemUUIDIfNeeded];
         [self commonInit];
     }
     
@@ -106,9 +111,23 @@
     return self.items.count;
 }
 
+- (TOFileSystemItem *)objectAtIndex:(NSUInteger)index
+{
+    return _items[index];
+}
+
 - (id)objectAtIndexedSubscript:(NSUInteger)index
 {
     return _items[index];
+}
+
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                  objects:(id __unsafe_unretained _Nullable [_Nonnull])buffer
+                                    count:(NSUInteger)len
+{
+    return [_items countByEnumeratingWithState:state
+                                       objects:buffer
+                                         count:len];
 }
 
 @end
