@@ -192,7 +192,7 @@
 
 - (void)updateObservingObjectsWithChangedItemURLs:(NSArray *)itemURLs
 {
-    
+    // Loop 
 }
 
 @end
