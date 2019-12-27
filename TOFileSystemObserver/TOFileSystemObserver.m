@@ -49,6 +49,9 @@
 /** The operation queue we will perform our scanning on. */
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
 
+/** A store for every item discovered on disk. We use this to determine when files are renamed, duplicated, or deleted. */
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSURL *> *fileList;
+
 /** A hash table that weakly holds item list objects */
 @property (nonatomic, strong) NSMapTable *itemListTable;
 
@@ -192,7 +195,7 @@
 
 - (void)updateObservingObjectsWithChangedItemURLs:(NSArray *)itemURLs
 {
-    // Loop 
+    NSLog(@"%@", itemURLs);
 }
 
 @end
