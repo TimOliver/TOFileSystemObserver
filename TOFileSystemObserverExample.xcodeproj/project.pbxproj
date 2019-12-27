@@ -22,9 +22,23 @@
 		22ADAEBC237815DA0088D31E /* TOFileSystemItemList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBB237815DA0088D31E /* TOFileSystemItemList.m */; };
 		22ADAEBD2378177F0088D31E /* TOFileSystemItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */; };
 		22ADAEC0237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */; };
+		22C7FE9C23B5BD120017CABD /* TOFileSystemItemDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FE9B23B5BD120017CABD /* TOFileSystemItemDictionary.m */; };
+		22C7FEA423B5E70E0017CABD /* TOFileSystemObserverTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FEA323B5E70E0017CABD /* TOFileSystemObserverTests.m */; };
+		22C7FEAC23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FEAB23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m */; };
+		22C7FEAD23B5E74E0017CABD /* TOFileSystemItemDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FE9B23B5BD120017CABD /* TOFileSystemItemDictionary.m */; };
 		22D601C923657FA500275AD9 /* TOFileSystemPresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */; };
 		87800716004A3B429A615773 /* libPods-TOFileSystemObserverExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D963DD85AA86DAC2EF78BAD /* libPods-TOFileSystemObserverExample.a */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		22C7FEA623B5E70E0017CABD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 223A8930233F13C9008FFE1A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 223A8937233F13C9008FFE1A;
+			remoteInfo = TOFileSystemObserverExample;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		0D963DD85AA86DAC2EF78BAD /* libPods-TOFileSystemObserverExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TOFileSystemObserverExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -59,6 +73,12 @@
 		22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+TOFileSystemDirectoryEnumerator.m"; sourceTree = "<group>"; };
 		22ADAEC1237AD1A40088D31E /* TOFileSystemItem+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TOFileSystemItem+Private.h"; sourceTree = "<group>"; };
 		22ADAEC3237AD24E0088D31E /* TOFileSystemItemList+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TOFileSystemItemList+Private.h"; sourceTree = "<group>"; };
+		22C7FE9A23B5BD120017CABD /* TOFileSystemItemDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemItemDictionary.h; sourceTree = "<group>"; };
+		22C7FE9B23B5BD120017CABD /* TOFileSystemItemDictionary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemItemDictionary.m; sourceTree = "<group>"; };
+		22C7FEA123B5E70E0017CABD /* TOFileSystemObserverTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TOFileSystemObserverTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		22C7FEA323B5E70E0017CABD /* TOFileSystemObserverTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemObserverTests.m; sourceTree = "<group>"; };
+		22C7FEA523B5E70E0017CABD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		22C7FEAB23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemItemDictionaryTests.m; sourceTree = "<group>"; };
 		22D601C723657FA500275AD9 /* TOFileSystemPresenter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemPresenter.h; sourceTree = "<group>"; };
 		22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemPresenter.m; sourceTree = "<group>"; };
 		93017B7D5ADFD2D3681F12E4 /* Pods-TOFileSystemObserverExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TOFileSystemObserverExample.debug.xcconfig"; path = "Target Support Files/Pods-TOFileSystemObserverExample/Pods-TOFileSystemObserverExample.debug.xcconfig"; sourceTree = "<group>"; };
@@ -71,6 +91,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				87800716004A3B429A615773 /* libPods-TOFileSystemObserverExample.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22C7FE9E23B5E70E0017CABD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -102,6 +129,7 @@
 			children = (
 				223A8954233F4A99008FFE1A /* TOFileSystemObserver */,
 				223A893A233F13CA008FFE1A /* TOFileSystemObserverExample */,
+				22C7FEA223B5E70E0017CABD /* TOFileSystemObserverTests */,
 				223A8939233F13CA008FFE1A /* Products */,
 				83E6F6A1977EF05EE5BA87E3 /* Pods */,
 				4F8DA90D4D2EFBA090963DD9 /* Frameworks */,
@@ -112,6 +140,7 @@
 			isa = PBXGroup;
 			children = (
 				223A8938233F13CA008FFE1A /* TOFileSystemObserverExample.app */,
+				22C7FEA123B5E70E0017CABD /* TOFileSystemObserverTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -150,10 +179,13 @@
 		223A8958233F4AB5008FFE1A /* Entities */ = {
 			isa = PBXGroup;
 			children = (
-				22ADAEC2237AD2330088D31E /* Private */,
+				22C7FE9A23B5BD120017CABD /* TOFileSystemItemDictionary.h */,
+				22C7FE9B23B5BD120017CABD /* TOFileSystemItemDictionary.m */,
 				22ADAEBA237815DA0088D31E /* TOFileSystemItemList.h */,
+				22ADAEC3237AD24E0088D31E /* TOFileSystemItemList+Private.h */,
 				22ADAEBB237815DA0088D31E /* TOFileSystemItemList.m */,
 				223A8959233F4B3B008FFE1A /* TOFileSystemItem.h */,
+				22ADAEC1237AD1A40088D31E /* TOFileSystemItem+Private.h */,
 				223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */,
 			);
 			path = Entities;
@@ -188,13 +220,14 @@
 			path = Categories;
 			sourceTree = "<group>";
 		};
-		22ADAEC2237AD2330088D31E /* Private */ = {
+		22C7FEA223B5E70E0017CABD /* TOFileSystemObserverTests */ = {
 			isa = PBXGroup;
 			children = (
-				22ADAEC3237AD24E0088D31E /* TOFileSystemItemList+Private.h */,
-				22ADAEC1237AD1A40088D31E /* TOFileSystemItem+Private.h */,
+				22C7FEAB23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m */,
+				22C7FEA323B5E70E0017CABD /* TOFileSystemObserverTests.m */,
+				22C7FEA523B5E70E0017CABD /* Info.plist */,
 			);
-			path = Private;
+			path = TOFileSystemObserverTests;
 			sourceTree = "<group>";
 		};
 		22D601C623657F5B00275AD9 /* FilePresenter */ = {
@@ -244,6 +277,24 @@
 			productReference = 223A8938233F13CA008FFE1A /* TOFileSystemObserverExample.app */;
 			productType = "com.apple.product-type.application";
 		};
+		22C7FEA023B5E70E0017CABD /* TOFileSystemObserverTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 22C7FEA823B5E70E0017CABD /* Build configuration list for PBXNativeTarget "TOFileSystemObserverTests" */;
+			buildPhases = (
+				22C7FE9D23B5E70E0017CABD /* Sources */,
+				22C7FE9E23B5E70E0017CABD /* Frameworks */,
+				22C7FE9F23B5E70E0017CABD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				22C7FEA723B5E70E0017CABD /* PBXTargetDependency */,
+			);
+			name = TOFileSystemObserverTests;
+			productName = TOFileSystemObserverTests;
+			productReference = 22C7FEA123B5E70E0017CABD /* TOFileSystemObserverTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -255,6 +306,10 @@
 				TargetAttributes = {
 					223A8937233F13C9008FFE1A = {
 						CreatedOnToolsVersion = 11.1;
+					};
+					22C7FEA023B5E70E0017CABD = {
+						CreatedOnToolsVersion = 11.3;
+						TestTargetID = 223A8937233F13C9008FFE1A;
 					};
 				};
 			};
@@ -272,6 +327,7 @@
 			projectRoot = "";
 			targets = (
 				223A8937233F13C9008FFE1A /* TOFileSystemObserverExample */,
+				22C7FEA023B5E70E0017CABD /* TOFileSystemObserverTests */,
 			);
 		};
 /* End PBXProject section */
@@ -283,6 +339,13 @@
 			files = (
 				223A894B233F13CA008FFE1A /* LaunchScreen.storyboard in Resources */,
 				223A8948233F13CA008FFE1A /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22C7FE9F23B5E70E0017CABD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -332,10 +395,29 @@
 				22ADAEBD2378177F0088D31E /* TOFileSystemItem.m in Sources */,
 				223A893D233F13CA008FFE1A /* TOAppDelegate.m in Sources */,
 				223A894E233F13CA008FFE1A /* main.m in Sources */,
+				22C7FE9C23B5BD120017CABD /* TOFileSystemItemDictionary.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22C7FE9D23B5E70E0017CABD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22C7FEAC23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m in Sources */,
+				22C7FEA423B5E70E0017CABD /* TOFileSystemObserverTests.m in Sources */,
+				22C7FEAD23B5E74E0017CABD /* TOFileSystemItemDictionary.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		22C7FEA723B5E70E0017CABD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 223A8937233F13C9008FFE1A /* TOFileSystemObserverExample */;
+			targetProxy = 22C7FEA623B5E70E0017CABD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		223A8949233F13CA008FFE1A /* LaunchScreen.storyboard */ = {
@@ -501,6 +583,46 @@
 			};
 			name = Release;
 		};
+		22C7FEA923B5E70E0017CABD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 6LF3GMKZAB;
+				INFOPLIST_FILE = TOFileSystemObserverTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.tim.TOFileSystemObserverTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TOFileSystemObserverExample.app/TOFileSystemObserverExample";
+			};
+			name = Debug;
+		};
+		22C7FEAA23B5E70E0017CABD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 6LF3GMKZAB;
+				INFOPLIST_FILE = TOFileSystemObserverTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.tim.TOFileSystemObserverTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TOFileSystemObserverExample.app/TOFileSystemObserverExample";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -518,6 +640,15 @@
 			buildConfigurations = (
 				223A8952233F13CB008FFE1A /* Debug */,
 				223A8953233F13CB008FFE1A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		22C7FEA823B5E70E0017CABD /* Build configuration list for PBXNativeTarget "TOFileSystemObserverTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				22C7FEA923B5E70E0017CABD /* Debug */,
+				22C7FEAA23B5E70E0017CABD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
