@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSURL *)itemURLForUUID:(nullable NSString *)uuid;
 
 /** Implementations for allowing dictionary style literal syntax. */
-- (void)setObject:(id)object forKeyedSubscript:(nonnull NSString *)key;
+- (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key;
 - (nullable id)objectForKeyedSubscript:(NSString *)key;
 
 @end

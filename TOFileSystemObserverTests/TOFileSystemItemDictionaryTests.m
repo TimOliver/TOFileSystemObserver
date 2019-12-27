@@ -22,6 +22,25 @@
     XCTAssertNotNil(dict);
 }
 
+- (void)testInsertionAndDeletion
+{
+    TOFileSystemItemDictionary *dict = [[TOFileSystemItemDictionary alloc] init];
+    
+    // Test first insertion
+    NSURL *url = [NSURL URLWithString:@"https://www.google.com"];
+    dict[@"google"] = url;
+    XCTAssertEqual(dict[@"google"], url);
+    
+    // Test second insertion
+    url = [NSURL URLWithString:@"https://www.bing.com"];
+    dict[@"google"] = url;
+    XCTAssertEqual(dict[@"google"], url);
+    
+    // Test deletion
+    dict[@"google"] = nil;
+    XCTAssertNil(dict[@"google"]);
+}
+
 - (void)testConcurrentReads
 {
     TOFileSystemItemDictionary *dict = [[TOFileSystemItemDictionary alloc] init];

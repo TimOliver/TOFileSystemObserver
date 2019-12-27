@@ -60,7 +60,7 @@
 }
 
 /** Implementation for allowing dictionary style literal syntax. */
-- (void)setObject:(id)object forKeyedSubscript:(nonnull NSString *)key
+- (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key
 {
     [self setItemURL:object forUUID:key];
 }
