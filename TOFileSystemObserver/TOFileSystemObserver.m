@@ -26,6 +26,7 @@
 #import "TOFileSystemScanOperation.h"
 #import "TOFileSystemPresenter.h"
 #import "TOFileSystemItemList+Private.h"
+#import "NSURL+TOFileSystemStandardized.h"
 
 #import "NSURL+TOFileSystemUUID.h"
 
@@ -64,7 +65,7 @@
 - (instancetype)init
 {
     if (self = [super init]) {
-        _directoryURL = [TOFileSystemPath documentsDirectoryURL];
+        _directoryURL = [TOFileSystemPath documentsDirectoryURL].to_standardizedURL;
         [self setUp];
     }
 
@@ -141,6 +142,9 @@
 
     // Start the observer to watch for any system level changes
     [self beginObservingBaseDirectory];
+    
+    // Perform an initial scan of all of the files we will observe
+    [self performFullDirectoryScan];
 }
 
 - (void)stop

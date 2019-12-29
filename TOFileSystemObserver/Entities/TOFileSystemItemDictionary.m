@@ -31,7 +31,6 @@
     return self;
 }
 
-
 - (NSUInteger)count
 {
     return self.items.count;
@@ -46,7 +45,6 @@
     });
 }
 
-/** Retrieves an item URL from the dictionary. May be called from multiple threads. */
 - (nullable NSURL *)itemURLForUUID:(NSString *)uuid
 {
     if (uuid.length == 0) { return nil; }
@@ -59,7 +57,6 @@
     return itemURL;
 }
 
-/** Implementation for allowing dictionary style literal syntax. */
 - (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key
 {
     [self setItemURL:object forUUID:key];

@@ -25,6 +25,7 @@
 #import "TOFileSystemPresenter.h"
 
 #import "NSURL+TOFileSystemUUID.h"
+#import "NSURL+TOFileSystemStandardized.h"
 #import "NSFileManager+TOFileSystemDirectoryEnumerator.h"
 
 @interface TOFileSystemScanOperation ()
@@ -109,21 +110,10 @@
     NSArray *childItemURLs = [self.fileManager to_fileSystemEnumeratorForDirectoryAtURL:self.directoryURL].allObjects;
     if (childItemURLs.count == 0) { return; }
 
-    // Due to some interesting behavior on behalf of the iOS
-    // file system, the absolute path to the base directory
-    // provided to this class can potentially be different
-    // to the file paths provided by the enumerators.
-    // (One contains '/private/' and one does not)
-    //
-    // In order to compare the base directory URL to
-    // items found by the enumerator, re-fetch the
-    // base URL as the parent of the top level items
-    // and re-set it.
-    self.directoryURL = [childItemURLs.firstObject URLByDeletingLastPathComponent];
-
     // Scan all of the items in the base directory
     for (NSURL *url in childItemURLs) {
-        [self scanItemAtURL:url pendingDirectories:self.pendingDirectories];
+        [self scanItemAtURL:url.to_standardizedURL
+         pendingDirectories:self.pendingDirectories];
     }
 
     // If we were only scanning the immediate contents
@@ -174,8 +164,6 @@
     // Check if we've already assigned an on-disk UUID
     NSString *uuid = [url to_fileSystemUUID];
 
-    NSLog(@"%@", url);
-    
     NSNumber *isDirectory;
     [url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
     
