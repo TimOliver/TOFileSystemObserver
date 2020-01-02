@@ -26,8 +26,9 @@
 #import "TOFileSystemScanOperation.h"
 #import "TOFileSystemPresenter.h"
 #import "TOFileSystemItemList+Private.h"
-#import "NSURL+TOFileSystemStandardized.h"
+#import "TOFileSystemItemDictionary.h"
 
+#import "NSURL+TOFileSystemStandardized.h"
 #import "NSURL+TOFileSystemUUID.h"
 
 @interface TOFileSystemObserver()
@@ -51,7 +52,7 @@
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
 
 /** A store for every item discovered on disk. We use this to determine when files are renamed, duplicated, or deleted. */
-@property (nonatomic, strong) NSMutableDictionary<NSString *, NSURL *> *fileList;
+@property (nonatomic, strong) TOFileSystemItemDictionary *allItems;
 
 /** A hash table that weakly holds item list objects */
 @property (nonatomic, strong) NSMapTable *itemListTable;
@@ -100,6 +101,9 @@
     _itemListTable = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsStrongMemory
                                                valueOptions:NSPointerFunctionsWeakMemory
                                                    capacity:0];
+    
+    // Set up a store for all of the discovered items
+    _allItems = [[TOFileSystemItemDictionary alloc] init];
 }
 
 #pragma mark - Observer Setup -
@@ -168,6 +172,7 @@
     // Create a new scan operation
     TOFileSystemScanOperation *scanOperation = nil;
     scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:self.directoryURL
+                                                           allItemsDictionary:self.allItems
                                                                 filePresenter:self.fileSystemPresenter];
 
     // Begin asynchronous execution

@@ -23,6 +23,7 @@
 #import "TOFileSystemScanOperation.h"
 #import "TOFileSystemItem.h"
 #import "TOFileSystemPresenter.h"
+#import "TOFileSystemItemDictionary.h"
 
 #import "NSURL+TOFileSystemUUID.h"
 #import "NSURL+TOFileSystemStandardized.h"
@@ -45,6 +46,9 @@
 /** When iterating through all the files, this array stores pending directories that need scanning*/
 @property (nonatomic, strong) NSMutableArray *pendingDirectories;
 
+/** A reference to the master list of items maintained by this observer. */
+@property (nonatomic, strong) TOFileSystemItemDictionary *allItems;
+
 @end
 
 @implementation TOFileSystemScanOperation
@@ -52,11 +56,13 @@
 #pragma - Class Lifecycle -
 
 - (instancetype)initWithDirectoryAtURL:(NSURL *)directoryURL
+                    allItemsDictionary:(nonnull TOFileSystemItemDictionary *)allItems
                          filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
 {
     if (self = [super init]) {
         _directoryURL = directoryURL;
         _filePresenter = filePresenter;
+        _allItems = allItems;
         _pendingDirectories = [NSMutableArray array];
         [self commonInit];
     }
@@ -65,11 +71,13 @@
 }
 
 - (instancetype)initWithItemURLs:(NSArray<NSURL *> *)itemURLs
-                   filePresenter:(TOFileSystemPresenter *)filePresenter
+              allItemsDictionary:(nonnull TOFileSystemItemDictionary *)allItems
+                   filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
 {
     if (self = [super init]) {
         _filePresenter = filePresenter;
         _itemURLs = itemURLs;
+        _allItems = allItems;
         [self commonInit];
     }
 
