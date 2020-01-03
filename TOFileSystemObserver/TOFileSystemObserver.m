@@ -178,6 +178,7 @@
     TOFileSystemScanOperation *scanOperation = nil;
     scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:self.directoryURL
                                                            allItemsDictionary:self.allItems
+                                                       copyingItemsDictionary:self.copyingItems
                                                                 filePresenter:self.fileSystemPresenter];
 
     // Begin asynchronous execution
