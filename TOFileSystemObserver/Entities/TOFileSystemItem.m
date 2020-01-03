@@ -90,9 +90,7 @@
     }
 
     // Check if it is a file or directory
-    NSNumber *isDirectory;
-    [url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
-    TOFileSystemItemType type = isDirectory.boolValue ? TOFileSystemItemTypeDirectory :
+    TOFileSystemItemType type = url.to_isDirectory ? TOFileSystemItemTypeDirectory :
                                                         TOFileSystemItemTypeFile;
     if (type != self.type) {
         self.type = type;
@@ -100,16 +98,14 @@
     }
 
     // Get its creation date
-    NSDate *creationDate;
-    [url getResourceValue:&creationDate forKey:NSURLCreationDateKey error:nil];
+    NSDate *creationDate = url.to_creationDate;
     if (![self.creationDate isEqualToDate:creationDate]) {
         self.creationDate = creationDate;
         hasChanges = YES;
     }
     
     // Get its modification date
-    NSDate *modificationDate;
-    [url getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:nil];
+    NSDate *modificationDate = url.to_modificationDate;
     if (![self.modificationDate isEqualToDate:modificationDate]) {
         self.modificationDate = modificationDate;
         hasChanges = YES;
@@ -117,10 +113,9 @@
     
     // If the type is a file, fetch its size
     if (self.type == TOFileSystemItemTypeFile) {
-        NSNumber *fileSize;
-        [url getResourceValue:&fileSize forKey:NSURLFileSizeKey error:nil];
-        if (fileSize.longLongValue != self.size) {
-            self.size = fileSize.longLongValue;
+        long long fileSize = url.to_size;
+        if (fileSize != self.size) {
+            self.size = fileSize;
             hasChanges = YES;
         }
     }
@@ -137,26 +132,21 @@
     if (![self.uuid isEqualToString:[itemURL to_fileSystemUUID]]) { return YES; }
 
     // File type
-    NSNumber *isDirectory;
-    [itemURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
-    TOFileSystemItemType type = isDirectory.boolValue ? TOFileSystemItemTypeDirectory : TOFileSystemItemTypeFile;
+    TOFileSystemItemType type = itemURL.to_isDirectory ? TOFileSystemItemTypeDirectory : TOFileSystemItemTypeFile;
     if (self.type != type) { return YES; }
 
     // File size
     if (self.type == TOFileSystemItemTypeFile) {
-        NSNumber *fileSize;
-        [itemURL getResourceValue:&fileSize forKey:NSURLFileSizeKey error:nil];
-        if(self.size != fileSize.longLongValue) { return YES; }
+        long long fileSize = itemURL.to_size;
+        if(self.size != fileSize) { return YES; }
     }
 
     // Creation date
-    NSDate *creationDate;
-    [itemURL getResourceValue:&creationDate forKey:NSURLCreationDateKey error:nil];
+    NSDate *creationDate = itemURL.to_creationDate;
     if (![self.creationDate isEqual:creationDate]) { return YES; }
 
     // Get its modification date
-    NSDate *modificationDate;
-    [itemURL getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:nil];
+    NSDate *modificationDate = itemURL.to_modificationDate;
     if (![self.modificationDate isEqual:modificationDate]) { return YES; }
 
     return NO;

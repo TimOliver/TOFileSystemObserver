@@ -183,9 +183,7 @@
     NSString *uuid = [url to_makeFileSystemUUIDIfNeeded];
 
     // If the item is a directory, add it to the pending list to scan later
-    NSNumber *isDirectory = nil;
-    [url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
-    if (isDirectory.boolValue) {
+    if (url.to_isDirectory) {
         [pendingDirectories addObject:url];
     }
     
