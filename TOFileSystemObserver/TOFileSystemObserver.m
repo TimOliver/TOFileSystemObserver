@@ -27,6 +27,7 @@
 #import "TOFileSystemPresenter.h"
 #import "TOFileSystemItemList+Private.h"
 #import "TOFileSystemItemDictionary.h"
+#import "TOFileSystemItem+Private.h"
 
 #import "NSURL+TOFileSystemStandardized.h"
 #import "NSURL+TOFileSystemUUID.h"
@@ -53,6 +54,9 @@
 
 /** A store for every item discovered on disk. We use this to determine when files are renamed, duplicated, or deleted. */
 @property (nonatomic, strong) TOFileSystemItemDictionary *allItems;
+
+/** A store of files that are actively being copied in right now. */
+@property (nonatomic, strong) TOFileSystemItemDictionary *copyingItems;
 
 /** A hash table that weakly holds item list objects */
 @property (nonatomic, strong) NSMapTable *itemListTable;
@@ -102,8 +106,9 @@
                                                valueOptions:NSPointerFunctionsWeakMemory
                                                    capacity:0];
     
-    // Set up a store for all of the discovered items
+    // Set up the stores for tracking items
     _allItems = [[TOFileSystemItemDictionary alloc] init];
+    _copyingItems = [[TOFileSystemItemDictionary alloc] init];
 }
 
 #pragma mark - Observer Setup -
@@ -204,7 +209,11 @@
 
 - (void)updateObservingObjectsWithChangedItemURLs:(NSArray *)itemURLs
 {
-    NSLog(@"%@", itemURLs);
+    for (NSURL *url in itemURLs) {
+        TOFileSystemItem *item = [[TOFileSystemItem alloc] initWithItemAtFileURL:url
+                                                              fileSystemObserver:self];
+        NSLog(@"%@", item);
+    }
 }
 
 @end
