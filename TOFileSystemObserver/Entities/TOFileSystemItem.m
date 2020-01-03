@@ -23,8 +23,14 @@
 #import "TOFileSystemItem.h"
 #import "TOFileSystemPath.h"
 #import "TOFileSystemObserver.h"
+#import "TOFileSystemPresenter.h"
 #import "NSURL+TOFileSystemAttributes.h"
 #import "NSURL+TOFileSystemUUID.h"
+
+/** Private interface to expose the file presenter for coordinated writes. */
+@interface TOFileSystemObserver (Private)
+@property (nonatomic, readonly) TOFileSystemPresenter *fileSystemPresenter;
+@end
 
 @interface TOFileSystemItem ()
 
@@ -53,7 +59,7 @@
         
         // If this item represents a deleted file, skip gathering the data
         if (!self.isDeleted) {
-            _uuid = [fileURL to_makeFileSystemUUIDIfNeeded];
+            [self configureUUIDForceRefresh:NO];
             [self refreshFromItemAtURL:fileURL];
         }
     }
@@ -62,6 +68,15 @@
 }
 
 #pragma mark - Update Properties -
+
+- (void)configureUUIDForceRefresh:(BOOL)forceRefresh
+{
+    TOFileSystemPresenter *presenter = self.fileSystemObserver.fileSystemPresenter;
+    NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:presenter];
+    [fileCoordinator coordinateWritingItemAtURL:_fileURL options:0 error:nil byAccessor:^(NSURL * _Nonnull newURL) {
+        _uuid = [newURL to_makeFileSystemUUIDIfNeeded];
+    }];
+}
 
 - (BOOL)refreshFromItemAtURL:(NSURL *)url
 {
@@ -150,6 +165,11 @@
 - (BOOL)isDeleted
 {
     return ![[NSFileManager defaultManager] fileExistsAtPath:self.fileURL.path];
+}
+
+- (void)regenerateUUID
+{
+    [self configureUUIDForceRefresh:YES];
 }
 
 #pragma mark - Debugging -

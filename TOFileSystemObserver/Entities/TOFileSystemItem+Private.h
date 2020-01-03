@@ -18,4 +18,7 @@
 - (instancetype)initWithItemAtFileURL:(NSURL *)fileURL
                    fileSystemObserver:(TOFileSystemObserver *)observer;
 
+/** Forces a refresh of the UUID (in cases where the file seems to have been duplicated) */
+- (void)regenerateUUID;
+
 @end
