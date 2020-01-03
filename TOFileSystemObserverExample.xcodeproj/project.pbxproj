@@ -16,6 +16,7 @@
 		223A894E233F13CA008FFE1A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A894D233F13CA008FFE1A /* main.m */; };
 		223A8957233F4AB0008FFE1A /* TOFileSystemObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */; };
 		223AC44123B83AB200C345A4 /* NSURL+TOFileSystemStandardized.m in Sources */ = {isa = PBXBuildFile; fileRef = 223AC44023B83AB200C345A4 /* NSURL+TOFileSystemStandardized.m */; };
+		22498E5923BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 22498E5823BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m */; };
 		2254ED2A2340588F00331B47 /* TOFileSystemPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED292340588F00331B47 /* TOFileSystemPath.m */; };
 		2254ED2E2340F04800331B47 /* TOFileSystemScanOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */; };
 		2254ED3C2341060000331B47 /* NSURL+TOFileSystemUUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */; };
@@ -63,6 +64,8 @@
 		223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemItem.m; sourceTree = "<group>"; };
 		223AC43F23B83AB200C345A4 /* NSURL+TOFileSystemStandardized.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSURL+TOFileSystemStandardized.h"; sourceTree = "<group>"; };
 		223AC44023B83AB200C345A4 /* NSURL+TOFileSystemStandardized.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSURL+TOFileSystemStandardized.m"; sourceTree = "<group>"; };
+		22498E5723BF030C00D0C345 /* NSURL+TOFileSystemAttributes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSURL+TOFileSystemAttributes.h"; sourceTree = "<group>"; };
+		22498E5823BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSURL+TOFileSystemAttributes.m"; sourceTree = "<group>"; };
 		2254ED282340588F00331B47 /* TOFileSystemPath.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemPath.h; sourceTree = "<group>"; };
 		2254ED292340588F00331B47 /* TOFileSystemPath.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemPath.m; sourceTree = "<group>"; };
 		2254ED2C2340F04800331B47 /* TOFileSystemScanOperation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemScanOperation.h; sourceTree = "<group>"; };
@@ -213,6 +216,8 @@
 		2254ED392341060000331B47 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				22498E5723BF030C00D0C345 /* NSURL+TOFileSystemAttributes.h */,
+				22498E5823BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m */,
 				223AC43F23B83AB200C345A4 /* NSURL+TOFileSystemStandardized.h */,
 				223AC44023B83AB200C345A4 /* NSURL+TOFileSystemStandardized.m */,
 				2254ED3B2341060000331B47 /* NSURL+TOFileSystemUUID.h */,
@@ -385,6 +390,7 @@
 			files = (
 				22ADAEC0237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */,
 				2254ED2E2340F04800331B47 /* TOFileSystemScanOperation.m in Sources */,
+				22498E5923BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m in Sources */,
 				2254ED2A2340588F00331B47 /* TOFileSystemPath.m in Sources */,
 				2254ED3C2341060000331B47 /* NSURL+TOFileSystemUUID.m in Sources */,
 				2232B64C233F6C1800358B05 /* TOFileSystemNotificationToken.m in Sources */,
