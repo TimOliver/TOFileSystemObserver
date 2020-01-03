@@ -213,11 +213,15 @@
 
 - (void)updateObservingObjectsWithChangedItemURLs:(NSArray *)itemURLs
 {
-    for (NSURL *url in itemURLs) {
-        TOFileSystemItem *item = [[TOFileSystemItem alloc] initWithItemAtFileURL:url
-                                                              fileSystemObserver:self];
-        NSLog(@"%@", item);
-    }
+    // Create a new scan operation to analyse what changed
+    TOFileSystemScanOperation *scanOperation = nil;
+    scanOperation = [[TOFileSystemScanOperation alloc] initWithItemURLs:itemURLs
+                                                           allItemsDictionary:self.allItems
+                                                       copyingItemsDictionary:self.copyingItems
+                                                                filePresenter:self.fileSystemPresenter];
+
+    // Begin asynchronous execution
+    [self.operationQueue addOperation:scanOperation];
 }
 
 @end

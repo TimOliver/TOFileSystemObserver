@@ -170,7 +170,9 @@
 
 - (void)scanItemURLsList
 {
-
+    for (NSURL *itemURL in self.itemURLs) {
+        [self scanItemAtURL:itemURL pendingDirectories:nil];
+    }
 }
 
 #pragma mark - Scanning Logic -
@@ -190,11 +192,7 @@
     // Verify this file has a unique UUID.
     uuid = [self uniqueUUIDForItemWithUUID:uuid atURL:url];
     
-    // Check if the file is actively being copied in,
-    // and add it to our master list of copying items for now
-    if (url.to_isCopying) {
-        [self.copyingItems setItemURL:url forUUID:uuid];
-    }
+    // TODO: Work out additional file mutation handling
     
     // Save the item to our master items list
     [self.allItems setItemURL:url forUUID:uuid];
