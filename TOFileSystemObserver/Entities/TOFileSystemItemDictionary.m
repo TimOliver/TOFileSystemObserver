@@ -7,6 +7,7 @@
 //
 
 #import "TOFileSystemItemDictionary.h"
+#import "NSURL+TOFileSystemStandardized.h"
 
 @interface TOFileSystemItemDictionary ()
 
@@ -41,7 +42,7 @@
     if (uuid.length == 0) { return; }
     
     dispatch_barrier_async(self.itemQueue, ^{
-        self.items[uuid] = itemURL;
+        self.items[uuid] = itemURL.to_standardizedURL;
     });
 }
 
@@ -65,6 +66,16 @@
 - (nullable id)objectForKeyedSubscript:(NSString *)key
 {
     return [self itemURLForUUID:key];
+}
+
+- (NSString *)description
+{
+    NSString *descriptionString = @"";
+    for (NSString *key in self.items.allKeys) {
+        descriptionString = [descriptionString stringByAppendingFormat:@"%@ - %@\n", key, self.items[key]];
+    }
+    
+    return descriptionString;
 }
 
 @end
