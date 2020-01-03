@@ -62,6 +62,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** Whether the item is still being copied into the app container. */
 @property (nonatomic, readonly) BOOL isCopying;
 
+/** Whether the item on disk represented by this object no longer exists. */
+@property (nonatomic, readonly) BOOL isDeleted;
+
 /** The file system observer backing this object. */
 @property (nonatomic, weak, readonly) TOFileSystemObserver *fileSystemObserver;
 
