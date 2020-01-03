@@ -27,6 +27,7 @@
 
 #import "NSURL+TOFileSystemUUID.h"
 #import "NSURL+TOFileSystemStandardized.h"
+#import "NSURL+TOFileSystemAttributes.h"
 #import "NSFileManager+TOFileSystemDirectoryEnumerator.h"
 
 @interface TOFileSystemScanOperation ()
@@ -49,6 +50,9 @@
 /** A reference to the master list of items maintained by this observer. */
 @property (nonatomic, strong) TOFileSystemItemDictionary *allItems;
 
+/** A reference to the list of items being copied so we can observe them later */
+@property (nonatomic, strong) TOFileSystemItemDictionary *copyingItems;
+
 @end
 
 @implementation TOFileSystemScanOperation
@@ -64,6 +68,7 @@
         _directoryURL = directoryURL;
         _filePresenter = filePresenter;
         _allItems = allItems;
+        _copyingItems = copyingItems;
         _pendingDirectories = [NSMutableArray array];
         [self commonInit];
     }
@@ -80,6 +85,7 @@
         _filePresenter = filePresenter;
         _itemURLs = itemURLs;
         _allItems = allItems;
+        _copyingItems = copyingItems;
         [self commonInit];
     }
 
@@ -181,11 +187,14 @@
         [pendingDirectories addObject:url];
     }
     
-    // Verify this file has a unique UUID
+    // Verify this file has a unique UUID.
     uuid = [self uniqueUUIDForItemWithUUID:uuid atURL:url];
     
-    // Check if the file is actively being copied in
-    
+    // Check if the file is actively being copied in,
+    // and add it to our master list of copying items for now
+    if (url.to_isCopying) {
+        [self.copyingItems setItemURL:url forUUID:uuid];
+    }
     
     // Save the item to our master items list
     [self.allItems setItemURL:url forUUID:uuid];
@@ -208,18 +217,14 @@
     }
     
     // Otherwise, the user must have duplicated a file, so re-gen the UUID
+    // and assign it to this file
     __block NSString *newUUID;
-    [self.filePresenter pauseWhileExecutingBlock:^{
+    NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:self.filePresenter];
+    [fileCoordinator coordinateWritingItemAtURL:url options:0 error:nil byAccessor:^(NSURL * _Nonnull newURL) {
         newUUID = [url to_generateFileSystemUUID];
     }];
-    
-    return newUUID;
-}
 
-- (BOOL)itemIsBeingCopied:(NSURL *)url
-{
-    NSDate *modificationDate;
-    [url getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:<#(out NSError *__autoreleasing  _Nullable * _Nullable)#>]
+    return newUUID;
 }
 
 - (NSInteger)numberOfDirectoryLevelsToURL:(NSURL *)url
