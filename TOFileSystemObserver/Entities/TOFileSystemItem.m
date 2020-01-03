@@ -23,6 +23,7 @@
 #import "TOFileSystemItem.h"
 #import "TOFileSystemPath.h"
 #import "TOFileSystemObserver.h"
+#import "NSURL+TOFileSystemAttributes.h"
 #import "NSURL+TOFileSystemUUID.h"
 
 @interface TOFileSystemItem ()
@@ -49,8 +50,12 @@
     if (self = [super init]) {
         _fileURL = fileURL;
         _fileSystemObserver = observer;
-        _uuid = [fileURL to_makeFileSystemUUIDIfNeeded];
-        [self refreshFromItemAtURL:fileURL];
+        
+        // If this item represents a deleted file, skip gathering the data
+        if (!self.isDeleted) {
+            _uuid = [fileURL to_makeFileSystemUUIDIfNeeded];
+            [self refreshFromItemAtURL:fileURL];
+        }
     }
 
     return self;
@@ -140,6 +145,32 @@
     if (![self.modificationDate isEqual:modificationDate]) { return YES; }
 
     return NO;
+}
+
+- (BOOL)isDeleted
+{
+    return ![[NSFileManager defaultManager] fileExistsAtPath:self.fileURL.path];
+}
+
+#pragma mark - Debugging -
+
+- (NSString *)description
+{
+    NSString *description = @"TOFileSystem Item - \n"
+                            @"Name:     %@\n"
+                            @"UUID:     %@\n"
+                            @"Type:     %@\n"
+                            @"Size:     %d\n"
+                            @"Created:  %@\n"
+                            @"Modified: %@\n";
+    
+    return [NSString stringWithFormat:description,
+            self.name,
+            self.uuid,
+            self.type != 0 ? @"Folder" : @"File",
+            self.size,
+            self.creationDate,
+            self.modificationDate];
 }
 
 @end
