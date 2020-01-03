@@ -49,6 +49,9 @@
 /** A file presenter object that will observe our file system */
 @property (nonatomic, strong) TOFileSystemPresenter *fileSystemPresenter;
 
+/** A file coordinator object that will ensure we don't clash when setting file attributes. */
+@property (nonatomic, strong) NSFileCoordinator *fileCoordinator;
+
 /** The operation queue we will perform our scanning on. */
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
 

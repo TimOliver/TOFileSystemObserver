@@ -8,11 +8,18 @@
 
 #import "TOFileSystemItemList.h"
 #import "TOFileSystemItem.h"
-#import "TOFileSystemPath.h"
 #import "TOFileSystemItem+Private.h"
+#import "TOFileSystemObserver.h"
+#import "TOFileSystemPath.h"
+#import "TOFileSystemPresenter.h"
 
 #import "NSURL+TOFileSystemUUID.h"
 #import "NSFileManager+TOFileSystemDirectoryEnumerator.h"
+
+/** Private interface to expose the file presenter for coordinated writes. */
+@interface TOFileSystemObserver (Private)
+@property (nonatomic, readonly) TOFileSystemPresenter *fileSystemPresenter;
+@end
 
 @interface TOFileSystemItemList ()
 
@@ -28,8 +35,11 @@
 /** Store a bookmark to this item in case the user moves it while it's open. */
 @property (nonatomic, strong) NSData *bookmarkData;
 
-/** The items array. Internally, it is mutable. */
-@property (nonatomic, strong, readwrite) NSMutableArray<TOFileSystemItem *> *items;
+/** An dictionary of the items in this dictionary, stored by their UUID. */
+@property (nonatomic, strong) NSMutableDictionary<NSString *, TOFileSystemItem *> *items;
+
+/** An array of the item UUIDs, sorted in the order specified. */
+@property (nonatomic, strong) NSMutableArray *sortedItems;
 
 @end
 
@@ -56,8 +66,9 @@
                                              relativeToURL:[TOFileSystemPath applicationSandboxURL]
                                                      error:nil];
     
-    // Create the file list array
-    _items = [NSMutableArray array];
+    // Create the file list stores
+    _items = [NSMutableDictionary dictionary];
+    _sortedItems = [NSMutableArray array];
     
     // Build the initial item list
     [self buildItemsList];
@@ -72,36 +83,46 @@
     for (NSURL *url in enumerator) {
         TOFileSystemItem *item = [[TOFileSystemItem alloc] initWithItemAtFileURL:url
                                                               fileSystemObserver:self.fileSystemObserver];
-        [_items addObject:item];
+        
+        // If an item with the same UUID already exists in the list (eg, the user duplicated a file), change
+        // the UUID of the second item
+        NSString *uuid = item.uuid;
+        if (_items[uuid]) {
+            [item regenerateUUID];
+        }
+        
+        // Capture the item with its UUID in the dictionary
+        _items[item.uuid] = item;
     }
     
     // Sort according to our current sort settings
-    [_items sortUsingDescriptors:@[self.currentSortingDescriptor]];
+    _sortedItems = _items.allKeys.mutableCopy;
+    [self sortItemsList];
 }
 
 #pragma mark - Sorting Items -
 
-- (NSSortDescriptor *)currentSortingDescriptor
+- (void)sortItemsList
 {
-    // Sorting alphanumeric
-    if (self.listOrder == TOFileSystemItemListOrderAlphanumeric) {
-        id sortingBlock = ^NSComparisonResult(NSString *obj1, NSString *obj2) {
-            return [obj1 localizedStandardCompare:obj2];
-        };
-        return [NSSortDescriptor sortDescriptorWithKey:@"name"
-                                             ascending:!self.isDescending
-                                            comparator:sortingBlock];
-    }
+    // Sort all of the UUIDS
+    [_sortedItems sortUsingComparator:^NSComparisonResult(NSString *firstUUID, NSString *secondUUID) {
+        TOFileSystemItem *firstItem = _items[firstUUID];
+        TOFileSystemItem *secondItem = _items[secondUUID];
+        
+        switch (_listOrder) {
+            case TOFileSystemItemListOrderAlphanumeric:
+                return [firstItem.name localizedStandardCompare:secondItem.name];
+            case TOFileSystemItemListOrderDate:
+                return [firstItem.modificationDate compare:secondItem.modificationDate];
+            default:
+                return firstItem.size > secondItem.size;
+        }
+    }];
     
-    NSString *sortingKey = nil;
-    if (self.listOrder == TOFileSystemItemListOrderDate) {
-        sortingKey = @"creationDate";
+    // If descending, flip the list
+    if (self.isDescending) {
+        _sortedItems = [[_sortedItems reverseObjectEnumerator] allObjects].mutableCopy;
     }
-    else {
-        sortingKey = @"size";
-    }
-    
-    return [NSSortDescriptor sortDescriptorWithKey:sortingKey ascending:!self.isDescending];
 }
 
 #pragma mark - External Item Access -
@@ -113,12 +134,12 @@
 
 - (TOFileSystemItem *)objectAtIndex:(NSUInteger)index
 {
-    return _items[index];
+    return self.items[self.sortedItems[index]];
 }
 
 - (id)objectAtIndexedSubscript:(NSUInteger)index
 {
-    return _items[index];
+    return self.items[self.sortedItems[index]];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
