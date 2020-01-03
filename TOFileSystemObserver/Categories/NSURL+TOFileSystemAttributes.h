@@ -16,6 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface NSURL (TOFileSystemAttributes)
 
+/** Whether the file is currently being copied or not. */
+@property (nonatomic, readonly) BOOL to_isCopying;
+
 /** Whether the item is a directory or file. */
 @property (nonatomic, readonly) BOOL to_isDirectory;
 
