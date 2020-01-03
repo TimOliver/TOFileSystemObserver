@@ -57,6 +57,7 @@
 
 - (instancetype)initWithDirectoryAtURL:(NSURL *)directoryURL
                     allItemsDictionary:(nonnull TOFileSystemItemDictionary *)allItems
+                copyingItemsDictionary:(nonnull TOFileSystemItemDictionary *)copyingItems
                          filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
 {
     if (self = [super init]) {
@@ -72,6 +73,7 @@
 
 - (instancetype)initWithItemURLs:(NSArray<NSURL *> *)itemURLs
               allItemsDictionary:(nonnull TOFileSystemItemDictionary *)allItems
+          copyingItemsDictionary:(nonnull TOFileSystemItemDictionary *)copyingItems
                    filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
 {
     if (self = [super init]) {
@@ -165,26 +167,59 @@
 
 }
 
-#pragma mark - Shared Scanning Logic -
+#pragma mark - Scanning Logic -
 
 - (void)scanItemAtURL:(NSURL *)url pendingDirectories:(NSMutableArray *)pendingDirectories
 {
     // Check if we've already assigned an on-disk UUID
-    NSString *uuid = [url to_fileSystemUUID];
+    NSString *uuid = [url to_makeFileSystemUUIDIfNeeded];
 
-    NSNumber *isDirectory;
+    // If the item is a directory, add it to the pending list to scan later
+    NSNumber *isDirectory = nil;
     [url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
-    
-    // If the item is a directory
     if (isDirectory.boolValue) {
-        // Add it to the pending list so we can start scanning it after this
         [pendingDirectories addObject:url];
     }
+    
+    // Verify this file has a unique UUID
+    uuid = [self uniqueUUIDForItemWithUUID:uuid atURL:url];
+    
+    // Check if the file is actively being copied in
+    
+    
+    // Save the item to our master items list
+    [self.allItems setItemURL:url forUUID:uuid];
 }
 
-- (TOFileSystemItem *)itemForParentOfItemAtURL:(NSURL *)url
+- (NSString *)uniqueUUIDForItemWithUUID:(NSString *)uuid atURL:(NSURL *)url
 {
-    return nil;
+    // Check if we already stored an item with that same UUID
+    NSURL *savedURL = self.allItems[uuid];
+    if (savedURL == nil) { return uuid; }
+    
+    // Check if the URLs match
+    if ([url.to_standardizedURL isEqual:savedURL]) {
+        return uuid;
+    }
+    
+    // If the old one no longer exists, assume we moved files
+    if (![[NSFileManager defaultManager] fileExistsAtPath:savedURL.path]) {
+        return uuid;
+    }
+    
+    // Otherwise, the user must have duplicated a file, so re-gen the UUID
+    __block NSString *newUUID;
+    [self.filePresenter pauseWhileExecutingBlock:^{
+        newUUID = [url to_generateFileSystemUUID];
+    }];
+    
+    return newUUID;
+}
+
+- (BOOL)itemIsBeingCopied:(NSURL *)url
+{
+    NSDate *modificationDate;
+    [url getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:<#(out NSError *__autoreleasing  _Nullable * _Nullable)#>]
 }
 
 - (NSInteger)numberOfDirectoryLevelsToURL:(NSURL *)url
