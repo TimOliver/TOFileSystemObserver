@@ -27,10 +27,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithBaseURL:(NSURL *)baseURL;
 
 /** Adds an item URL to the dictionary. May be called from multiple threads. */
-- (void)setItemURL:(NSURL *)itemURL forUUID:(nullable NSString *)uuid;
+- (void)setItemURL:(nullable NSURL *)itemURL forUUID:(nullable NSString *)uuid;
 
 /** Retrieves an item URL from the dictionary. May be called from multiple threads. */
 - (nullable NSURL *)itemURLForUUID:(nullable NSString *)uuid;
+
+/** Tries to retrieve a UUID value for a URL, if it exists */
+- (nullable NSString *)uuidForItemWithURL:(NSURL *)itemURL;
 
 /** Implementations for allowing dictionary style literal syntax. */
 - (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key;
