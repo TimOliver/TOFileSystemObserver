@@ -49,20 +49,17 @@
 /** A file presenter object that will observe our file system */
 @property (nonatomic, strong) TOFileSystemPresenter *fileSystemPresenter;
 
-/** A file coordinator object that will ensure we don't clash when setting file attributes. */
-@property (nonatomic, strong) NSFileCoordinator *fileCoordinator;
-
 /** The operation queue we will perform our scanning on. */
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
 
-/** A store for every item discovered on disk. We use this to determine when files are renamed, duplicated, or deleted. */
+/** A store for every item URL discovered on disk to ensure there are no duplicate UUIDs. */
 @property (nonatomic, strong) TOFileSystemItemDictionary *allItems;
 
-/** A store of files that are actively being copied in right now. */
-@property (nonatomic, strong) TOFileSystemItemDictionary *copyingItems;
-
-/** A hash table that weakly holds item list objects */
+/** A map table that weakly holds item list objects */
 @property (nonatomic, strong) NSMapTable *itemListTable;
+
+/** A map table that weakly holds any items currently being presented. */
+@property (nonatomic, strong) NSMapTable *itemTable;
 
 @end
 
@@ -104,14 +101,16 @@
     // Set up the file system presenter
     _fileSystemPresenter = [[TOFileSystemPresenter alloc] init];
     
-    // Set up the hash table
+    // Set up the map tables
     _itemListTable = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsStrongMemory
                                                valueOptions:NSPointerFunctionsWeakMemory
                                                    capacity:0];
+    _itemTable = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsStrongMemory
+                                           valueOptions:NSPointerFunctionsWeakMemory
+                                               capacity:0];
     
     // Set up the stores for tracking items
-    _allItems = [[TOFileSystemItemDictionary alloc] init];
-    _copyingItems = [[TOFileSystemItemDictionary alloc] init];
+    _allItems = [[TOFileSystemItemDictionary alloc] initWithBaseURL:self.directoryURL];
 }
 
 #pragma mark - Observer Setup -
@@ -174,14 +173,10 @@
 
 - (void)performFullDirectoryScan
 {
-    // Cancel any in progress operations since we'll be starting again
-    [self.operationQueue cancelAllOperations];
-
     // Create a new scan operation
     TOFileSystemScanOperation *scanOperation = nil;
     scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:self.directoryURL
                                                            allItemsDictionary:self.allItems
-                                                       copyingItemsDictionary:self.copyingItems
                                                                 filePresenter:self.fileSystemPresenter];
 
     // Begin asynchronous execution
@@ -197,19 +192,102 @@
         directoryURL = self.directoryURL;
     }
     
-    // Fetch the UUID for this item and see if we've cached it already
-    NSString *uuid = [directoryURL to_fileSystemUUID];
-    TOFileSystemItemList *itemList = [self.itemListTable objectForKey:uuid];
-    if (itemList) { return itemList; }
+    // Create a block to generate or re-fetch a list object
+    __block TOFileSystemItemList *itemList = nil;
+    void (^getListBlock)(void) = ^{
+        // Fetch the UUID for this item and see if we've cached it already
+        NSString *uuid = [directoryURL to_fileSystemUUID];
+        uuid = [self verifiedUniqueUUIDForItemAtURL:directoryURL uuid:uuid];
+        itemList = [self.itemListTable objectForKey:uuid];
+        if (itemList) { return; }
+        
+        // Create a new one, and save it to the map table
+        itemList = [[TOFileSystemItemList alloc] initWithDirectoryURL:directoryURL
+                                                                         fileSystemObserver:self];
+        [self.itemListTable setObject:itemList forKey:itemList.uuid];
+        self.allItems[uuid] = directoryURL;
+    };
     
-    // Create a new one, and save it to the map table
-    itemList = [[TOFileSystemItemList alloc] initWithDirectoryURL:directoryURL
-                                                                     fileSystemObserver:self];
-    [self.itemListTable setObject:itemList forKey:itemList.uuid];
+    // Since map tables can internally mutate, perform all access on the main thread
+    if (![NSThread isMainThread]) {
+        dispatch_queue_t mainQueue = dispatch_get_main_queue();
+        dispatch_sync(mainQueue, getListBlock);
+    }
+    else {
+        getListBlock();
+    }
+
     return itemList;
 }
 
-#pragma mark - Updating Observing Object -
+- (TOFileSystemItem *)itemForFileAtURL:(NSURL *)fileURL
+{
+    // Exit out if the URL is invalid
+    if (![[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]) {
+        return nil;
+    }
+    
+    // Create a block to generate or re-fetch an existing object
+    __block TOFileSystemItem *item = nil;
+    void (^getItemBlock)(void) = ^{
+        // Fetch the UUID for this item and see if we've cached it already
+        NSString *uuid = [fileURL to_fileSystemUUID];
+        uuid = [self verifiedUniqueUUIDForItemAtURL:fileURL uuid:uuid];
+        item = [self.itemTable objectForKey:uuid];
+        if (item) { return; }
+        
+        // Create a new one, and save it to the map table
+        item = [[TOFileSystemItem alloc] initWithItemAtFileURL:fileURL fileSystemObserver:self];
+        [self.itemTable setObject:item forKey:item.uuid];
+        self.allItems[uuid] = fileURL;
+    };
+    
+    // Since map tables can internally mutate, perform all access on the main thread
+    if (![NSThread isMainThread]) {
+        dispatch_queue_t mainQueue = dispatch_get_main_queue();
+        dispatch_sync(mainQueue, getItemBlock);
+    }
+    else {
+        getItemBlock();
+    }
+
+    return item;
+}
+
+#pragma mark - Handling UUID Redundancy -
+
+- (NSString *)verifiedUniqueUUIDForItemAtURL:(NSURL *)itemURL uuid:(NSString *)uuid
+{
+    // If it was detected that there are two items with the same UUID
+    // in the master list, regenerate the UUID for this one
+    
+    // If this item isn't in the master list yet, then there is no chance for conflicts
+    NSURL *url = self.allItems[uuid];
+    if (url == nil) { return uuid; }
+    
+    // If an item does exist, check it is at the same location
+    if ([url.to_standardizedPath isEqualToString:itemURL.to_standardizedPath]) {
+        return uuid;
+    }
+    
+    // If the file no longer exists at the URL in the store, assume it was moved
+    if (![[NSFileManager defaultManager] fileExistsAtPath:url.path]) {
+        self.allItems[uuid] = nil;
+        return uuid;
+    }
+    
+    // If another file with the same UUID exists alongside this one, they are clearly duplicated.
+    // Create a new UUID for this item
+    __block NSString *newUUID = nil;
+    NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:self.fileSystemPresenter];
+    [fileCoordinator coordinateWritingItemAtURL:itemURL options:0 error:nil byAccessor:^(NSURL * _Nonnull newURL) {
+        newUUID = [newURL to_generateFileSystemUUID];
+    }];
+    
+    return newUUID;
+}
+
+#pragma mark - File System Change Notifications -
 
 - (void)updateObservingObjectsWithChangedItemURLs:(NSArray *)itemURLs
 {
@@ -217,7 +295,6 @@
     TOFileSystemScanOperation *scanOperation = nil;
     scanOperation = [[TOFileSystemScanOperation alloc] initWithItemURLs:itemURLs
                                                            allItemsDictionary:self.allItems
-                                                       copyingItemsDictionary:self.copyingItems
                                                                 filePresenter:self.fileSystemPresenter];
 
     // Begin asynchronous execution

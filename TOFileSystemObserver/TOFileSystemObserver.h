@@ -99,8 +99,17 @@ NS_ASSUME_NONNULL_BEGIN
  
  @param directoryURL The URL to target. Use `nil` for the observer's base directory.
  */
-- (TOFileSystemItemList *)itemListForDirectoryAtURL:(nullable NSURL *)directoryURL;
+- (nullable TOFileSystemItemList *)itemListForDirectoryAtURL:(nullable NSURL *)directoryURL;
+
+/**
+ Returns an item object representing the file or directory at the URL specified.
+ When the file observer is running, this object is live, and will be automatically
+ updated whenever the system detects that the file has changed.
  
+  @param fileURL The URL to target.
+ */
+- (nullable TOFileSystemItem *)itemForFileAtURL:(NSURL *)fileURL;
+
  /**
  Registers a new notification block that will be triggered each time an update is detected.
  It is your responsibility to strongly retain the token object, and release it only
