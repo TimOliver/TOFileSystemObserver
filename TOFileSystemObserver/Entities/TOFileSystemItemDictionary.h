@@ -35,6 +35,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** Tries to retrieve a UUID value for a URL, if it exists */
 - (nullable NSString *)uuidForItemWithURL:(NSURL *)itemURL;
 
+/** Delete an entry from the store. */
+- (void)removeItemURLForUUID:(NSString *)uuid;
+
 /** Implementations for allowing dictionary style literal syntax. */
 - (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key;
 - (nullable id)objectForKeyedSubscript:(NSString *)key;
