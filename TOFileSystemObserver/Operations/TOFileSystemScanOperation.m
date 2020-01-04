@@ -50,9 +50,6 @@
 /** A reference to the master list of items maintained by this observer. */
 @property (nonatomic, strong) TOFileSystemItemDictionary *allItems;
 
-/** A reference to the list of items being copied so we can observe them later */
-@property (nonatomic, strong) TOFileSystemItemDictionary *copyingItems;
-
 @end
 
 @implementation TOFileSystemScanOperation
@@ -61,14 +58,12 @@
 
 - (instancetype)initWithDirectoryAtURL:(NSURL *)directoryURL
                     allItemsDictionary:(nonnull TOFileSystemItemDictionary *)allItems
-                copyingItemsDictionary:(nonnull TOFileSystemItemDictionary *)copyingItems
                          filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
 {
     if (self = [super init]) {
         _directoryURL = directoryURL;
         _filePresenter = filePresenter;
         _allItems = allItems;
-        _copyingItems = copyingItems;
         _pendingDirectories = [NSMutableArray array];
         [self commonInit];
     }
@@ -78,14 +73,12 @@
 
 - (instancetype)initWithItemURLs:(NSArray<NSURL *> *)itemURLs
               allItemsDictionary:(nonnull TOFileSystemItemDictionary *)allItems
-          copyingItemsDictionary:(nonnull TOFileSystemItemDictionary *)copyingItems
                    filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
 {
     if (self = [super init]) {
         _filePresenter = filePresenter;
         _itemURLs = itemURLs;
         _allItems = allItems;
-        _copyingItems = copyingItems;
         [self commonInit];
     }
 
