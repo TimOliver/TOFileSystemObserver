@@ -29,10 +29,9 @@
 #import "TOFileSystemItemDictionary.h"
 #import "TOFileSystemItem+Private.h"
 
-#import "NSURL+TOFileSystemStandardized.h"
 #import "NSURL+TOFileSystemUUID.h"
 
-@interface TOFileSystemObserver()
+@interface TOFileSystemObserver() <TOFileSystemScanOperationDelegate>
 
 /** The absolute path to our observed directory's super directory so we can build paths. */
 @property (nonatomic, strong) NSURL *parentDirectoryURL;
@@ -70,7 +69,7 @@
 - (instancetype)init
 {
     if (self = [super init]) {
-        _directoryURL = [TOFileSystemPath documentsDirectoryURL].to_standardizedURL;
+        _directoryURL = [TOFileSystemPath documentsDirectoryURL].URLByStandardizingPath;
         [self setUp];
     }
 
@@ -178,7 +177,9 @@
     scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:self.directoryURL
                                                            allItemsDictionary:self.allItems
                                                                 filePresenter:self.fileSystemPresenter];
-
+    scanOperation.subDirectoryLevelLimit = self.includedDirectoryLevels;
+    scanOperation.delegate = self;
+    
     // Begin asynchronous execution
     [self.operationQueue addOperation:scanOperation];
 }
@@ -266,7 +267,7 @@
     if (url == nil) { return uuid; }
     
     // If an item does exist, check it is at the same location
-    if ([url.to_standardizedPath isEqualToString:itemURL.to_standardizedPath]) {
+    if ([url.URLByStandardizingPath isEqual:itemURL.URLByStandardizingPath]) {
         return uuid;
     }
     
@@ -296,9 +297,42 @@
     scanOperation = [[TOFileSystemScanOperation alloc] initWithItemURLs:itemURLs
                                                            allItemsDictionary:self.allItems
                                                                 filePresenter:self.fileSystemPresenter];
+    scanOperation.subDirectoryLevelLimit = self.includedDirectoryLevels;
+    scanOperation.delegate = self;
 
     // Begin asynchronous execution
     [self.operationQueue addOperation:scanOperation];
+}
+
+#pragma mark - Scan Operation Delegate -
+
+- (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
+ didDiscoverItemAtURL:(NSURL *)itemURL
+             withUUID:(NSString *)uuid
+{
+    NSLog(@"File found: %@", itemURL);
+}
+
+- (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
+   itemDidChangeAtURL:(NSURL *)itemURL
+             withUUID:(NSString *)uuid
+{
+    NSLog(@"File Changed: %@", itemURL);
+}
+
+- (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
+         itemWithUUID:(NSString *)uuid
+        didMoveFromURL:(NSURL *)previousURL
+                toURL:(NSURL *)url
+{
+    NSLog(@"File moved: %@", url);
+}
+
+- (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
+   didDeleteItemAtURL:(NSURL *)itemURL
+             withUUID:(NSString *)uuid
+{
+    NSLog(@"File deleted: %@", itemURL);
 }
 
 @end
