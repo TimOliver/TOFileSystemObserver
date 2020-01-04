@@ -7,7 +7,6 @@
 //
 
 #import "TOFileSystemItemDictionary.h"
-#import "NSURL+TOFileSystemStandardized.h"
 
 @interface TOFileSystemItemDictionary ()
 
@@ -27,7 +26,7 @@
 - (instancetype)initWithBaseURL:(NSURL *)baseURL
 {
     if (self = [super init]) {
-        _baseURL = baseURL.to_standardizedURL;
+        _baseURL = baseURL.URLByDeletingLastPathComponent.URLByStandardizingPath;
         _items = [NSMutableDictionary dictionary];
         _itemQueue = dispatch_queue_create("TOFileSystemObserver.itemDictionaryQueue",
                                            DISPATCH_QUEUE_CONCURRENT);
@@ -47,7 +46,7 @@
     
     // Remove the un-needed absolute path to save memory
     NSString *basePath = self.baseURL.path;
-    NSString *itemPath = itemURL.to_standardizedPath;
+    NSString *itemPath = itemURL.URLByStandardizingPath.path;
     NSString *newPath = [itemPath stringByReplacingOccurrencesOfString:basePath withString:@""];
     
     // Use dispatch barriers to block all reads when we mutate the dictionary
@@ -67,7 +66,7 @@
     });
     if (itemURL == nil) { return nil; }
     
-    return [self.baseURL URLByAppendingPathComponent:itemURL.path];
+    return [self.baseURL URLByAppendingPathComponent:itemURL.path].URLByStandardizingPath;
 }
 
 - (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key
