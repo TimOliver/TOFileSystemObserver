@@ -22,11 +22,27 @@
 
 #import "TOFileSystemItem.h"
 #import "TOFileSystemPath.h"
+#import "TOFileSystemObserver.h"
+#import "TOFileSystemPresenter.h"
+#import "NSURL+TOFileSystemAttributes.h"
 #import "NSURL+TOFileSystemUUID.h"
+
+/** Private interface to expose the file presenter for coordinated writes. */
+@interface TOFileSystemObserver (Private)
+@property (nonatomic, readonly) TOFileSystemPresenter *fileSystemPresenter;
+@end
 
 @interface TOFileSystemItem ()
 
-@property (readonly) RLMLinkingObjects *parentItems;
+/** Internal writing overrides for public properties */
+@property (nonatomic, strong, readwrite) NSURL *fileURL;
+@property (nonatomic, assign, readwrite) TOFileSystemItemType type;
+@property (nonatomic, copy,   readwrite) NSString *uuid;
+@property (nonatomic, copy,   readwrite) NSString *name;
+@property (nonatomic, assign, readwrite) long long size;
+@property (nonatomic, strong, readwrite) NSDate *creationDate;
+@property (nonatomic, strong, readwrite) NSDate *modificationDate;
+@property (nonatomic, assign, readwrite) BOOL isCopying;
 
 @end
 
@@ -35,58 +51,76 @@
 #pragma mark - Class Creation -
 
 - (instancetype)initWithItemAtFileURL:(NSURL *)fileURL
+                   fileSystemObserver:(TOFileSystemObserver *)observer
 {
     if (self = [super init]) {
-        [self updateWithItemAtFileURL:fileURL];
+        _fileURL = fileURL;
+        _fileSystemObserver = observer;
+        
+        // If this item represents a deleted file, skip gathering the data
+        if (!self.isDeleted) {
+            [self configureUUIDForceRefresh:NO];
+            [self refreshFromItemAtURL:fileURL];
+        }
     }
 
     return self;
 }
 
-+ (nullable TOFileSystemItem *)itemInRealm:(RLMRealm *)realm forItemAtURL:(NSURL *)itemURL
-{
-    // Fetch the on-disk UUID for this file item.
-    NSString *uuid = [itemURL to_fileSystemUUID];
-    if (uuid == nil) { return nil; }
-
-    // Query for the item with that UUID in the database
-    return [TOFileSystemItem objectInRealm:realm forPrimaryKey:uuid];
-}
-
 #pragma mark - Update Properties -
 
-- (void)updateWithItemAtFileURL:(NSURL *)fileURL
+- (void)configureUUIDForceRefresh:(BOOL)forceRefresh
 {
-    // Copy the name of the item
-    self.name = [fileURL lastPathComponent];
+    TOFileSystemPresenter *presenter = self.fileSystemObserver.fileSystemPresenter;
+    NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:presenter];
+    [fileCoordinator coordinateWritingItemAtURL:_fileURL options:0 error:nil byAccessor:^(NSURL * _Nonnull newURL) {
+        _uuid = [newURL to_makeFileSystemUUIDIfNeeded];
+    }];
+}
 
-    // Before we're persisted, ensure the on-disk file
-    // has the same UUID as this object
-    if (!self.realm) {
-        [fileURL to_setFileSystemUUID:self.uuid];
+- (BOOL)refreshFromItemAtURL:(NSURL *)url
+{
+    BOOL hasChanges = NO;
+    
+    // Copy the name of the item
+    NSString *name = [url lastPathComponent];
+    if (self.name.length == 0 || ![name isEqualToString:self.name]) {
+        self.name = name;
+        hasChanges = YES;
     }
 
     // Check if it is a file or directory
-    NSNumber *isDirectory;
-    [fileURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
-    self.type = isDirectory.boolValue ? TOFileSystemItemTypeDirectory : TOFileSystemItemTypeFile;
-
-    // Get its file size
-    if (self.type == TOFileSystemItemTypeFile) {
-        NSNumber *fileSize;
-        [fileURL getResourceValue:&fileSize forKey:NSURLFileSizeKey error:nil];
-        self.size = fileSize.intValue;
+    TOFileSystemItemType type = url.to_isDirectory ? TOFileSystemItemTypeDirectory :
+                                                        TOFileSystemItemTypeFile;
+    if (type != self.type) {
+        self.type = type;
+        hasChanges = YES;
     }
 
     // Get its creation date
-    NSDate *creationDate;
-    [fileURL getResourceValue:&creationDate forKey:NSURLCreationDateKey error:nil];
-    self.creationDate = creationDate;
-
+    NSDate *creationDate = url.to_creationDate;
+    if (![self.creationDate isEqualToDate:creationDate]) {
+        self.creationDate = creationDate;
+        hasChanges = YES;
+    }
+    
     // Get its modification date
-    NSDate *modificationDate;
-    [fileURL getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:nil];
-    self.modificationDate = modificationDate;
+    NSDate *modificationDate = url.to_modificationDate;
+    if (![self.modificationDate isEqualToDate:modificationDate]) {
+        self.modificationDate = modificationDate;
+        hasChanges = YES;
+    }
+    
+    // If the type is a file, fetch its size
+    if (self.type == TOFileSystemItemTypeFile) {
+        long long fileSize = url.to_size;
+        if (fileSize != self.size) {
+            self.size = fileSize;
+            hasChanges = YES;
+        }
+    }
+    
+    return hasChanges;
 }
 
 - (BOOL)hasChangesComparedToItemAtURL:(NSURL *)itemURL
@@ -98,94 +132,55 @@
     if (![self.uuid isEqualToString:[itemURL to_fileSystemUUID]]) { return YES; }
 
     // File type
-    NSNumber *isDirectory;
-    [itemURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
-    TOFileSystemItemType type = isDirectory.boolValue ? TOFileSystemItemTypeDirectory : TOFileSystemItemTypeFile;
+    TOFileSystemItemType type = itemURL.to_isDirectory ? TOFileSystemItemTypeDirectory : TOFileSystemItemTypeFile;
     if (self.type != type) { return YES; }
 
     // File size
     if (self.type == TOFileSystemItemTypeFile) {
-        NSNumber *fileSize;
-        [itemURL getResourceValue:&fileSize forKey:NSURLFileSizeKey error:nil];
-        if(self.size != fileSize.intValue) { return YES; }
+        long long fileSize = itemURL.to_size;
+        if(self.size != fileSize) { return YES; }
     }
 
     // Creation date
-    NSDate *creationDate;
-    [itemURL getResourceValue:&creationDate forKey:NSURLCreationDateKey error:nil];
+    NSDate *creationDate = itemURL.to_creationDate;
     if (![self.creationDate isEqual:creationDate]) { return YES; }
 
     // Get its modification date
-    NSDate *modificationDate;
-    [itemURL getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:nil];
+    NSDate *modificationDate = itemURL.to_modificationDate;
     if (![self.modificationDate isEqual:modificationDate]) { return YES; }
-
-    // Parent directory
-    NSString *parentUUID = [itemURL.URLByDeletingLastPathComponent to_fileSystemUUID];
-    if (![parentUUID isEqualToString:self.parentDirectory.uuid]) { return YES; }
 
     return NO;
 }
 
-//- (NSURL *)absoluteFileURL
-//{
-//    NSString *filePath = @"";
-//
-//    // Prepend each parent directory name
-//    TOFileSystemItem *item = self;
-//    while ((item = item.parentDirectory)) {
-//        // Because the directory base points directly to our file in the sandbox,
-//        // don't prepend the top level item, as it would then be prepended twice
-//        if (item.directoryBase == nil) {
-//            filePath = [NSString stringWithFormat:@"%@/%@", item.name, filePath];
-//        }
-//    }
-//
-//    // Determine the parent item with the base directory parent
-//    item = self;
-//    while (item.directoryBase == nil) {
-//        item = item.parentDirectory;
-//    }
-//
-//    // Prepend the rest of the directory
-//    if (item.directoryBase.filePath.length > 0) {
-//        filePath = [NSString stringWithFormat:@"%@/%@", item.directoryBase.filePath, filePath];
-//    }
-//
-//    // Prepend the rest of the Sandbox
-//    NSURL *url = [TOFileSystemPath applicationSandboxURL];
-//    return [url URLByAppendingPathComponent:filePath];
-//}
-
-- (TOFileSystemItem *)parentDirectory
+- (BOOL)isDeleted
 {
-    return self.parentItems.firstObject;
+    return ![[NSFileManager defaultManager] fileExistsAtPath:self.fileURL.path];
 }
 
-#pragma mark - Realm Properties -
-
-+ (NSString *)primaryKey { return @"uuid"; }
-
-+ (NSArray<NSString *> *)indexedProperties
+- (void)regenerateUUID
 {
-    return @[@"name"];
+    [self configureUUIDForceRefresh:YES];
 }
 
-+ (NSDictionary *)defaultPropertyValues
-{
-    return @{@"uuid": [NSUUID UUID].UUIDString};
-}
+#pragma mark - Debugging -
 
-+ (NSDictionary *)linkingObjectsProperties
+- (NSString *)description
 {
-    return @{
-        @"parentItems": [RLMPropertyDescriptor descriptorWithClass:TOFileSystemItem.class propertyName:@"childItems"],
-        /*@"parentBases": [RLMPropertyDescriptor descriptorWithClass:TOFileSystemBase.class propertyName:@"item"],*/
-    };
+    NSString *description = @"TOFileSystem Item - \n"
+                            @"Name:     %@\n"
+                            @"UUID:     %@\n"
+                            @"Type:     %@\n"
+                            @"Size:     %d\n"
+                            @"Created:  %@\n"
+                            @"Modified: %@\n";
+    
+    return [NSString stringWithFormat:description,
+            self.name,
+            self.uuid,
+            self.type != 0 ? @"Folder" : @"File",
+            self.size,
+            self.creationDate,
+            self.modificationDate];
 }
-
-// Never automatically include this in the default Realm schema
-// as it may get exposed in the app's own Realm files.
-+ (BOOL)shouldIncludeInDefaultSchema { return NO; }
 
 @end

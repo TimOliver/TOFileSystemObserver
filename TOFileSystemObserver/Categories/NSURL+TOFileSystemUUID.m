@@ -67,13 +67,37 @@ static NSString * const kTOFileSystemAttributeKey = @"dev.tim.fileSystemObserver
     setxattr(filePath, keyName, uuidString, strlen(uuidString), 0, 0);
 }
 
-- (NSString *)to_generateUUID
+- (NSString *)to_generateFileSystemUUID
 {
     NSString *uuid = [NSUUID UUID].UUIDString;
     [self to_setFileSystemUUID:uuid];
     return uuid;
 }
 
-
+- (NSString *)to_makeFileSystemUUIDIfNeeded
+{
+    // Attempt to load any existing UUID that may be there
+    NSString *uuid = [self to_fileSystemUUID];
+    
+    // Create a brand new one if it doesn't exist
+    if (uuid == nil) {
+        return [self to_generateFileSystemUUID];
+    }
+    
+    // Check to see if the UUID matches the UUID format
+    NSString *uuidPattern = @"\\A[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}\\Z";
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:uuidPattern
+                                                                           options:NSRegularExpressionCaseInsensitive
+                                                                             error:nil];
+    NSRange range = [regex rangeOfFirstMatchInString:uuid options:0 range:NSMakeRange(0, uuid.length)];
+    
+    // A valid regex was found.
+    if (range.location != NSNotFound) {
+        return uuid;
+    }
+    
+    // If not, generate a new UUID and save it to the file
+    return [self to_generateFileSystemUUID];
+}
 
 @end

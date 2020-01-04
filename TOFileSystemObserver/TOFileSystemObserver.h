@@ -22,6 +22,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "TOFileSystemItemList.h"
 #import "TOFileSystemItem.h"
 #import "TOFileSystemNotificationToken.h"
 
@@ -57,20 +58,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger includedDirectoryLevels;
 
 /**
- The name of the snapshots database on disk.
- It may only be changed when the observer isn't running.
- The default value is "{AppBundleIdentifier}.fileSystemSnapshots.realm".
- */
-@property (nonatomic, copy) NSString *databaseFileName;
-
-/**
- The file route to the directory holding the snapshots database file on disk.
- It may only be changed when the observer isn't running.
- The default value is the application `Caches` directory.
- */
-@property (nonatomic, copy) NSURL *databaseDirectoryURL;
-
-/**
  The item that represents the base directory that was set to be observed
  by this file system observer.
 
@@ -79,17 +66,6 @@ NS_ASSUME_NONNULL_BEGIN
  is kept in an auto-release pool in dispatch queues.)
  */
 @property (nonatomic, readonly) TOFileSystemItem *directoryItem;
-
-/**
- At any given time, the fully up-to-date list of items that have
- been captured by the file system observer, starting from within
- the observed directory.
-
- (This item will be refetched from the database each time it is called,
- so it is completely thread-safe. Like all Realm items, please ensure it
- is kept in an auto-release pool in dispatch queues.)
- */
-@property (nonatomic, readonly, nullable) RLMArray<TOFileSystemItem *> *items;
 
 /** Create a new instance of the observer with the base URL that will be observed. */
 - (instancetype)initWithDirectoryURL:(NSURL *)directoryURL;
@@ -106,10 +82,35 @@ NS_ASSUME_NONNULL_BEGIN
 /** Suspends the file system observer from monitoring any file system changes. */
 - (void)stop;
 
-/** Deletes all of the data related to directory being monitored by this observer. */
-- (void)reset;
+/**
+ Performs a full scan of the contents of the base directory on a background thread,
+ and triggers all of the registered notification objects and blocks for
+ every item discovered.
+ 
+ Setting `includedDirectoryLevels` will limit how many directory levels down the scan
+ will be performed, but by default, all levels are scanned.
+ */
+- (void)performFullDirectoryScan;
 
 /**
+ Returns a list of directories and files inside the directory specified.
+ When the file observer is running, this list is live, and will be automatically
+ updated whenever any of the underlying files on disk are changed.
+ 
+ @param directoryURL The URL to target. Use `nil` for the observer's base directory.
+ */
+- (nullable TOFileSystemItemList *)itemListForDirectoryAtURL:(nullable NSURL *)directoryURL;
+
+/**
+ Returns an item object representing the file or directory at the URL specified.
+ When the file observer is running, this object is live, and will be automatically
+ updated whenever the system detects that the file has changed.
+ 
+  @param fileURL The URL to target.
+ */
+- (nullable TOFileSystemItem *)itemForFileAtURL:(NSURL *)fileURL;
+
+ /**
  Registers a new notification block that will be triggered each time an update is detected.
  It is your responsibility to strongly retain the token object, and release it only
  when you wish to stop receiving notifications.
@@ -117,24 +118,6 @@ NS_ASSUME_NONNULL_BEGIN
  @param block A block that will be called each time a file system event is detected.
 */
 - (TOFileSystemNotificationToken *)addNotificationBlock:(TOFileSystemNotificationBlock)block;
-
-/**
- Registers a target object that will receive events when the file system changes.
- When an event occurs, the selector will be supplied with both a reference to this object,
- and a list of all the changes that occurred.
-
- @param target The object that will receive events.
- @param selector The selector that will be triggered when a change occurs.
- */
-- (void)addTarget:(id)target forEventsWithSelector:(SEL)selector;
-
-/**
- When not longer needed, de-registers an object that was receiving update events
- from the file system.
-
- @param target The object to cease sending events to.
- */
-- (void)removeTarget:(id)target;
 
 /**
  When the app itself is performing an operation to add a new item, this method

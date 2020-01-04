@@ -68,4 +68,11 @@
     return path;
 }
 
++ (NSDictionary<NSURL *, NSArray *> *)directoryDictionaryWithItemURLs:(NSArray<NSURL *> *)itemURLs
+{
+    NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+    
+    return dictionary;
+}
+
 @end

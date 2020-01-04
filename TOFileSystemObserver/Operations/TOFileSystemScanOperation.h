@@ -24,6 +24,7 @@
 
 @class TOFileSystemItem;
 @class TOFileSystemPresenter;
+@class TOFileSystemItemDictionary;
 @class RLMRealmConfiguration;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -39,13 +40,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** Create a new instance that will scan all of the child items of the provided directory */
 - (instancetype)initWithDirectoryAtURL:(NSURL *)directoryURL
-                         filePresenter:(TOFileSystemPresenter *)filePresenter
-                    realmConfiguration:(RLMRealmConfiguration *)realmConfiguration;
+                    allItemsDictionary:(nonnull TOFileSystemItemDictionary *)allItems
+                         filePresenter:(TOFileSystemPresenter *)filePresenter;
 
 /** Create a new instance that will scan all of the files/folders provided. */
 - (instancetype)initWithItemURLs:(NSArray<NSURL *> *)itemURLs
-                         filePresenter:(TOFileSystemPresenter *)filePresenter
-                    realmConfiguration:(RLMRealmConfiguration *)realmConfiguration;
+              allItemsDictionary:(nonnull TOFileSystemItemDictionary *)allItems
+                   filePresenter:(TOFileSystemPresenter *)filePresenter;
 
 @end
 

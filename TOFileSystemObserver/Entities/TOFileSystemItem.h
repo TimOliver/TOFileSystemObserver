@@ -21,7 +21,6 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
-#import <Realm/Realm.h>
 
 // The different types of items stored in the file system
 typedef NS_ENUM(NSInteger, TOFileSystemItemType) {
@@ -29,66 +28,45 @@ typedef NS_ENUM(NSInteger, TOFileSystemItemType) {
     TOFileSystemItemTypeDirectory // A folder
 };
 
-// Forward declaration so that the item may be used in an array
-@class TOFileSystemItem;
-RLM_ARRAY_TYPE(TOFileSystemItem)
+@class TOFileSystemObserver;
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- A Realm managed object model used to track
- a snapshot copy of the current file system.
-
- This is then compared with the current file system
- to determine when something has changed.
+ An object that represents either a file
+ or folder on disk.
  */
-@interface TOFileSystemItem : RLMObject
+@interface TOFileSystemItem : NSObject
+
+/** The absolute URL path to this item. */
+@property (nonatomic, readonly) NSURL *fileURL;
 
 /** The type of the item (either a file or folder) */
-@property (nonatomic, assign) TOFileSystemItemType type;
+@property (nonatomic, readonly) TOFileSystemItemType type;
 
-/** The unique ID number assigned to this item by the file system. */
-@property (nonatomic, copy) NSString *uuid;
+/** The unique UUID that was assigned to the file by this library. */
+@property (nonatomic, readonly) NSString *uuid;
 
 /** The name on disk of the item. */
-@property (nonatomic, copy) NSString *name;
+@property (nonatomic, readonly) NSString *name;
 
 /** The size (in bytes) of this item. (0 for directories). */
-@property (nonatomic, assign) long long size;
+@property (nonatomic, readonly) long long size;
 
 /** The creation date of the item. */
-@property (nonatomic, strong) NSDate *creationDate;
+@property (nonatomic, readonly) NSDate *creationDate;
 
 /** The last modification date of the item. */
-@property (nonatomic, strong) NSDate *modificationDate;
+@property (nonatomic, readonly) NSDate *modificationDate;
 
 /** Whether the item is still being copied into the app container. */
-@property (nonatomic, assign) BOOL isCopying;
+@property (nonatomic, readonly) BOOL isCopying;
 
-/** Set to YES when the file is no longer where it should be,
- but isn't confirmed to be deleted or just moved. */
-@property (nonatomic, assign) BOOL isPendingDeletion;
+/** Whether the item on disk represented by this object no longer exists. */
+@property (nonatomic, readonly) BOOL isDeleted;
 
-/** If a directory, the child items inside it. */
-@property (nonatomic, strong, nullable) RLMArray<TOFileSystemItem *><TOFileSystemItem> *childItems;
-
-/** The parent directory, if any that this item belongs to. */
-@property (readonly, nullable) TOFileSystemItem *parentDirectory;
-
-/** Generates an absolute URL path to this item. */
-//@property (nonatomic, readonly) NSURL *absoluteFileURL;
-
-/** Fetches a file item from the supplied Realm. Returns nil if it can't be found. */
-+ (nullable TOFileSystemItem *)itemInRealm:(RLMRealm *)realm forItemAtURL:(NSURL *)itemURL;
-
-/** Create a new, unmanaged instance to represent the file at the given URL. */
-- (instancetype)initWithItemAtFileURL:(NSURL *)fileURL;
-
-/** Refresh the properties of the item against the file at the given URL. */
-- (void)updateWithItemAtFileURL:(NSURL *)fileURL;
-
-/** Compares the meta-data in the DB against the file on disk*/
-- (BOOL)hasChangesComparedToItemAtURL:(NSURL *)itemURL;
+/** The file system observer backing this object. */
+@property (nonatomic, weak, readonly) TOFileSystemObserver *fileSystemObserver;
 
 @end
 

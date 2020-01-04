@@ -65,7 +65,7 @@
     // Create the dispatch queue for the items
     _itemListAccessQueue = dispatch_queue_create("dev.tim.itemListAccessQueue", DISPATCH_QUEUE_SERIAL);
 
-    // Create the dispatch semaphore when seriazling paused work
+    // Create the dispatch semaphore when serializing paused work
     _pausingSemaphore = dispatch_semaphore_create(1);
 
     // Default time interval
@@ -101,7 +101,10 @@
         // Cancel if timing has already been started
         if (self.isTiming) { return; }
         self.isTiming = YES;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.timerInterval * NSEC_PER_SEC)), self.itemListAccessQueue, completionBlock);
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW,
+                                      (int64_t)(self.timerInterval * NSEC_PER_SEC)),
+                                      self.itemListAccessQueue,
+                                      completionBlock);
     };
 
     dispatch_async(self.itemListAccessQueue, timerBlock);

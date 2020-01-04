@@ -22,12 +22,13 @@
 
 #import "TOFileSystemScanOperation.h"
 #import "TOFileSystemItem.h"
-#import "TOFileSystemRealmConfiguration.h"
 #import "TOFileSystemPresenter.h"
+#import "TOFileSystemItemDictionary.h"
 
 #import "NSURL+TOFileSystemUUID.h"
-
-#import <Realm/Realm.h>
+#import "NSURL+TOFileSystemStandardized.h"
+#import "NSURL+TOFileSystemAttributes.h"
+#import "NSFileManager+TOFileSystemDirectoryEnumerator.h"
 
 @interface TOFileSystemScanOperation ()
 
@@ -37,20 +38,17 @@
 /** A flat list of file URLs to scan. */
 @property (nonatomic, strong) NSArray *itemURLs;
 
-/** A thread-safe reference to the Realm file holding our state */
-@property (nonatomic, strong) RLMRealmConfiguration *realmConfiguration;
-
 /** A reference to the file system presenter object so we may pause when causing file writes. */
 @property (nonatomic, strong) TOFileSystemPresenter *filePresenter;
 
 /** A local file manager object we can use for retrieving disk contents. */
 @property (nonatomic, strong) NSFileManager *fileManager;
 
-/** Generate a thread safe instance of the Realm object */
-@property (nonatomic, readonly) RLMRealm *realm;
-
 /** When iterating through all the files, this array stores pending directories that need scanning*/
 @property (nonatomic, strong) NSMutableArray *pendingDirectories;
+
+/** A reference to the master list of items maintained by this observer. */
+@property (nonatomic, strong) TOFileSystemItemDictionary *allItems;
 
 @end
 
@@ -59,13 +57,13 @@
 #pragma - Class Lifecycle -
 
 - (instancetype)initWithDirectoryAtURL:(NSURL *)directoryURL
+                    allItemsDictionary:(nonnull TOFileSystemItemDictionary *)allItems
                          filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
-                    realmConfiguration:(RLMRealmConfiguration *)realmConfiguration
 {
     if (self = [super init]) {
-        _realmConfiguration = realmConfiguration;
         _directoryURL = directoryURL;
         _filePresenter = filePresenter;
+        _allItems = allItems;
         _pendingDirectories = [NSMutableArray array];
         [self commonInit];
     }
@@ -74,13 +72,13 @@
 }
 
 - (instancetype)initWithItemURLs:(NSArray<NSURL *> *)itemURLs
-                   filePresenter:(TOFileSystemPresenter *)filePresenter
-              realmConfiguration:(RLMRealmConfiguration *)realmConfiguration
+              allItemsDictionary:(nonnull TOFileSystemItemDictionary *)allItems
+                   filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
 {
     if (self = [super init]) {
-        _realmConfiguration = realmConfiguration;
         _filePresenter = filePresenter;
         _itemURLs = itemURLs;
+        _allItems = allItems;
         [self commonInit];
     }
 
@@ -118,24 +116,13 @@
 - (void)scanAllSubdirectoriesFromBaseURL
 {
     // Start scanning every item in our base directory
-    NSArray *childItemURLs = [self urlEnumeratorForURL:self.directoryURL].allObjects;
+    NSArray *childItemURLs = [self.fileManager to_fileSystemEnumeratorForDirectoryAtURL:self.directoryURL].allObjects;
     if (childItemURLs.count == 0) { return; }
-
-    // Due to some interesting behavior on behalf of the iOS
-    // file system, the absolute path to the base directory
-    // provided to this class can potentially be different
-    // to the file paths provided by the enumerators.
-    // (One contains '/private/' and one does not)
-    //
-    // In order to compare the base directory URL to
-    // items found by the enumerator, re-fetch the
-    // base URL as the parent of the top level items
-    // and re-set it.
-    self.directoryURL = [childItemURLs.firstObject URLByDeletingLastPathComponent];
 
     // Scan all of the items in the base directory
     for (NSURL *url in childItemURLs) {
-        [self scanItemAtURL:url pendingDirectories:self.pendingDirectories];
+        [self scanItemAtURL:url.to_standardizedURL
+         pendingDirectories:self.pendingDirectories];
     }
 
     // If we were only scanning the immediate contents
@@ -165,7 +152,7 @@
         }
 
         // Create a new enumerator for it
-        NSDirectoryEnumerator *enumerator = [self urlEnumeratorForURL:url];
+        NSDirectoryEnumerator *enumerator = [self.fileManager to_fileSystemEnumeratorForDirectoryAtURL:url];
         for (NSURL *url in enumerator) {
             [self scanItemAtURL:url pendingDirectories:pendingDirectories];
         }
@@ -176,49 +163,57 @@
 
 - (void)scanItemURLsList
 {
-
+    for (NSURL *itemURL in self.itemURLs) {
+        [self scanItemAtURL:itemURL pendingDirectories:nil];
+    }
 }
 
-#pragma mark - Shared Scanning Logic -
+#pragma mark - Scanning Logic -
 
 - (void)scanItemAtURL:(NSURL *)url pendingDirectories:(NSMutableArray *)pendingDirectories
 {
-    // Obtain a thread safe reference to Realm
-    RLMRealm *realm = self.realm;
-
     // Check if we've already assigned an on-disk UUID
-    NSString *uuid = [url to_fileSystemUUID];
-    __block TOFileSystemItem *item = [TOFileSystemItem objectInRealm:realm forPrimaryKey:uuid];
+    NSString *uuid = [url to_makeFileSystemUUIDIfNeeded];
 
-    // If UUID is nil, or if it's not already in the DB, insert it
-    if (uuid == nil || item == nil) {
-        // Add the item to the database
-        [self.filePresenter pauseWhileExecutingBlock:^{
-            item = [self addNewItemAtURL:url];
-        }];
-    }
-    else {
-        // If it has an entry in the database, check to see if it has changed at all
-        BOOL hasChanged = [item hasChangesComparedToItemAtURL:url];
-
-    }
-
-    // If the item is a directory
-    if (item.type == TOFileSystemItemTypeDirectory) {
-        // Add it to the pending list so we can start scanning it after this
+    // If the item is a directory, add it to the pending list to scan later
+    if (url.to_isDirectory) {
         [pendingDirectories addObject:url];
     }
+    
+    // Verify this file has a unique UUID.
+    uuid = [self uniqueUUIDForItemWithUUID:uuid atURL:url];
+    
+    // TODO: Work out additional file mutation handling
+    
+    // Save the item to our master items list
+    [self.allItems setItemURL:url forUUID:uuid];
 }
 
-- (TOFileSystemItem *)itemForParentOfItemAtURL:(NSURL *)url
+- (NSString *)uniqueUUIDForItemWithUUID:(NSString *)uuid atURL:(NSURL *)url
 {
-    NSString *uuid = [url.URLByDeletingLastPathComponent to_fileSystemUUID];
-    NSAssert(uuid.length > 0, @"The parent item should always exist before children");
+    // Check if we already stored an item with that same UUID
+    NSURL *savedURL = self.allItems[uuid];
+    if (savedURL == nil) { return uuid; }
+    
+    // Check if the URLs match
+    if ([url.to_standardizedURL isEqual:savedURL]) {
+        return uuid;
+    }
+    
+    // If the old one no longer exists, assume we moved files
+    if (![[NSFileManager defaultManager] fileExistsAtPath:savedURL.path]) {
+        return uuid;
+    }
+    
+    // Otherwise, the user must have duplicated a file, so re-gen the UUID
+    // and assign it to this file
+    __block NSString *newUUID;
+    NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:self.filePresenter];
+    [fileCoordinator coordinateWritingItemAtURL:url options:0 error:nil byAccessor:^(NSURL * _Nonnull newURL) {
+        newUUID = [url to_generateFileSystemUUID];
+    }];
 
-    TOFileSystemItem *item = [TOFileSystemItem objectInRealm:self.realm forPrimaryKey:uuid];
-    NSAssert(item != nil, @"Parent should already exist at this point");
-
-    return item;
+    return newUUID;
 }
 
 - (NSInteger)numberOfDirectoryLevelsToURL:(NSURL *)url
@@ -235,55 +230,6 @@
     }
 
     return MAX(levels, -1);
-}
-
-- (TOFileSystemItem *)addNewItemAtURL:(NSURL *)newItemURL
-{
-    // Get a reference to the parent directory
-    TOFileSystemItem *parentItem = [self itemForParentOfItemAtURL:newItemURL];
-
-    // Create a new object for this item (and assign its parent)
-    TOFileSystemItem *item = [[TOFileSystemItem alloc] initWithItemAtFileURL:newItemURL];
-
-    // Add the item to Realm, and assign it as a child to the parent
-    @autoreleasepool {
-        RLMRealm *realm = self.realm;
-        [realm transactionWithBlock:^{
-            [realm addOrUpdateObject:item];
-            [parentItem.childItems addObject:item];
-        }];
-    }
-
-    return item;
-}
-
-#pragma mark - File System Handling -
-
-- (NSDirectoryEnumerator<NSURL *> *)urlEnumeratorForURL:(NSURL *)url
-{
-    // Set the keys for the properties we wish to capture
-    NSArray *keys = @[NSURLIsDirectoryKey,
-                      NSURLFileSizeKey,
-                      NSURLCreationDateKey,
-                      NSURLContentModificationDateKey];
-
-    // Set the flags for the enumerator
-    NSDirectoryEnumerationOptions options = NSDirectoryEnumerationSkipsHiddenFiles |
-                                            NSDirectoryEnumerationSkipsSubdirectoryDescendants;
-
-    // Create the enumerator
-    NSDirectoryEnumerator<NSURL *> *urlEnumerator = [self.fileManager enumeratorAtURL:url
-                                                           includingPropertiesForKeys:keys
-                                                                              options:options
-                                                                         errorHandler:nil];
-    return urlEnumerator;
-}
-
-#pragma mark - Convenience Accessors -
-
-- (RLMRealm *)realm
-{
-    return [RLMRealm realmWithConfiguration:self.realmConfiguration error:nil];
 }
 
 @end

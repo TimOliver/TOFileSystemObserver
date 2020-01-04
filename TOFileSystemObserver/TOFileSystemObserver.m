@@ -23,9 +23,14 @@
 #import "TOFileSystemObserver.h"
 
 #import "TOFileSystemPath.h"
-#import "TOFileSystemRealmConfiguration.h"
 #import "TOFileSystemScanOperation.h"
 #import "TOFileSystemPresenter.h"
+#import "TOFileSystemItemList+Private.h"
+#import "TOFileSystemItemDictionary.h"
+#import "TOFileSystemItem+Private.h"
+
+#import "NSURL+TOFileSystemStandardized.h"
+#import "NSURL+TOFileSystemUUID.h"
 
 @interface TOFileSystemObserver()
 
@@ -47,11 +52,14 @@
 /** The operation queue we will perform our scanning on. */
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
 
-/** The configuration for the Realm database we'll be using. */
-@property (nonatomic, strong) RLMRealmConfiguration *realmConfiguration;
+/** A store for every item URL discovered on disk to ensure there are no duplicate UUIDs. */
+@property (nonatomic, strong) TOFileSystemItemDictionary *allItems;
 
-/** Gets a new copy of the Realm database backing this observer. */
-@property (nonatomic, readonly) RLMRealm *realm;
+/** A map table that weakly holds item list objects */
+@property (nonatomic, strong) NSMapTable *itemListTable;
+
+/** A map table that weakly holds any items currently being presented. */
+@property (nonatomic, strong) NSMapTable *itemTable;
 
 @end
 
@@ -62,7 +70,7 @@
 - (instancetype)init
 {
     if (self = [super init]) {
-        _directoryURL = [TOFileSystemPath documentsDirectoryURL];
+        _directoryURL = [TOFileSystemPath documentsDirectoryURL].to_standardizedURL;
         [self setUp];
     }
 
@@ -84,8 +92,6 @@
     // Set-up default property values
     _isRunning = NO;
     _excludedItems = @[@"Inbox"];
-    _databaseFileName = [TOFileSystemPath defaultDatabaseFileName];
-    _databaseDirectoryURL = [TOFileSystemPath cachesDirectoryURL];
     
     // Set-up the operation queue
     _operationQueue = [[NSOperationQueue alloc] init];
@@ -94,50 +100,38 @@
 
     // Set up the file system presenter
     _fileSystemPresenter = [[TOFileSystemPresenter alloc] init];
+    
+    // Set up the map tables
+    _itemListTable = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsStrongMemory
+                                               valueOptions:NSPointerFunctionsWeakMemory
+                                                   capacity:0];
+    _itemTable = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsStrongMemory
+                                           valueOptions:NSPointerFunctionsWeakMemory
+                                               capacity:0];
+    
+    // Set up the stores for tracking items
+    _allItems = [[TOFileSystemItemDictionary alloc] initWithBaseURL:self.directoryURL];
 }
 
 #pragma mark - Observer Setup -
 
-- (BOOL)configureDatabase
-{
-    // Create the Realm configuration
-    NSURL *databaseFileURL = [self.databaseDirectoryURL
-                                URLByAppendingPathComponent:self.databaseFileName];
-    self.realmConfiguration = [TOFileSystemRealmConfiguration
-                               fileSystemConfigurationWithFileURL:databaseFileURL];
-
-    // Remove the database while we're developing
-    [[NSFileManager defaultManager] removeItemAtURL:self.realmConfiguration.fileURL error:nil];
-
-    // Try creating the database for potentially the first time
-    if (self.realm == nil) { return NO; }
-
-    // Then try creating our base item for our taget folder for the first time
-    TOFileSystemItem *baseItem = self.directoryItem;
-    if (baseItem == nil) { return NO; }
-    
-    return YES;
-}
-
 - (void)configureFilePresenter
 {
+    // Attach the root directory to the observer
+    NSURL *url = self.directoryURL;
+    self.fileSystemPresenter.directoryURL = url;
+    
+    // Set up the callback handler for when changes are detected
     __weak typeof(self) weakSelf = self;
     self.fileSystemPresenter.itemsDidChangeHandler = ^(NSArray *itemURLs) {
-        NSLog(@"%@", itemURLs);
-        //[weakSelf performScanWithItems:itemURLs];
+        [weakSelf updateObservingObjectsWithChangedItemURLs:itemURLs];
     };
 }
 
 - (void)beginObservingBaseDirectory
 {
-    // Attach the root directory to the observer
-    NSURL *url = self.directoryURL;
-    self.fileSystemPresenter.directoryURL = url;
-
-    // Set the detect handler
+    // Configure the file presenter and start
     [self configureFilePresenter];
-
-    // Start the handler
     [self.fileSystemPresenter start];
 }
 
@@ -150,12 +144,6 @@
     // Set the running state
     self.isRunning = YES;
 
-    // Set up and configure our backing data store
-    if (![self configureDatabase]) {
-        [self stop];
-        return;
-    }
-
     // Lock in the properties of the base directory
     _parentDirectoryURL = [_directoryURL URLByDeletingLastPathComponent];
     _baseDirectoryUUID = self.directoryItem.uuid;
@@ -165,8 +153,8 @@
 
     // Start the observer to watch for any system level changes
     [self beginObservingBaseDirectory];
-
-    // Kick off an initial scan of the entire file hierarchy
+    
+    // Perform an initial scan of all of the files we will observe
     [self performFullDirectoryScan];
 }
 
@@ -185,57 +173,132 @@
 
 - (void)performFullDirectoryScan
 {
-    // Cancel any in progress operations since we'll be starting again
-    [self.operationQueue cancelAllOperations];
-
     // Create a new scan operation
     TOFileSystemScanOperation *scanOperation = nil;
     scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:self.directoryURL
-                                                                filePresenter:self.fileSystemPresenter
-                                                           realmConfiguration:self.realmConfiguration];
+                                                           allItemsDictionary:self.allItems
+                                                                filePresenter:self.fileSystemPresenter];
 
     // Begin asynchronous execution
     [self.operationQueue addOperation:scanOperation];
 }
 
-#pragma mark - Convenience Accessors -
+#pragma mark - Creating Observing Objects -
 
-- (RLMRealm *)realm
+- (TOFileSystemItemList *)itemListForDirectoryAtURL:(NSURL *)directoryURL
 {
-    if (!self.isRunning) { return nil; }
-
-    // Attempt to create possibly the first instance of this realm
-    NSError *error;
-    RLMRealm *realm = [RLMRealm realmWithConfiguration:self.realmConfiguration error:&error];
-
-    // If an error occurs, log it, and return nil.
-    if (error) {
-        NSLog(@"TOFileSystemObserver: Was unable to start because an error occured in Realm: %@", error.description);
-        return nil;
+    // Default to the base directory if nil is supplied
+    if (directoryURL == nil) {
+        directoryURL = self.directoryURL;
+    }
+    
+    // Create a block to generate or re-fetch a list object
+    __block TOFileSystemItemList *itemList = nil;
+    void (^getListBlock)(void) = ^{
+        // Fetch the UUID for this item and see if we've cached it already
+        NSString *uuid = [directoryURL to_fileSystemUUID];
+        uuid = [self verifiedUniqueUUIDForItemAtURL:directoryURL uuid:uuid];
+        itemList = [self.itemListTable objectForKey:uuid];
+        if (itemList) { return; }
+        
+        // Create a new one, and save it to the map table
+        itemList = [[TOFileSystemItemList alloc] initWithDirectoryURL:directoryURL
+                                                                         fileSystemObserver:self];
+        [self.itemListTable setObject:itemList forKey:itemList.uuid];
+        self.allItems[uuid] = directoryURL;
+    };
+    
+    // Since map tables can internally mutate, perform all access on the main thread
+    if (![NSThread isMainThread]) {
+        dispatch_queue_t mainQueue = dispatch_get_main_queue();
+        dispatch_sync(mainQueue, getListBlock);
+    }
+    else {
+        getListBlock();
     }
 
-    return realm;
+    return itemList;
 }
 
-- (TOFileSystemItem *)directoryItem
+- (TOFileSystemItem *)itemForFileAtURL:(NSURL *)fileURL
 {
-    // The database isn't created until the observer has been started
-    if (!self.isRunning) { return nil; }
-
-    // Grab a local instance of Realm to save recreating it for each
-    RLMRealm *realm = self.realm;
-    
-    // See if there already exists an item for this directory in Realm
-    TOFileSystemItem *item = [TOFileSystemItem itemInRealm:self.realm forItemAtURL:self.directoryURL];
-    
-    // If not, create a new one and persist it
-    if (item == nil) {
-        item = [[TOFileSystemItem alloc] initWithItemAtFileURL:self.directoryURL];
-        id block = ^{ [realm addObject:item]; };
-        [realm transactionWithBlock:block];
+    // Exit out if the URL is invalid
+    if (![[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]) {
+        return nil;
     }
     
+    // Create a block to generate or re-fetch an existing object
+    __block TOFileSystemItem *item = nil;
+    void (^getItemBlock)(void) = ^{
+        // Fetch the UUID for this item and see if we've cached it already
+        NSString *uuid = [fileURL to_fileSystemUUID];
+        uuid = [self verifiedUniqueUUIDForItemAtURL:fileURL uuid:uuid];
+        item = [self.itemTable objectForKey:uuid];
+        if (item) { return; }
+        
+        // Create a new one, and save it to the map table
+        item = [[TOFileSystemItem alloc] initWithItemAtFileURL:fileURL fileSystemObserver:self];
+        [self.itemTable setObject:item forKey:item.uuid];
+        self.allItems[uuid] = fileURL;
+    };
+    
+    // Since map tables can internally mutate, perform all access on the main thread
+    if (![NSThread isMainThread]) {
+        dispatch_queue_t mainQueue = dispatch_get_main_queue();
+        dispatch_sync(mainQueue, getItemBlock);
+    }
+    else {
+        getItemBlock();
+    }
+
     return item;
+}
+
+#pragma mark - Handling UUID Redundancy -
+
+- (NSString *)verifiedUniqueUUIDForItemAtURL:(NSURL *)itemURL uuid:(NSString *)uuid
+{
+    // If it was detected that there are two items with the same UUID
+    // in the master list, regenerate the UUID for this one
+    
+    // If this item isn't in the master list yet, then there is no chance for conflicts
+    NSURL *url = self.allItems[uuid];
+    if (url == nil) { return uuid; }
+    
+    // If an item does exist, check it is at the same location
+    if ([url.to_standardizedPath isEqualToString:itemURL.to_standardizedPath]) {
+        return uuid;
+    }
+    
+    // If the file no longer exists at the URL in the store, assume it was moved
+    if (![[NSFileManager defaultManager] fileExistsAtPath:url.path]) {
+        self.allItems[uuid] = nil;
+        return uuid;
+    }
+    
+    // If another file with the same UUID exists alongside this one, they are clearly duplicated.
+    // Create a new UUID for this item
+    __block NSString *newUUID = nil;
+    NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:self.fileSystemPresenter];
+    [fileCoordinator coordinateWritingItemAtURL:itemURL options:0 error:nil byAccessor:^(NSURL * _Nonnull newURL) {
+        newUUID = [newURL to_generateFileSystemUUID];
+    }];
+    
+    return newUUID;
+}
+
+#pragma mark - File System Change Notifications -
+
+- (void)updateObservingObjectsWithChangedItemURLs:(NSArray *)itemURLs
+{
+    // Create a new scan operation to analyse what changed
+    TOFileSystemScanOperation *scanOperation = nil;
+    scanOperation = [[TOFileSystemScanOperation alloc] initWithItemURLs:itemURLs
+                                                           allItemsDictionary:self.allItems
+                                                                filePresenter:self.fileSystemPresenter];
+
+    // Begin asynchronous execution
+    [self.operationQueue addOperation:scanOperation];
 }
 
 @end

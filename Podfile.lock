@@ -1,18 +1,3 @@
-PODS:
-  - Realm (3.20.0):
-    - Realm/Headers (= 3.20.0)
-  - Realm/Headers (3.20.0)
-
-DEPENDENCIES:
-  - Realm
-
-SPEC REPOS:
-  https://cdn.cocoapods.org/:
-    - Realm
-
-SPEC CHECKSUMS:
-  Realm: 8b2ca5bc6479a91f379b6b42b5922e396cd5ba5a
-
-PODFILE CHECKSUM: 3fa3cf033fdf0856f55fb75bfcdd258d82e13b4e
+PODFILE CHECKSUM: adcf013d04771aebbdc74eb7b29921e9b72089b6
 
 COCOAPODS: 1.8.4
