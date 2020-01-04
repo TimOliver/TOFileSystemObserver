@@ -11,6 +11,9 @@
 
 @interface TOFileSystemItemDictionary ()
 
+/** The base URL against which all other URLs are saved. */
+@property (nonatomic, strong) NSURL *baseURL;
+
 /** The dictionary that holds all of the item URLs */
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSURL*> *items;
 
@@ -21,9 +24,10 @@
 
 @implementation TOFileSystemItemDictionary
 
-- (instancetype)init
+- (instancetype)initWithBaseURL:(NSURL *)baseURL
 {
     if (self = [super init]) {
+        _baseURL = baseURL.to_standardizedURL;
         _items = [NSMutableDictionary dictionary];
         _itemQueue = dispatch_queue_create("TOFileSystemObserver.itemDictionaryQueue",
                                            DISPATCH_QUEUE_CONCURRENT);
@@ -41,8 +45,14 @@
 {
     if (uuid.length == 0) { return; }
     
+    // Remove the un-needed absolute path to save memory
+    NSString *basePath = self.baseURL.path;
+    NSString *itemPath = itemURL.to_standardizedPath;
+    NSString *newPath = [itemPath stringByReplacingOccurrencesOfString:basePath withString:@""];
+    
+    // Use dispatch barriers to block all reads when we mutate the dictionary
     dispatch_barrier_async(self.itemQueue, ^{
-        self.items[uuid] = itemURL.to_standardizedURL;
+        self.items[uuid] = [NSURL fileURLWithPath:newPath];
     });
 }
 
@@ -50,12 +60,14 @@
 {
     if (uuid.length == 0) { return nil; }
     
+    // Use dispatch barriers to allow asynchronouse reading
     __block NSURL *itemURL = nil;
     dispatch_sync(self.itemQueue, ^{
         itemURL = self.items[uuid];
     });
+    if (itemURL == nil) { return nil; }
     
-    return itemURL;
+    return [self.baseURL URLByAppendingPathComponent:itemURL.path];
 }
 
 - (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key

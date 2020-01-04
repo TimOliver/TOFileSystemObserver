@@ -23,6 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** The number of items currently in the dictionary. */
 @property (nonatomic, readonly) NSUInteger count;
 
+/** Create a new instance with the base URL that all items will be relatively saved against. */
+- (instancetype)initWithBaseURL:(NSURL *)baseURL;
+
 /** Adds an item URL to the dictionary. May be called from multiple threads. */
 - (void)setItemURL:(NSURL *)itemURL forUUID:(nullable NSString *)uuid;
 
@@ -32,6 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 /** Implementations for allowing dictionary style literal syntax. */
 - (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key;
 - (nullable id)objectForKeyedSubscript:(NSString *)key;
+
+- (instancetype)init NS_UNAVAILABLE;
 
 @end
 
