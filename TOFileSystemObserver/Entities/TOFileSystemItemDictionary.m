@@ -99,6 +99,15 @@
     [self setItemURL:object forUUID:key];
 }
 
+- (void)removeItemURLForUUID:(NSString *)uuid
+{
+    if (uuid == nil) { return; }
+    
+    dispatch_sync(self.itemQueue, ^{
+        [self.items removeObjectForKey:uuid];
+    });
+}
+
 - (nullable id)objectForKeyedSubscript:(NSString *)key
 {
     return [self itemURLForUUID:key];

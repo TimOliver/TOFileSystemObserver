@@ -273,7 +273,7 @@
     
     // If the file no longer exists at the URL in the store, assume it was moved
     if (![[NSFileManager defaultManager] fileExistsAtPath:url.path]) {
-        self.allItems[uuid] = nil;
+        [self.allItems removeItemURLForUUID:uuid];
         return uuid;
     }
     
