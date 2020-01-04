@@ -29,6 +29,9 @@
 #import "NSURL+TOFileSystemAttributes.h"
 #import "NSFileManager+TOFileSystemDirectoryEnumerator.h"
 
+/** In iOS, files deleted via the Files app are moved to this private folder. */
+NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
+
 @interface TOFileSystemScanOperation ()
 
 /** When scanning folder hierarchy, this is the top level directory */
@@ -167,9 +170,13 @@
 
 - (void)scanItemURLsList
 {
+    // Loop through each reported file URL and perform a scan to see what changed
     for (NSURL *itemURL in self.itemURLs) {
         [self scanItemAtURL:itemURL pendingDirectories:self.pendingDirectories];
     }
+    
+    // After all files are scanned, clean out any files
+    [self cleanUpFilesPendingDeletion];
 }
 
 #pragma mark - Scanning Logic -
@@ -198,11 +205,8 @@
     // Verify this file has a unique UUID.
     uuid = [self uniqueUUIDForItemAtURL:url withUUID:uuid];
     
-    // If this is a full scan, trigger the 'added' delegate
-    [self verifyNewItemDiscoveredAtURL:url uuid:uuid];
-    
-    // Save the item to our master items list
-    [self.allItems setItemURL:url forUUID:uuid];
+    // Perform a verification of the item, and trigger the appropriate notifications
+    [self verifyItemAtURL:url uuid:uuid];
 }
 
 - (BOOL)verifyItemIsNotMissingAtURL:(NSURL *)url
@@ -240,22 +244,20 @@
         return YES;
     }
     
-    // We've confirmed that this file is has been moved or renamed.
+    // We've confirmed that this file is has been moved, renamed, or deleted.
     
-    // When deleting files, the Files app will move files to a `.Trash` folder.
-    // If the destination is that folder, consider this file deleted.
-    if ([url.path rangeOfString:@"/.Trash/"].location != NSNotFound) {
-        self.allItems[uuid] = nil;
-        
-        if ([self.delegate respondsToSelector:@selector(scanOperation:didDeleteItemAtURL:withUUID:)]) {
-            [self.delegate scanOperation:self didDeleteItemAtURL:url withUUID:uuid];
-        }
-        
+    // If it's new destination is the iOS Trash folder, it's defintely been deleted.
+    if ([url.path rangeOfString:kTOFileSystemTrashFolderName].location != NSNotFound) {
+        // Add it to the list of missing items so we can clean it out at the end of this scan
+        self.missingItems[uuid] = url;
         return NO;
     }
     
     // Update the store for the new location
     self.allItems[uuid] = url;
+    
+    // If it was marked as potentially deleted, remove it from the deletion list
+    [self.missingItems removeObjectForKey:uuid];
     
     // Post a notification that this operation happened
     if ([self.delegate respondsToSelector:@selector(scanOperation:itemWithUUID:didMoveFromURL:toURL:)]) {
@@ -264,23 +266,42 @@
     
     return YES;
 }
-
-- (void)verifyNewItemDiscoveredAtURL:(NSURL *)url uuid:(NSString *)uuid
+- (void)verifyItemAtURL:(NSURL *)url uuid:(NSString *)uuid
 {
     NSURL *savedURL = self.allItems[uuid];
     
-    // If we're doing the initial system scan, post every discovered item
-    if (savedURL && !self.directoryURL) {
-        return;
+    // Save/update the item to our master items list
+    [self.allItems setItemURL:url forUUID:uuid];
+    
+    // If this item wasn't in the master store yet, trigger an alert that it was discovered
+    // (On full scans, this happens regardless)
+    if (!savedURL || self.directoryURL) {
+        if ([self.delegate respondsToSelector:@selector(scanOperation:didDiscoverItemAtURL:withUUID:)]) {
+            [self.delegate scanOperation:self didDiscoverItemAtURL:url withUUID:uuid];
+        }
+        return;;
     }
     
-    // Make sure the delegate is implemented
-    if (![self.delegate respondsToSelector:@selector(scanOperation:didDiscoverItemAtURL:withUUID:)]) {
-        return;
+    // Otherwise, post a notification that "something" changed, so we should update it's state
+    if ([self.delegate respondsToSelector:@selector(scanOperation:itemDidChangeAtURL:withUUID:)]) {
+        [self.delegate scanOperation:self itemDidChangeAtURL:url withUUID:uuid];
     }
+}
+
+- (void)cleanUpFilesPendingDeletion
+{
+    if (self.missingItems.count == 0) { return; }
     
-    // Post the notification
-    [self.delegate scanOperation:self didDiscoverItemAtURL:url withUUID:uuid];
+    // Loop through each missing item entry
+    for (NSString *uuid in self.missingItems.allKeys) {
+        // Remove it from the master store
+        [self.allItems removeItemURLForUUID:uuid];
+        
+        // Trigger a delegate update event
+        if ([self.delegate respondsToSelector:@selector(scanOperation:didDeleteItemAtURL:withUUID:)]) {
+            [self.delegate scanOperation:self didDeleteItemAtURL:self.missingItems[uuid] withUUID:uuid];
+        }
+    }
 }
 
 #pragma mark - State Tracking -
