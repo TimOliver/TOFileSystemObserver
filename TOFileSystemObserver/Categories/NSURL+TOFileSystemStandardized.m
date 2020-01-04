@@ -10,11 +10,15 @@
 
 @implementation NSURL (TOFileSystemStandardized)
 
-- (NSURL *)to_standardizedURL
+- (NSString *)to_standardizedPath
 {
     NSString *filePath = self.path;
-    filePath = filePath.stringByStandardizingPath;
-    return [NSURL fileURLWithPath:filePath];
+    return filePath.stringByStandardizingPath;
+}
+
+- (NSURL *)to_standardizedURL
+{
+    return [NSURL fileURLWithPath:self.to_standardizedPath];
 }
 
 @end

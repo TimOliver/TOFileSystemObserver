@@ -17,6 +17,13 @@ NS_ASSUME_NONNULL_BEGIN
  suitable for string comparisons and converting between
  absolute and relative.
  */
+@property (nonatomic, readonly) NSString *to_standardizedPath;
+
+/**
+ Returns a standardized version of the file path as a URL,
+ suitable for string comparisons and converting between
+ absolute and relative.
+ */
 @property (nonatomic, readonly) NSURL *to_standardizedURL;
 
 @end
