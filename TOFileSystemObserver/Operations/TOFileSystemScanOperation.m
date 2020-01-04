@@ -79,6 +79,7 @@
         _filePresenter = filePresenter;
         _itemURLs = itemURLs;
         _allItems = allItems;
+        _pendingDirectories = [NSMutableArray array];
         [self commonInit];
     }
 
@@ -164,7 +165,7 @@
 - (void)scanItemURLsList
 {
     for (NSURL *itemURL in self.itemURLs) {
-        [self scanItemAtURL:itemURL pendingDirectories:nil];
+        [self scanItemAtURL:itemURL pendingDirectories:self.pendingDirectories];
     }
 }
 
