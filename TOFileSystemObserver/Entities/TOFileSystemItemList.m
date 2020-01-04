@@ -16,11 +16,6 @@
 #import "NSURL+TOFileSystemUUID.h"
 #import "NSFileManager+TOFileSystemDirectoryEnumerator.h"
 
-/** Private interface to expose the file presenter for coordinated writes. */
-@interface TOFileSystemObserver (Private)
-@property (nonatomic, readonly) TOFileSystemPresenter *fileSystemPresenter;
-@end
-
 @interface TOFileSystemItemList ()
 
 /** The UUID string of the directory backing this object */
@@ -81,16 +76,8 @@
     
     // Build a new list of files from what is currently on disk
     for (NSURL *url in enumerator) {
-        TOFileSystemItem *item = [[TOFileSystemItem alloc] initWithItemAtFileURL:url
-                                                              fileSystemObserver:self.fileSystemObserver];
-        
-        // If an item with the same UUID already exists in the list (eg, the user duplicated a file), change
-        // the UUID of the second item
-        NSString *uuid = item.uuid;
-        if (_items[uuid]) {
-            [item regenerateUUID];
-        }
-        
+        TOFileSystemItem *item = [self.fileSystemObserver itemForFileAtURL:url];
+
         // Capture the item with its UUID in the dictionary
         _items[item.uuid] = item;
     }
