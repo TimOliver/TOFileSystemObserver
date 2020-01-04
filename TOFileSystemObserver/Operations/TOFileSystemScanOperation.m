@@ -26,7 +26,6 @@
 #import "TOFileSystemItemDictionary.h"
 
 #import "NSURL+TOFileSystemUUID.h"
-#import "NSURL+TOFileSystemStandardized.h"
 #import "NSURL+TOFileSystemAttributes.h"
 #import "NSFileManager+TOFileSystemDirectoryEnumerator.h"
 
@@ -122,7 +121,7 @@
 
     // Scan all of the items in the base directory
     for (NSURL *url in childItemURLs) {
-        [self scanItemAtURL:url.to_standardizedURL
+        [self scanItemAtURL:url.URLByStandardizingPath
          pendingDirectories:self.pendingDirectories];
     }
 
@@ -184,11 +183,32 @@
     // Verify this file has a unique UUID.
     uuid = [self uniqueUUIDForItemWithUUID:uuid atURL:url];
     
-    // TODO: Work out additional file mutation handling
+    // If this is a full scan, trigger the 'added' delegate
+    [self postDiscoveredNotificationForItemAtURL:url uuid:uuid];
     
     // Save the item to our master items list
     [self.allItems setItemURL:url forUUID:uuid];
 }
+
+- (void)postDiscoveredNotificationForItemAtURL:(NSURL *)url uuid:(NSString *)uuid
+{
+    NSURL *savedURL = self.allItems[uuid];
+    
+    // If we're doing the initial system scan, post every discovered item
+    if (savedURL && !self.directoryURL) {
+        return;
+    }
+    
+    // Make sure the delegate is implemented
+    if (![self.delegate respondsToSelector:@selector(scanOperation:didDiscoverItemAtURL:withUUID:)]) {
+        return;
+    }
+    
+    // Post the notification
+    [self.delegate scanOperation:self didDiscoverItemAtURL:url withUUID:uuid];
+}
+
+#pragma mark - State Tracking -
 
 - (NSString *)uniqueUUIDForItemWithUUID:(NSString *)uuid atURL:(NSURL *)url
 {
@@ -197,7 +217,7 @@
     if (savedURL == nil) { return uuid; }
     
     // Check if the URLs match
-    if ([url.to_standardizedURL isEqual:savedURL]) {
+    if ([url.URLByStandardizingPath isEqual:savedURL]) {
         return uuid;
     }
     
