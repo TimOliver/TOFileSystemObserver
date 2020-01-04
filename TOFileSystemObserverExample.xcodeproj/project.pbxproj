@@ -130,7 +130,6 @@
 				223A893A233F13CA008FFE1A /* TOFileSystemObserverExample */,
 				22C7FEA223B5E70E0017CABD /* TOFileSystemObserverTests */,
 				223A8939233F13CA008FFE1A /* Products */,
-				83E6F6A1977EF05EE5BA87E3 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -238,13 +237,6 @@
 				22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */,
 			);
 			path = FilePresenter;
-			sourceTree = "<group>";
-		};
-		83E6F6A1977EF05EE5BA87E3 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
