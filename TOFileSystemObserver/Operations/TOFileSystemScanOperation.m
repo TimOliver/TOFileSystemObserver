@@ -49,6 +49,9 @@
 /** A reference to the master list of items maintained by this observer. */
 @property (nonatomic, strong) TOFileSystemItemDictionary *allItems;
 
+/** A store for items that have disappeared inside this operation, either deleted or moved. */
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSURL *> *missingItems;
+
 @end
 
 @implementation TOFileSystemScanOperation
@@ -79,6 +82,7 @@
         _itemURLs = itemURLs;
         _allItems = allItems;
         _pendingDirectories = [NSMutableArray array];
+        _missingItems = [NSMutableDictionary dictionary];
         [self commonInit];
     }
 
@@ -172,6 +176,12 @@
 
 - (void)scanItemAtURL:(NSURL *)url pendingDirectories:(NSMutableArray *)pendingDirectories
 {
+    // Double-check the file is still at that URL
+    // (The file presenter will sometimes provide the old URL for moved files)
+    if (![self verifyItemIsNotMissingAtURL:url]) {
+        return;
+    }
+    
     // Check if we've already assigned an on-disk UUID
     NSString *uuid = [url to_makeFileSystemUUIDIfNeeded];
 
@@ -180,17 +190,82 @@
         [pendingDirectories addObject:url];
     }
     
+    // Check if the item had been moved
+    if (![self verifyIfItemWasMovedOrDeletedWithURL:url uuid:uuid]) {
+        return;
+    }
+    
     // Verify this file has a unique UUID.
-    uuid = [self uniqueUUIDForItemWithUUID:uuid atURL:url];
+    uuid = [self uniqueUUIDForItemAtURL:url withUUID:uuid];
     
     // If this is a full scan, trigger the 'added' delegate
-    [self postDiscoveredNotificationForItemAtURL:url uuid:uuid];
+    [self verifyNewItemDiscoveredAtURL:url uuid:uuid];
     
     // Save the item to our master items list
     [self.allItems setItemURL:url forUUID:uuid];
 }
 
-- (void)postDiscoveredNotificationForItemAtURL:(NSURL *)url uuid:(NSString *)uuid
+- (BOOL)verifyItemIsNotMissingAtURL:(NSURL *)url
+{
+    // Exit out if we're not interested in tracking deleted files in this operation
+    if (self.missingItems == nil) { return YES; }
+    
+    // Check if the file is still present at that URL
+    if ([[NSFileManager defaultManager] fileExistsAtPath:url.path]) {
+        return YES;
+    }
+    
+    // Look up in the all items store to see if we have a UUID
+    NSString *uuid = [self.allItems uuidForItemWithURL:url];
+    if (uuid == nil) { return NO; }
+    
+    // Save a reference to this file in case it turns up later in this operation
+    self.missingItems[uuid] = url;
+    
+    return NO;
+}
+
+- (BOOL)verifyIfItemWasMovedOrDeletedWithURL:(NSURL *)url uuid:(NSString *)uuid
+{
+    NSURL *savedURL = self.allItems[uuid];
+    if (savedURL == nil) { return YES; }
+    
+    // If the URLs match, the item hasn't been moved
+    if ([savedURL isEqual:url]) {
+        return YES;
+    }
+    
+    // If the old URL still has a file there, then this is a duplicate
+    if ([[NSFileManager defaultManager] fileExistsAtPath:savedURL.path]) {
+        return YES;
+    }
+    
+    // We've confirmed that this file is has been moved or renamed.
+    
+    // When deleting files, the Files app will move files to a `.Trash` folder.
+    // If the destination is that folder, consider this file deleted.
+    if ([url.path rangeOfString:@"/.Trash/"].location != NSNotFound) {
+        self.allItems[uuid] = nil;
+        
+        if ([self.delegate respondsToSelector:@selector(scanOperation:didDeleteItemAtURL:withUUID:)]) {
+            [self.delegate scanOperation:self didDeleteItemAtURL:url withUUID:uuid];
+        }
+        
+        return NO;
+    }
+    
+    // Update the store for the new location
+    self.allItems[uuid] = url;
+    
+    // Post a notification that this operation happened
+    if ([self.delegate respondsToSelector:@selector(scanOperation:itemWithUUID:didMoveFromURL:toURL:)]) {
+        [self.delegate scanOperation:self itemWithUUID:uuid didMoveFromURL:savedURL toURL:url];
+    }
+    
+    return YES;
+}
+
+- (void)verifyNewItemDiscoveredAtURL:(NSURL *)url uuid:(NSString *)uuid
 {
     NSURL *savedURL = self.allItems[uuid];
     
@@ -210,7 +285,7 @@
 
 #pragma mark - State Tracking -
 
-- (NSString *)uniqueUUIDForItemWithUUID:(NSString *)uuid atURL:(NSURL *)url
+- (NSString *)uniqueUUIDForItemAtURL:(NSURL *)url withUUID:(NSString *)uuid
 {
     // Check if we already stored an item with that same UUID
     NSURL *savedURL = self.allItems[uuid];
