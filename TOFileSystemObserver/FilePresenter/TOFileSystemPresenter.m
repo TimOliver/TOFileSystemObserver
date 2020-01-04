@@ -37,7 +37,7 @@
 - (instancetype)init
 {
     if (self = [super init]) {
-        [self commongInit];
+        [self commonInit];
     }
 
     return self;
@@ -47,13 +47,13 @@
 {
     if (self = [super init]) {
         _directoryURL = directoryURL;
-        [self commongInit];
+        [self commonInit];
     }
 
     return self;
 }
 
-- (void)commongInit
+- (void)commonInit
 {
     // Create the queue to receive events
     _eventsOperationQueue = [[NSOperationQueue alloc] init];
