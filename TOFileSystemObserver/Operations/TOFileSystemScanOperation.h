@@ -27,13 +27,43 @@
 @class TOFileSystemItemDictionary;
 @class RLMRealmConfiguration;
 
+@class TOFileSystemScanOperation;
+
 NS_ASSUME_NONNULL_BEGIN
+
+@protocol TOFileSystemScanOperationDelegate <NSObject>
+
+/**
+ Called when a new item is discovered is discovered during a scan.
+ This is called every time for full-system scans, but will then only be called on items not previously found before
+ in subsequent scans.
+ */
+- (void)scanOperation:(TOFileSystemScanOperation *)scanOperation didDiscoverItemAtURL:(NSURL *)itemURL withUUID:(NSString *)uuid;
+
+/**
+ Called when the properties of an object have been changed (eg, renamed etc)
+ */
+- (void)scanOperation:(TOFileSystemScanOperation *)scanOperation itemDidChangeAtURL:(NSURL *)itemURL withUUID:(NSString *)uuid;
+
+/** Called when the file has been moved to another part of the sandbox. */
+- (void)scanOperation:(TOFileSystemScanOperation *)scanOperation itemWithUUID:(NSString *)uuid
+        didMoveFromURL:(NSURL *)previousURL
+                toURL:(NSURL *)url;
+
+/** Called when the file has been deleted. */
+- (void)scanOperation:(TOFileSystemScanOperation *)scanOperation didDeleteItemAtURL:(NSURL *)itemURL withUUID:(NSString *)uuid;
+
+@end
+
 /**
  An operation that will either scan all
  child items of a directory, or a list of items
  and update their snapshot if they have changed.
  */
 @interface TOFileSystemScanOperation : NSOperation
+
+/** A delegate object that will be called upon any detected change events. */
+@property (nonatomic, weak) id<TOFileSystemScanOperationDelegate> delegate;
 
 /** When scanning hierarchies, the numbers deep to scan (-1 is all of them) */
 @property (nonatomic, assign) NSInteger subDirectoryLevelLimit;
