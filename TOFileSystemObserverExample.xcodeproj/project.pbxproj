@@ -28,7 +28,6 @@
 		22C7FEAC23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FEAB23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m */; };
 		22C7FEAD23B5E74E0017CABD /* TOFileSystemItemDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FE9B23B5BD120017CABD /* TOFileSystemItemDictionary.m */; };
 		22D601C923657FA500275AD9 /* TOFileSystemPresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */; };
-		87800716004A3B429A615773 /* libPods-TOFileSystemObserverExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D963DD85AA86DAC2EF78BAD /* libPods-TOFileSystemObserverExample.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,7 +41,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0D963DD85AA86DAC2EF78BAD /* libPods-TOFileSystemObserverExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TOFileSystemObserverExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2232B64A233F6C1800358B05 /* TOFileSystemNotificationToken.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemNotificationToken.h; sourceTree = "<group>"; };
 		2232B64B233F6C1800358B05 /* TOFileSystemNotificationToken.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemNotificationToken.m; sourceTree = "<group>"; };
 		2232B64D233FA19C00358B05 /* TOFileSystemChanges.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemChanges.h; sourceTree = "<group>"; };
@@ -85,8 +83,6 @@
 		22C7FEAB23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemItemDictionaryTests.m; sourceTree = "<group>"; };
 		22D601C723657FA500275AD9 /* TOFileSystemPresenter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemPresenter.h; sourceTree = "<group>"; };
 		22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemPresenter.m; sourceTree = "<group>"; };
-		93017B7D5ADFD2D3681F12E4 /* Pods-TOFileSystemObserverExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TOFileSystemObserverExample.debug.xcconfig"; path = "Target Support Files/Pods-TOFileSystemObserverExample/Pods-TOFileSystemObserverExample.debug.xcconfig"; sourceTree = "<group>"; };
-		E4F449698A6C2F152710D4B6 /* Pods-TOFileSystemObserverExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TOFileSystemObserverExample.release.xcconfig"; path = "Target Support Files/Pods-TOFileSystemObserverExample/Pods-TOFileSystemObserverExample.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,7 +90,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				87800716004A3B429A615773 /* libPods-TOFileSystemObserverExample.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -136,7 +131,6 @@
 				22C7FEA223B5E70E0017CABD /* TOFileSystemObserverTests */,
 				223A8939233F13CA008FFE1A /* Products */,
 				83E6F6A1977EF05EE5BA87E3 /* Pods */,
-				4F8DA90D4D2EFBA090963DD9 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -246,19 +240,9 @@
 			path = FilePresenter;
 			sourceTree = "<group>";
 		};
-		4F8DA90D4D2EFBA090963DD9 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				0D963DD85AA86DAC2EF78BAD /* libPods-TOFileSystemObserverExample.a */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		83E6F6A1977EF05EE5BA87E3 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				93017B7D5ADFD2D3681F12E4 /* Pods-TOFileSystemObserverExample.debug.xcconfig */,
-				E4F449698A6C2F152710D4B6 /* Pods-TOFileSystemObserverExample.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -270,7 +254,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 223A8951233F13CB008FFE1A /* Build configuration list for PBXNativeTarget "TOFileSystemObserverExample" */;
 			buildPhases = (
-				3A10E19D8F76C66493FE2A5A /* [CP] Check Pods Manifest.lock */,
 				223A8934233F13C9008FFE1A /* Sources */,
 				223A8935233F13C9008FFE1A /* Frameworks */,
 				223A8936233F13C9008FFE1A /* Resources */,
@@ -357,31 +340,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		3A10E19D8F76C66493FE2A5A /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-TOFileSystemObserverExample-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		223A8934233F13C9008FFE1A /* Sources */ = {
@@ -551,7 +509,6 @@
 		};
 		223A8952233F13CB008FFE1A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 93017B7D5ADFD2D3681F12E4 /* Pods-TOFileSystemObserverExample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -572,7 +529,6 @@
 		};
 		223A8953233F13CB008FFE1A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E4F449698A6C2F152710D4B6 /* Pods-TOFileSystemObserverExample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
