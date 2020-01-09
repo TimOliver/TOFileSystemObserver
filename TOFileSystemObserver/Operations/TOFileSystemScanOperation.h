@@ -40,9 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation didDiscoverItemAtURL:(NSURL *)itemURL withUUID:(NSString *)uuid;
 
-/**
- Called when the properties of an object have been changed (eg, renamed etc)
- */
+/** Called when the properties of an object have been changed (eg, renamed etc) */
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation itemDidChangeAtURL:(NSURL *)itemURL withUUID:(NSString *)uuid;
 
 /** Called when the file has been moved to another part of the sandbox. */

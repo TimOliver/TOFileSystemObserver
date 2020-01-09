@@ -310,7 +310,13 @@
  didDiscoverItemAtURL:(NSURL *)itemURL
              withUUID:(NSString *)uuid
 {
-    NSLog(@"File found: %@", itemURL);
+    // See if there is a list for the parent, and add if need be
+    NSString *parentUUID = [itemURL to_uuidForParentDirectory];
+    
+    id mainBlock = ^{
+        TOFileSystemItemList *list = [self.itemListTable objectForKey:parentUUID];
+        
+    };
 }
 
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
