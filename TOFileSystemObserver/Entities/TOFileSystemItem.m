@@ -21,6 +21,7 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import "TOFileSystemItem.h"
+#import "TOFileSystemItemList+Private.h"
 #import "TOFileSystemPath.h"
 #import "TOFileSystemObserver.h"
 #import "TOFileSystemPresenter.h"
@@ -33,6 +34,12 @@
 @end
 
 @interface TOFileSystemItem ()
+
+/**
+ Stores any lists this item is a part of so if
+ any properties here change, we can notify them.
+ */
+@property (nonatomic, strong) NSHashTable *listTable;
 
 /** Internal writing overrides for public properties */
 @property (nonatomic, strong, readwrite) NSURL *fileURL;
@@ -59,6 +66,7 @@
         
         // If this item represents a deleted file, skip gathering the data
         if (!self.isDeleted) {
+            _listTable = [[NSHashTable alloc] initWithOptions:NSPointerFunctionsWeakMemory capacity:0];
             [self configureUUIDForceRefresh:NO];
             [self refreshFromItemAtURL:fileURL];
         }
@@ -160,6 +168,41 @@
 - (void)regenerateUUID
 {
     [self configureUUIDForceRefresh:YES];
+}
+
+#pragma mark - Lists -
+
+- (void)addToList:(TOFileSystemItemList *)list
+{
+    [self.listTable addObject:list];
+}
+
+- (void)refreshLists
+{
+    for (TOFileSystemItemList *list in self.listTable) {
+        [list itemDidRefresh:self];
+    }
+}
+
+- (void)removeFromList:(TOFileSystemItemList *)list
+{
+    [self.listTable removeObject:list];
+}
+
+#pragma mark - Equality -
+
+- (BOOL)isEqual:(id)object
+{
+    if (self == object) { return YES; }
+    if (![object isKindOfClass:TOFileSystemItem.class]) { return NO; }
+    
+    TOFileSystemItem *item = (TOFileSystemItem *)object;
+    return [item.uuid isEqualToString:self.uuid];
+}
+
+- (NSUInteger)hash
+{
+    return self.uuid.hash;
 }
 
 #pragma mark - Debugging -

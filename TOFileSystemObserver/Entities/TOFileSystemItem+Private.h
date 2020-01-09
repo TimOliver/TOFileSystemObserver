@@ -21,4 +21,13 @@
 /** Forces a refresh of the UUID (in cases where the file seems to have been duplicated) */
 - (void)regenerateUUID;
 
+/** Add this item to a list object so we can notify the list when it changes*/
+- (void)addToList:(TOFileSystemItemList *)list;
+
+/** Notify all lists that this object's proeprties updated. */
+- (void)refreshLists;
+
+/** Remove this item from a list */
+- (void)removeFromList:(TOFileSystemItemList *)list;
+
 @end
