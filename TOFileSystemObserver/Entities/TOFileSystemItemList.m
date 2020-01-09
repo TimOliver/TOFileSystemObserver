@@ -34,7 +34,7 @@
 @property (nonatomic, strong) NSMutableDictionary<NSString *, TOFileSystemItem *> *items;
 
 /** An array of the item UUIDs, sorted in the order specified. */
-@property (nonatomic, strong) NSMutableArray *sortedItems;
+@property (nonatomic, strong) NSMutableArray<NSString *> *sortedItems;
 
 @end
 
@@ -136,6 +136,23 @@
     return [_items countByEnumeratingWithState:state
                                        objects:buffer
                                          count:len];
+}
+
+#pragma mark - Live Item Updating -
+
+- (void)addItemWithUUID:(NSString *)uuid fileURL:(NSURL *)url
+{
+    
+}
+
+- (void)removeItemWithUUID:(NSString *)uuid fileURL:(NSURL *)url
+{
+    
+}
+
+- (void)itemDidRefresh:(TOFileSystemItem *)item
+{
+    
 }
 
 #pragma mark - Debugging -
