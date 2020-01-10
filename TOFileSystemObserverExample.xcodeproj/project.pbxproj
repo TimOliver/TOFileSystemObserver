@@ -71,6 +71,7 @@
 		229E0BA623C8503C0019937C /* TOFileSystemItemListChanges.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemItemListChanges.h; sourceTree = "<group>"; };
 		229E0BA723C8503C0019937C /* TOFileSystemItemListChanges.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemItemListChanges.m; sourceTree = "<group>"; };
 		229E0BA923C850510019937C /* TOFileSystemItemListChanges+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TOFileSystemItemListChanges+Private.h"; sourceTree = "<group>"; };
+		229E0BAA23C85ACD0019937C /* TOFileSystemNotificationToken+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TOFileSystemNotificationToken+Private.h"; sourceTree = "<group>"; };
 		22ADAEBA237815DA0088D31E /* TOFileSystemItemList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemItemList.h; sourceTree = "<group>"; };
 		22ADAEBB237815DA0088D31E /* TOFileSystemItemList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemItemList.m; sourceTree = "<group>"; };
 		22ADAEBE237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+TOFileSystemDirectoryEnumerator.h"; sourceTree = "<group>"; };
@@ -110,6 +111,7 @@
 				2232B652233FAFF700358B05 /* TOFileSystemNotificationTarget.h */,
 				2232B653233FAFF700358B05 /* TOFileSystemNotificationTarget.m */,
 				2232B64A233F6C1800358B05 /* TOFileSystemNotificationToken.h */,
+				229E0BAA23C85ACD0019937C /* TOFileSystemNotificationToken+Private.h */,
 				2232B64B233F6C1800358B05 /* TOFileSystemNotificationToken.m */,
 			);
 			path = Notifications;

@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  It is your responsibility to maintain a strong reference to this
  object for the duration that you wish to receive events. It will
- remove itself from the file system observer if it is deallocated.
+ remove itself from the observing object when deallocated.
  */
 @interface TOFileSystemNotificationToken : NSObject
 
@@ -27,6 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
  from the file system observer.
  */
 - (void)invalidate;
+
+- (instancetype)init NS_UNAVAILABLE;
 
 @end
 

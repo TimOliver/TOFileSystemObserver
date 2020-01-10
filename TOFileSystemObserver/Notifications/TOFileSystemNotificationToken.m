@@ -10,4 +10,9 @@
 
 @implementation TOFileSystemNotificationToken
 
+- (void)dealloc
+{
+    [self invalidate];
+}
+
 @end
