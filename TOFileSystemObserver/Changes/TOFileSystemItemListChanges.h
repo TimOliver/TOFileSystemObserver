@@ -34,23 +34,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** For table/collection view convenience, create an array of index paths
  for items that were deleted. */
-- (nullable NSArray<NSIndexPath *> *)indexPathsForDeletionsInSection:(NSInteger)section;
+- (NSArray<NSIndexPath *> *)indexPathsForDeletionsInSection:(NSInteger)section;
 
 /** For table/collection view convenience, create an array of index paths
  for items that were inserted. */
-- (nullable NSArray<NSIndexPath *> *)indexPathsForInsertionsInSection:(NSInteger)section;
+- (NSArray<NSIndexPath *> *)indexPathsForInsertionsInSection:(NSInteger)section;
 
 /** For table/collection view convenience, create an array of index paths
  for items that were modified. */
-- (nullable NSArray<NSIndexPath *> *)indexPathsForModificationsInSection:(NSInteger)section;
+- (NSArray<NSIndexPath *> *)indexPathsForModificationsInSection:(NSInteger)section;
 
 /** For table/collection view convenience, create an array of index paths that
  items about to be moved were originally in. */
-- (nullable NSArray<NSIndexPath *> *)indexPathsForMovementSourcesInSection:(NSInteger)section;
+- (NSArray<NSIndexPath *> *)indexPathsForMovementSourcesInSection:(NSInteger)section;
 
 /** For table/collection view convenience, create an array of index paths that
  items about to be moved are now currently in, based off an array of source index  */
-- (nullable NSArray<NSIndexPath *> *)indexPathsForMovementDestinationsWithSourceIndexPaths:(NSArray<NSIndexPath *> *)sourceIndexPaths;
+- (NSArray<NSIndexPath *> *)indexPathsForMovementDestinationsWithSourceIndexPaths:(NSArray<NSIndexPath *> *)sourceIndexPaths;
 
 @end
 

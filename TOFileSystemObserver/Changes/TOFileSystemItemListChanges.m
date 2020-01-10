@@ -69,10 +69,10 @@
 
 #pragma mark - Table/Collection View Converters -
 
-- (nullable NSArray<NSIndexPath *> *)indexPathsForCollection:(nullable NSArray<NSNumber *> *)collection
+- (NSArray<NSIndexPath *> *)indexPathsForCollection:(nullable NSArray<NSNumber *> *)collection
                                                    inSection:(NSInteger)section
 {
-    if (!collection) { return nil; }
+    if (!collection) { return [NSArray array]; }
     
     NSMutableArray *array = [NSMutableArray array];
     for (NSNumber *number in collection) {
@@ -83,29 +83,29 @@
     return [NSArray arrayWithArray:array];
 }
 
-- (nullable NSArray<NSIndexPath *> *)indexPathsForDeletionsInSection:(NSInteger)section
+- (NSArray<NSIndexPath *> *)indexPathsForDeletionsInSection:(NSInteger)section
 {
     return [self indexPathsForCollection:self.deletions inSection:section];
 }
 
-- (nullable NSArray<NSIndexPath *> *)indexPathsForInsertionsInSection:(NSInteger)section
+- (NSArray<NSIndexPath *> *)indexPathsForInsertionsInSection:(NSInteger)section
 {
     return [self indexPathsForCollection:self.insertions inSection:section];
 }
 
-- (nullable NSArray<NSIndexPath *> *)indexPathsForModificationsInSection:(NSInteger)section
+- (NSArray<NSIndexPath *> *)indexPathsForModificationsInSection:(NSInteger)section
 {
     return [self indexPathsForCollection:self.modificatons inSection:section];
 }
 
-- (nullable NSArray<NSIndexPath *> *)indexPathsForMovementSourcesInSection:(NSInteger)section
+- (NSArray<NSIndexPath *> *)indexPathsForMovementSourcesInSection:(NSInteger)section
 {
     return [self indexPathsForCollection:self.movements.allKeys inSection:section];
 }
 
-- (nullable NSArray<NSIndexPath *> *)indexPathsForMovementDestinationsWithSourceIndexPaths:(NSArray<NSIndexPath *> *)sourceIndexPaths
+- (NSArray<NSIndexPath *> *)indexPathsForMovementDestinationsWithSourceIndexPaths:(NSArray<NSIndexPath *> *)sourceIndexPaths
 {
-    if (self.movements == nil) { return nil; }
+    if (self.movements == nil) { return [NSArray array]; }
     
     NSMutableArray *array = [NSMutableArray array];
     for (NSIndexPath *sourceIndexPath in sourceIndexPaths) {
