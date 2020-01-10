@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** A protocol denoting that the object can serve notification tokens. */
 @protocol TOFileSystemNotifying <NSObject>
 
+@required
 /** Removes the notification from the observing object. */
 - (void)removeNotificationToken:(TOFileSystemNotificationToken *)token;
 
@@ -23,10 +24,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TOFileSystemNotificationToken ()
 
 /** The object for which this token was generated from. */
-@property (nonatomic, readonly) id<TOFileSystemNotifying> observingObject;
+@property (nonatomic, weak, readwrite) id<TOFileSystemNotifying> observingObject;
 
 /** The block that will be triggered each time an event occurs. */
-@property (nonatomic, readonly) void (^notificationBlock)(id observer, id changes);
+@property (nonatomic, copy, readwrite) void (^notificationBlock)(id observer, id changes);
 
 /** Create a new instance with the observer and the block */
 + (instancetype)tokenWithObservingObject:(id<TOFileSystemNotifying>)observingObject
