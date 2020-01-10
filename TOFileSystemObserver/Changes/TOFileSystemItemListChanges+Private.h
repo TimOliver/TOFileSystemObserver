@@ -22,7 +22,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addModificationIndex:(NSInteger)index;
 
 /** Add the source and dest index values for a row to be moved. */
-- (void)addMovementWithSourceIndex:(NSInteger)sourceIndex destinationIndex:(NSInteger)destinationIndex;
+- (void)addMovementWithSourceIndex:(NSInteger)sourceIndex
+                  destinationIndex:(NSInteger)destinationIndex;
 
 @end
 
