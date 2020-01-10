@@ -24,10 +24,10 @@
 /** Add this item to a list object so we can notify the list when it changes*/
 - (void)addToList:(TOFileSystemItemList *)list;
 
-/** Notify all lists that this object's proeprties updated. */
-- (void)refreshLists;
+/** Notify this object that it should re-fetch all its properties from disk */
+- (void)refreshWithURL:(NSURL *)itemURL;
 
 /** Remove this item from a list */
-- (void)removeFromList:(TOFileSystemItemList *)list;
+- (void)removeFromLists;
 
 @end

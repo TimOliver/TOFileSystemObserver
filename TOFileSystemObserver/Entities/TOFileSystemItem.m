@@ -177,10 +177,10 @@
     [self.listTable addObject:list];
 }
 
-- (void)refreshLists
+- (void)refreshWithURL:(NSURL *)itemURL
 {
     for (TOFileSystemItemList *list in self.listTable) {
-        [list itemDidRefresh:self];
+        [list itemDidRefreshWithUUID:self.uuid];
     }
 }
 
