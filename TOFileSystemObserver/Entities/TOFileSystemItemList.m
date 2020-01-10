@@ -14,6 +14,8 @@
 #import "TOFileSystemPresenter.h"
 #import "TOFileSystemNotificationToken.h"
 #import "TOFileSystemNotificationToken+Private.h"
+#import "TOFileSystemItemListChanges.h"
+#import "TOFileSystemItemListChanges+Private.h"
 
 #import "NSURL+TOFileSystemUUID.h"
 #import "NSFileManager+TOFileSystemDirectoryEnumerator.h"
@@ -130,14 +132,10 @@
 
 - (NSUInteger)sortedIndexForItem:(TOFileSystemItem *)item
 {
-    // Perform a binary search to determine the index this item should be stored at
-    NSRange searchRange = NSMakeRange(0, self.sortedItems.count);
-    NSUInteger findIndex = [self.sortedItems indexOfObject:item.uuid
-                                        inSortedRange:searchRange
-                                              options:NSBinarySearchingFirstEqual
-                                      usingComparator:self.sortComparator];
-    
-    return findIndex;
+    return [self.sortedItems indexOfObject:item.uuid
+                             inSortedRange:(NSRange){0, self.sortedItems.count}
+                                   options:NSBinarySearchingInsertionIndex
+                           usingComparator:self.sortComparator];
 }
 
 #pragma mark - External Item Access -
@@ -173,10 +171,21 @@
     // Skip if this item is already in the list
     if (self.items[uuid]) { return; }
     
+    // Generate a new item and add it to our list
     TOFileSystemItem *item = [self.fileSystemObserver itemForFileAtURL:url];
+    [item addToList:self];
+    self.items[item.uuid] = item;
+    
+    // Work out where the item should go in our sorted list
     NSUInteger sortedIndex = [self sortedIndexForItem:item];
     [self.sortedItems insertObject:item.uuid atIndex:sortedIndex];
-    [item addToList:self];
+    
+    // Perform the broadcast to any observing objects that this update ocurred
+    TOFileSystemItemListChanges *changes = [[TOFileSystemItemListChanges alloc] init];
+    [changes addInsertionIndex:sortedIndex];
+    for (TOFileSystemNotificationToken *token in self.notificationObservers) {
+        token.notificationBlock(self, changes);
+    }
 }
 
 - (void)removeItemWithUUID:(NSString *)uuid fileURL:(NSURL *)url
