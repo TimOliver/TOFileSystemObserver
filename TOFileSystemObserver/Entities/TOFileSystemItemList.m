@@ -12,6 +12,8 @@
 #import "TOFileSystemObserver.h"
 #import "TOFileSystemPath.h"
 #import "TOFileSystemPresenter.h"
+#import "TOFileSystemNotificationToken.h"
+#import "TOFileSystemNotificationToken+Private.h"
 
 #import "NSURL+TOFileSystemUUID.h"
 #import "NSFileManager+TOFileSystemDirectoryEnumerator.h"

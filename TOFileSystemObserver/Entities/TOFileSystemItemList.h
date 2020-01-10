@@ -24,6 +24,13 @@
 
 @class TOFileSystemObserver;
 @class TOFileSystemItem;
+@class TOFileSystemItemListChanges;
+@class TOFileSystemNotificationToken;
+@class TOFileSystemItemList;
+
+/** A block that may be registered in order to observe when items in the list change. */
+typedef void (^TOFileSystemItemListNotificationBlock)(TOFileSystemItemList * _Nonnull itemList,
+                                                      TOFileSystemItemListChanges * _Nullable changes);
 
 /** The different options for ordering item lists */
 typedef NS_ENUM(NSInteger, TOFileSystemItemListOrder) {
@@ -63,6 +70,15 @@ NS_ASSUME_NONNULL_BEGIN
 /** The absolute URL to this directory containing these items. */
 @property (nonatomic, readonly) NSURL *directoryURL;
 
+/**
+ Registers a new notification block that will be
+ triggered each time the data in the list changes.
+ 
+ The returned notification token must be strongly retained
+ by your code for the duration you wish to receive notifications.
+ */
+- (TOFileSystemNotificationToken *)addNotificationBlock:(TOFileSystemItemListNotificationBlock)block;
+
 /** Retrieves the item at the requested index. */
 - (TOFileSystemItem *)objectAtIndex:(NSUInteger)index;
 
@@ -72,11 +88,5 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 
 @end
-
-/**
- Whenever the list of items changes for any reason (eg, an item
- was inserted, modified, or deleted. Or even just the sorting mode changed),
- 
- */
 
 NS_ASSUME_NONNULL_END
