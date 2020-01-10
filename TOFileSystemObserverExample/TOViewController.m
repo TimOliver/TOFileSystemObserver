@@ -13,6 +13,7 @@
 
 @property (nonatomic, strong) TOFileSystemObserver *observer;
 @property (nonatomic, strong) TOFileSystemItemList *fileItemList;
+@property (nonatomic, strong) TOFileSystemNotificationToken *listToken;
 
 @end
 
@@ -29,6 +30,29 @@
 
     // Create a live list of the base folder for this controller
     self.fileItemList = [self.observer itemListForDirectoryAtURL:nil];
+    
+    __weak typeof(self) weakSelf = self;
+    self.listToken = [self.fileItemList addNotificationBlock:^(TOFileSystemItemList *itemList,
+                                                               TOFileSystemItemListChanges *changes)
+    {
+        UITableView *tableView = weakSelf.tableView;
+        [tableView beginUpdates];
+        [tableView deleteRowsAtIndexPaths:[changes indexPathsForDeletionsInSection:0]
+                         withRowAnimation:UITableViewRowAnimationAutomatic];
+        [tableView insertRowsAtIndexPaths:[changes indexPathsForInsertionsInSection:0]
+                         withRowAnimation:UITableViewRowAnimationAutomatic];
+        [tableView reloadRowsAtIndexPaths:[changes indexPathsForModificationsInSection:0]
+                         withRowAnimation:UITableViewRowAnimationAutomatic];
+        
+        NSDictionary *movements = changes.movements;
+        for (NSNumber *sourceNumber in movements) {
+            NSIndexPath *sourceIndex = [NSIndexPath indexPathForRow:sourceNumber.intValue inSection:0];
+            NSIndexPath *destIndex = [NSIndexPath indexPathForRow:[movements[sourceNumber] intValue] inSection:0];
+            [tableView moveRowAtIndexPath:sourceIndex toIndexPath:destIndex];
+        }
+        
+        [tableView endUpdates];
+    }];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView

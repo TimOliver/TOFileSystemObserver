@@ -25,6 +25,7 @@
 #import "TOFileSystemItemList.h"
 #import "TOFileSystemItem.h"
 #import "TOFileSystemNotificationToken.h"
+#import "TOFileSystemItemListChanges.h"
 
 @class TOFileSystemObserver;
 
