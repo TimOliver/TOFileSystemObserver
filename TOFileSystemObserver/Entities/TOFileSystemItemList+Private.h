@@ -10,6 +10,8 @@
 #import "TOFileSystemItemList.h"
 #import "TOFileSystemItem.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class TOFileSystemObserver;
 
 /** Private interface for creating item objects */
@@ -29,3 +31,5 @@
 - (void)removeItemWithUUID:(NSString *)uuid fileURL:(NSURL *)url;
 
 @end
+
+NS_ASSUME_NONNULL_END
