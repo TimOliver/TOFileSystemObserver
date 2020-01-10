@@ -279,7 +279,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
         if ([self.delegate respondsToSelector:@selector(scanOperation:didDiscoverItemAtURL:withUUID:)]) {
             [self.delegate scanOperation:self didDiscoverItemAtURL:url withUUID:uuid];
         }
-        return;;
+        return;
     }
     
     // Otherwise, post a notification that "something" changed, so we should update it's state
