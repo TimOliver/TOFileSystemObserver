@@ -310,20 +310,29 @@
  didDiscoverItemAtURL:(NSURL *)itemURL
              withUUID:(NSString *)uuid
 {
-    // See if there is a list for the parent, and add if need be
+    // See if there is a list had been made for the parent, and add it
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];
-    
     id mainBlock = ^{
         TOFileSystemItemList *list = [self.itemListTable objectForKey:parentUUID];
+        [list addItemWithUUID:uuid itemURL:itemURL];
         
+        // TODO: Add broadcast notifications
     };
+    dispatch_async(dispatch_get_main_queue(), mainBlock);
 }
 
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
    itemDidChangeAtURL:(NSURL *)itemURL
              withUUID:(NSString *)uuid
 {
-    NSLog(@"File Changed: %@", itemURL);
+    id mainBlock = ^{
+        // See if this item exists in memory, and if so, trigger a refresh
+        TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
+        [item refreshWithURL:itemURL];
+        
+        // TODO: Add broadcast notifications
+    };
+    dispatch_async(dispatch_get_main_queue(), mainBlock);
 }
 
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
@@ -331,14 +340,29 @@
         didMoveFromURL:(NSURL *)previousURL
                 toURL:(NSURL *)url
 {
-    NSLog(@"File moved: %@", url);
+    id mainBlock = ^{
+        // Search for this item in our lists and refresh it
+        TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
+        [item refreshWithURL:url];
+        
+        // TODO: Add broadcast notifications
+    };
+    dispatch_async(dispatch_get_main_queue(), mainBlock);
 }
 
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
    didDeleteItemAtURL:(NSURL *)itemURL
              withUUID:(NSString *)uuid
 {
-    NSLog(@"File deleted: %@", itemURL);
+    id mainBlock = ^{
+        // If we have this item in memory, remove it from everywhere
+        TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
+        [item removeFromLists];
+        [self.itemTable removeObjectForKey:uuid];
+        
+        // TODO: Add broadcast notifications
+    };
+    dispatch_async(dispatch_get_main_queue(), mainBlock);
 }
 
 @end
