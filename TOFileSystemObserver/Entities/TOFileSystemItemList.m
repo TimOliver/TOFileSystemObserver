@@ -78,6 +78,9 @@
     for (NSURL *url in enumerator) {
         TOFileSystemItem *item = [self.fileSystemObserver itemForFileAtURL:url];
 
+        // Add the list to the item's store so it can notify of updates
+        [item addToList:self];
+        
         // Capture the item with its UUID in the dictionary
         _items[item.uuid] = item;
     }
@@ -89,14 +92,21 @@
 
 #pragma mark - Sorting Items -
 
-- (void)sortItemsList
+- (NSComparator)sortComparator
 {
-    // Sort all of the UUIDS
-    [_sortedItems sortUsingComparator:^NSComparisonResult(NSString *firstUUID, NSString *secondUUID) {
-        TOFileSystemItem *firstItem = _items[firstUUID];
-        TOFileSystemItem *secondItem = _items[secondUUID];
+    __weak typeof(self) weakSelf = self;
+    return ^NSComparisonResult(NSString *firstUUID, NSString *secondUUID) {
+        TOFileSystemItem *firstItem = weakSelf.items[firstUUID];
+        TOFileSystemItem *secondItem = weakSelf.items[secondUUID];
         
-        switch (_listOrder) {
+        // If the order is flipped, swap around the two items
+        if (self.isDescending) {
+            TOFileSystemItem *tempItem = firstItem;
+            firstItem = secondItem;
+            secondItem = tempItem;
+        }
+        
+        switch (weakSelf.listOrder) {
             case TOFileSystemItemListOrderAlphanumeric:
                 return [firstItem.name localizedStandardCompare:secondItem.name];
             case TOFileSystemItemListOrderDate:
@@ -104,12 +114,25 @@
             default:
                 return firstItem.size > secondItem.size;
         }
-    }];
+    };
+}
+
+- (void)sortItemsList
+{
+    // Sort all of the UUIDS
+    [_sortedItems sortUsingComparator:self.sortComparator];
+}
+
+- (NSUInteger)sortedIndexForItem:(TOFileSystemItem *)item
+{
+    // Perform a binary search to determine the index this item should be stored at
+    NSRange searchRange = NSMakeRange(0, self.sortedItems.count);
+    NSUInteger findIndex = [self.sortedItems indexOfObject:item.uuid
+                                        inSortedRange:searchRange
+                                              options:NSBinarySearchingFirstEqual
+                                      usingComparator:self.sortComparator];
     
-    // If descending, flip the list
-    if (self.isDescending) {
-        _sortedItems = [[_sortedItems reverseObjectEnumerator] allObjects].mutableCopy;
-    }
+    return findIndex;
 }
 
 #pragma mark - External Item Access -
@@ -140,19 +163,26 @@
 
 #pragma mark - Live Item Updating -
 
-- (void)addItemWithUUID:(NSString *)uuid fileURL:(NSURL *)url
+- (void)addItemWithUUID:(NSString *)uuid itemURL:(NSURL *)url
 {
+    // Skip if this item is already in the list
+    if (self.items[uuid]) { return; }
     
+    TOFileSystemItem *item = [self.fileSystemObserver itemForFileAtURL:url];
+    NSUInteger sortedIndex = [self sortedIndexForItem:item];
+    [self.sortedItems insertObject:item.uuid atIndex:sortedIndex];
+    [item addToList:self];
 }
 
 - (void)removeItemWithUUID:(NSString *)uuid fileURL:(NSURL *)url
 {
-    
+    [self.items removeObjectForKey:uuid];
+    [self.sortedItems removeObject:uuid];
 }
 
-- (void)itemDidRefresh:(TOFileSystemItem *)item
+- (void)itemDidRefreshWithUUID:(NSString *)uuid
 {
-    
+
 }
 
 #pragma mark - Debugging -

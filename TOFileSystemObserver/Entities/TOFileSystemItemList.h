@@ -73,4 +73,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+/**
+ Whenever the list of items changes for any reason (eg, an item
+ was inserted, modified, or deleted. Or even just the sorting mode changed),
+ 
+ */
+
 NS_ASSUME_NONNULL_END

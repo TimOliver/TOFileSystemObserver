@@ -20,10 +20,10 @@
                   fileSystemObserver:(TOFileSystemObserver *)observer;
 
 /** Add a new item to the list. */
-- (void)addItemWithUUID:(NSString *)uuid fileURL:(NSURL *)url;
+- (void)addItemWithUUID:(NSString *)uuid itemURL:(NSURL *)url;
 
 /** Triggered when an item's properties have changed. */
-- (void)itemDidRefresh:(TOFileSystemItem *)item;
+- (void)itemDidRefreshWithUUID:(NSString *)uuid;
 
 /** Remove an object from the list (It was deleted or moved away). */
 - (void)removeItemWithUUID:(NSString *)uuid fileURL:(NSURL *)url;
