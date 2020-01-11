@@ -186,7 +186,16 @@
 
 - (void)removeFromList:(TOFileSystemItemList *)list
 {
+    [list removeItemWithUUID:self.uuid fileURL:self.fileURL];
     [self.listTable removeObject:list];
+}
+
+- (void)removeFromAllLists
+{
+    for (TOFileSystemItemList *list in self.listTable) {
+        [list removeItemWithUUID:self.uuid fileURL:self.fileURL];
+    }
+    [self.listTable removeAllObjects];
 }
 
 #pragma mark - Equality -

@@ -27,7 +27,10 @@
 /** Notify this object that it should re-fetch all its properties from disk */
 - (void)refreshWithURL:(NSURL *)itemURL;
 
-/** Remove this item from a list */
-- (void)removeFromLists;
+/** Remove this item from a specific */
+- (void)removeFromList:(TOFileSystemItemList *)list;
+
+/** Remove this item from all list */
+- (void)removeFromAllLists;
 
 @end

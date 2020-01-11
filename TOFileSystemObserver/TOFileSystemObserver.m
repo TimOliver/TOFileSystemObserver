@@ -340,10 +340,22 @@
         didMoveFromURL:(NSURL *)previousURL
                 toURL:(NSURL *)url
 {
+    // See if moved from, or into a new list
+    NSString *oldParentUUID = [previousURL to_uuidForParentDirectory];
+    NSString *newParentUUID = [url to_uuidForParentDirectory];
+    
     id mainBlock = ^{
-        // Search for this item in our lists and refresh it
+        // Get the item and refresh its internal state for the new location
         TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
         [item refreshWithURL:url];
+        
+        // Potentially remove it from the old list
+        TOFileSystemItemList *oldList = [self.itemListTable objectForKey:oldParentUUID];
+        [item removeFromList:oldList];
+        
+        // Potentially add it to a new list
+        TOFileSystemItemList *newList = [self.itemListTable objectForKey:newParentUUID];
+        [item addToList:newList];
         
         // TODO: Add broadcast notifications
     };
@@ -357,7 +369,7 @@
     id mainBlock = ^{
         // If we have this item in memory, remove it from everywhere
         TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
-        [item removeFromLists];
+        [item removeFromAllLists];
         [self.itemTable removeObjectForKey:uuid];
         
         // TODO: Add broadcast notifications

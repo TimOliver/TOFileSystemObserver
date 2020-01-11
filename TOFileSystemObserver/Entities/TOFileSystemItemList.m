@@ -11,7 +11,6 @@
 #import "TOFileSystemItem+Private.h"
 #import "TOFileSystemObserver.h"
 #import "TOFileSystemPath.h"
-#import "TOFileSystemPresenter.h"
 #import "TOFileSystemNotificationToken.h"
 #import "TOFileSystemNotificationToken+Private.h"
 #import "TOFileSystemItemListChanges.h"
@@ -239,8 +238,23 @@
 
 - (void)removeItemWithUUID:(NSString *)uuid fileURL:(NSURL *)url
 {
+    // Verify the item is still here
+    if (self.items[uuid] == nil) { return; }
+    
+    // Work out where the item is in the list
+    NSInteger index = [self.sortedItems indexOfObject:uuid];
+    NSAssert(index != NSNotFound, @"items and sortedItems should never be out of sync");
+    
+    // Remove the item from both stores
     [self.items removeObjectForKey:uuid];
-    [self.sortedItems removeObject:uuid];
+    [self.sortedItems removeObjectAtIndex:index];
+    
+    // Trigger the notification blocks
+    TOFileSystemItemListChanges *changes = [[TOFileSystemItemListChanges alloc] init];
+    [changes addDeletionIndex:index];
+    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+        token.notificationBlock(self, changes);
+    }
 }
 
 - (void)itemDidRefreshWithUUID:(NSString *)uuid
