@@ -140,10 +140,11 @@
     // Pause and wait for the semaphore to complete
     dispatch_semaphore_wait(self.pausingSemaphore, DISPATCH_TIME_FOREVER);
 
-    [NSFileCoordinator removeFilePresenter:self];
-    if (block) { block(); }
-    [NSFileCoordinator addFilePresenter:self];
-
+    @autoreleasepool {
+        [NSFileCoordinator removeFilePresenter:self];
+        if (block) { block(); }
+        [NSFileCoordinator addFilePresenter:self];
+    }
     // Resume the semaphore
     dispatch_semaphore_signal(self.pausingSemaphore);
 }
