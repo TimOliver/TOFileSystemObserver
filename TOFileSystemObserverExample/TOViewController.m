@@ -7,7 +7,9 @@
 //
 
 #import "TOViewController.h"
+
 #import "TOFileSystemObserver.h"
+#import "TOFileSystemObserver+UIKit.h"
 
 @interface TOViewController ()
 
@@ -36,22 +38,8 @@
                                                                TOFileSystemItemListChanges *changes)
     {
         UITableView *tableView = weakSelf.tableView;
-        [tableView beginUpdates];
-        {
-            [tableView deleteRowsAtIndexPaths:[changes indexPathsForDeletionsInSection:0]
-                             withRowAnimation:UITableViewRowAnimationAutomatic];
-            [tableView insertRowsAtIndexPaths:[changes indexPathsForInsertionsInSection:0]
-                             withRowAnimation:UITableViewRowAnimationAutomatic];
-            [tableView reloadRowsAtIndexPaths:[changes indexPathsForModificationsInSection:0]
-                             withRowAnimation:UITableViewRowAnimationAutomatic];
-            
-            NSArray *sourceMovements = [changes indexPathsForMovementSourcesInSection:0];
-            NSArray *destinationMovements = [changes indexPathsForMovementDestinationsWithSourceIndexPaths:sourceMovements];
-            for (NSInteger i = 0; i < sourceMovements.count; i++) {
-                [tableView moveRowAtIndexPath:sourceMovements[i] toIndexPath:destinationMovements[i]];
-            }
-        }
-        [tableView endUpdates];
+        TOFileSystemItemListUpdateTableView(tableView, changes, 0);
+
     }];
     
     // Add test button for flipping direction
@@ -113,12 +101,19 @@
     static NSString *cellIdentifier = @"Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier];
     }
     
     TOFileSystemItem *fileItem = self.fileItemList[indexPath.row];
     cell.textLabel.text = fileItem.name;
 
+    if (fileItem.isCopying) {
+        cell.detailTextLabel.text = @"Copying";
+    }
+    else {
+        cell.detailTextLabel.text = fileItem.type == TOFileSystemItemTypeDirectory ? @"Dicrectory" : @"File";
+    }
+    
     return cell;
 }
 

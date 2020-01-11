@@ -41,6 +41,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2206C80723C9BECA009FD5DD /* TOFileSystemObserver+UIKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TOFileSystemObserver+UIKit.h"; sourceTree = "<group>"; };
 		2232B64A233F6C1800358B05 /* TOFileSystemNotificationToken.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemNotificationToken.h; sourceTree = "<group>"; };
 		2232B64B233F6C1800358B05 /* TOFileSystemNotificationToken.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemNotificationToken.m; sourceTree = "<group>"; };
 		2232B64D233FA19C00358B05 /* TOFileSystemChanges.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemChanges.h; sourceTree = "<group>"; };
@@ -105,6 +106,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2206C80A23C9BFDF009FD5DD /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				2206C80723C9BECA009FD5DD /* TOFileSystemObserver+UIKit.h */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
 		2232B649233F6BF900358B05 /* Notifications */ = {
 			isa = PBXGroup;
 			children = (
@@ -175,6 +184,7 @@
 				2254ED27234055BB00331B47 /* FilePaths */,
 				2232B649233F6BF900358B05 /* Notifications */,
 				2254ED2B2340EF0F00331B47 /* Operations */,
+				2206C80A23C9BFDF009FD5DD /* Utilities */,
 			);
 			path = TOFileSystemObserver;
 			sourceTree = "<group>";
