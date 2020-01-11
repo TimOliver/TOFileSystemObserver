@@ -44,15 +44,42 @@
         [tableView reloadRowsAtIndexPaths:[changes indexPathsForModificationsInSection:0]
                          withRowAnimation:UITableViewRowAnimationAutomatic];
         
-        NSDictionary *movements = changes.movements;
-        for (NSNumber *sourceNumber in movements) {
-            NSIndexPath *sourceIndex = [NSIndexPath indexPathForRow:sourceNumber.intValue inSection:0];
-            NSIndexPath *destIndex = [NSIndexPath indexPathForRow:[movements[sourceNumber] intValue] inSection:0];
-            [tableView moveRowAtIndexPath:sourceIndex toIndexPath:destIndex];
+        NSArray *sourceMovements = [changes indexPathsForMovementSourcesInSection:0];
+        NSArray *destinationMovements = [changes indexPathsForMovementDestinationsWithSourceIndexPaths:sourceMovements];
+        for (NSInteger i = 0; i < sourceMovements.count; i++) {
+            [tableView moveRowAtIndexPath:sourceMovements[i] toIndexPath:destinationMovements[i]];
         }
         
         [tableView endUpdates];
     }];
+    
+    // Add test button for rotating list order
+    UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithTitle:@"Name"
+                                                                    style:UIBarButtonItemStylePlain
+                                                                   target:self
+                                                                   action:@selector(rightButtonTapped:)];
+    self.navigationItem.rightBarButtonItem = rightButton;
+}
+
+- (void)rightButtonTapped:(id)sender
+{
+    TOFileSystemItemListOrder order = self.fileItemList.listOrder + 1;
+    if (order > TOFileSystemItemListOrderSize) { order = 0; }
+    
+    UIBarButtonItem *item = (UIBarButtonItem *)sender;
+    switch (order) {
+        case TOFileSystemItemListOrderSize:
+            item.title = @"Size";
+            break;
+        case TOFileSystemItemListOrderDate:
+            item.title = @"Date";
+            break;
+        default:
+            item.title = @"Name";
+            break;
+    }
+    
+    self.fileItemList.listOrder = order;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView

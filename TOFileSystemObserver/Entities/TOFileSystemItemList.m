@@ -104,11 +104,19 @@
     // Sort the list to the new order
     [self sortItemsList];
     
+    // Build a dictionary of all of the UUIDs so we can map the old
+    // ordering to the new ordering, but use the hashing features of the
+    // dictionary to avoid doing random lookup for every item
+    NSMutableDictionary *newSortedItemsDict = [NSMutableDictionary dictionary];
+    for (NSInteger i = 0; i < self.sortedItems.count; i++) {
+        newSortedItemsDict[self.sortedItems[i]] = @(i);
+    }
+    
     // Loop through and build a list of indices for each moved cell.
     TOFileSystemItemListChanges *changes = [[TOFileSystemItemListChanges alloc] init];
     for (NSInteger i = 0; i < previousList.count; i++) {
         // Work out where the item in the new list went
-        NSInteger newIndex = [self sortedIndexForItemWithUUID:previousList[i]];
+        NSInteger newIndex = [newSortedItemsDict[previousList[i]] intValue];
         [changes addMovementWithSourceIndex:i destinationIndex:newIndex];
     }
     
@@ -124,6 +132,11 @@
 {
     __weak typeof(self) weakSelf = self;
     return ^NSComparisonResult(NSString *firstUUID, NSString *secondUUID) {
+        // Check if the UUID matches
+        if ([firstUUID isEqualToString:secondUUID]) {
+            return NSOrderedSame;
+        }
+        
         TOFileSystemItem *firstItem = weakSelf.items[firstUUID];
         TOFileSystemItem *secondItem = weakSelf.items[secondUUID];
         
@@ -136,11 +149,21 @@
         
         switch (weakSelf.listOrder) {
             case TOFileSystemItemListOrderAlphanumeric:
+            {
                 return [firstItem.name localizedStandardCompare:secondItem.name];
+            }
             case TOFileSystemItemListOrderDate:
+            {
                 return [firstItem.modificationDate compare:secondItem.modificationDate];
+            }
             default:
-                return firstItem.size > secondItem.size;
+            {
+                // File sizes always go descending by default.
+                // Compare file names if the sizes match to keep clean ordering (Because folders are always 0)
+                NSComparisonResult result = [@(secondItem.size) compare:@(firstItem.size)];
+                if (result == NSOrderedSame) { return [firstItem.name localizedStandardCompare:secondItem.name]; }
+                return result;
+            }
         }
     };
 }
@@ -248,7 +271,7 @@
 {
     if (_listOrder == listOrder) { return; }
     _listOrder = listOrder;
-    
+    [self rebuildItemListForListingOrder];
 }
 
 - (void)setIsDescending:(BOOL)isDescending
