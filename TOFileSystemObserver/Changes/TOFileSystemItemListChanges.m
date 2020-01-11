@@ -117,4 +117,14 @@
     return [NSArray arrayWithArray:array];
 }
 
+- (BOOL)hasItemMovements
+{
+    return self.movements != nil;
+}
+
+- (BOOL)hasItemChanges
+{
+    return (self.deletions || self.insertions || self.modificatons);
+}
+
 @end

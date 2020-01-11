@@ -20,6 +20,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface TOFileSystemItemListChanges : NSObject
 
+/** State check to see if there are any pending movements. */
+@property (nonatomic, readonly) BOOL hasItemMovements;
+
+/** State check if it has cell updates that aren't movements. */
+@property (nonatomic, readonly) BOOL hasItemChanges;
+
 /** The indices of any objects that were deleted. */
 @property (nonatomic, readonly, nullable) NSArray<NSNumber *> *deletions;
 
