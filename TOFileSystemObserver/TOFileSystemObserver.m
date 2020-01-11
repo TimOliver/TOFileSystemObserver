@@ -340,9 +340,15 @@
         didMoveFromURL:(NSURL *)previousURL
                 toURL:(NSURL *)url
 {
+    // If the movement occurred inside the same folder (eg, it was renamed),
+    // cancel out here.
+    NSURL *oldParentURL = previousURL.URLByDeletingLastPathComponent.URLByStandardizingPath;
+    NSURL *newParentURL = url.URLByDeletingLastPathComponent.URLByStandardizingPath;
+    if ([oldParentURL isEqual:newParentURL]) { return; }
+    
     // See if moved from, or into a new list
-    NSString *oldParentUUID = [previousURL to_uuidForParentDirectory];
-    NSString *newParentUUID = [url to_uuidForParentDirectory];
+    NSString *oldParentUUID = [oldParentURL to_fileSystemUUID];
+    NSString *newParentUUID = [newParentURL to_fileSystemUUID];
     
     id mainBlock = ^{
         // Get the item and refresh its internal state for the new location
