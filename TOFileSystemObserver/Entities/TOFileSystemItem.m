@@ -80,15 +80,17 @@
 - (void)configureUUIDForceRefresh:(BOOL)forceRefresh
 {
     TOFileSystemPresenter *presenter = self.fileSystemObserver.fileSystemPresenter;
-    NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:presenter];
-    [fileCoordinator coordinateWritingItemAtURL:_fileURL options:0 error:nil byAccessor:^(NSURL * _Nonnull newURL) {
-        _uuid = [newURL to_makeFileSystemUUIDIfNeeded];
+    [presenter pauseWhileExecutingBlock:^{
+        self.uuid = [self.fileURL to_makeFileSystemUUIDIfNeeded];
     }];
 }
 
 - (BOOL)refreshFromItemAtURL:(NSURL *)url
 {
     BOOL hasChanges = NO;
+    
+    // Copy the new URL to this item
+    self.fileURL = url;
     
     // Copy the name of the item
     NSString *name = [url lastPathComponent];
@@ -179,6 +181,7 @@
 
 - (void)refreshWithURL:(NSURL *)itemURL
 {
+    [self refreshFromItemAtURL:itemURL];
     for (TOFileSystemItemList *list in self.listTable) {
         [list itemDidRefreshWithUUID:self.uuid];
     }
