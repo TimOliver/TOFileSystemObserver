@@ -106,7 +106,7 @@
     
     // Build a dictionary of all of the UUIDs so we can map the old
     // ordering to the new ordering, but use the hashing features of the
-    // dictionary to avoid doing random lookup for every item
+    // dictionary to avoid doing random lookup each time for each item
     NSMutableDictionary *newSortedItemsDict = [NSMutableDictionary dictionary];
     for (NSInteger i = 0; i < self.sortedItems.count; i++) {
         newSortedItemsDict[self.sortedItems[i]] = @(i);
@@ -278,6 +278,7 @@
 {
     if (_isDescending == isDescending) { return; }
     _isDescending = isDescending;
+    [self rebuildItemListForListingOrder];
 }
 
 #pragma mark - Debugging -

@@ -37,21 +37,29 @@
     {
         UITableView *tableView = weakSelf.tableView;
         [tableView beginUpdates];
-        [tableView deleteRowsAtIndexPaths:[changes indexPathsForDeletionsInSection:0]
-                         withRowAnimation:UITableViewRowAnimationAutomatic];
-        [tableView insertRowsAtIndexPaths:[changes indexPathsForInsertionsInSection:0]
-                         withRowAnimation:UITableViewRowAnimationAutomatic];
-        [tableView reloadRowsAtIndexPaths:[changes indexPathsForModificationsInSection:0]
-                         withRowAnimation:UITableViewRowAnimationAutomatic];
-        
-        NSArray *sourceMovements = [changes indexPathsForMovementSourcesInSection:0];
-        NSArray *destinationMovements = [changes indexPathsForMovementDestinationsWithSourceIndexPaths:sourceMovements];
-        for (NSInteger i = 0; i < sourceMovements.count; i++) {
-            [tableView moveRowAtIndexPath:sourceMovements[i] toIndexPath:destinationMovements[i]];
+        {
+            [tableView deleteRowsAtIndexPaths:[changes indexPathsForDeletionsInSection:0]
+                             withRowAnimation:UITableViewRowAnimationAutomatic];
+            [tableView insertRowsAtIndexPaths:[changes indexPathsForInsertionsInSection:0]
+                             withRowAnimation:UITableViewRowAnimationAutomatic];
+            [tableView reloadRowsAtIndexPaths:[changes indexPathsForModificationsInSection:0]
+                             withRowAnimation:UITableViewRowAnimationAutomatic];
+            
+            NSArray *sourceMovements = [changes indexPathsForMovementSourcesInSection:0];
+            NSArray *destinationMovements = [changes indexPathsForMovementDestinationsWithSourceIndexPaths:sourceMovements];
+            for (NSInteger i = 0; i < sourceMovements.count; i++) {
+                [tableView moveRowAtIndexPath:sourceMovements[i] toIndexPath:destinationMovements[i]];
+            }
         }
-        
         [tableView endUpdates];
     }];
+    
+    // Add test button for flipping direction
+    UIBarButtonItem *leftButton = [[UIBarButtonItem alloc] initWithTitle:@"Asc"
+                                                                    style:UIBarButtonItemStylePlain
+                                                                   target:self
+                                                                   action:@selector(leftButtonTapped:)];
+    self.navigationItem.leftBarButtonItem = leftButton;
     
     // Add test button for rotating list order
     UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithTitle:@"Name"
@@ -59,6 +67,14 @@
                                                                    target:self
                                                                    action:@selector(rightButtonTapped:)];
     self.navigationItem.rightBarButtonItem = rightButton;
+}
+
+- (void)leftButtonTapped:(id)sender
+{
+    BOOL descending = !self.fileItemList.isDescending;
+    UIBarButtonItem *item = (UIBarButtonItem *)sender;
+    item.title = descending ? @"Desc" : @"Asc";
+    self.fileItemList.isDescending = descending;
 }
 
 - (void)rightButtonTapped:(id)sender
