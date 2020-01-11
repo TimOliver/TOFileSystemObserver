@@ -259,7 +259,35 @@
 
 - (void)itemDidRefreshWithUUID:(NSString *)uuid
 {
-
+    // Verify the item is still here
+    if (self.items[uuid] == nil) { return; }
+    
+    // Create a changes object for the notification blocks
+    TOFileSystemItemListChanges *changes = [[TOFileSystemItemListChanges alloc] init];
+    
+    // Work out where it is in the list
+    NSInteger oldIndex = [self.sortedItems indexOfObject:uuid];
+    
+    // Work out where it should go in the list
+    [self.sortedItems removeObjectAtIndex:oldIndex];
+    NSInteger newIndex = [self sortedIndexForItemWithUUID:uuid];
+    
+    // Move it to the new location
+    if (oldIndex != newIndex) {
+        [self.sortedItems insertObject:uuid atIndex:newIndex];
+        [changes addMovementWithSourceIndex:oldIndex destinationIndex:newIndex];
+    }
+    else {
+        [self.sortedItems insertObject:uuid atIndex:oldIndex];
+    }
+    
+    // Set the change object to reload the item
+    [changes addModificationIndex:newIndex];
+    
+    // Broadcast the changes
+    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+        token.notificationBlock(self, changes);
+    }
 }
 
 #pragma mark - Notification Token -
@@ -308,3 +336,7 @@
 }
 
 @end
+
+#pragma mark - Convenience UI Change Implementations -
+
+

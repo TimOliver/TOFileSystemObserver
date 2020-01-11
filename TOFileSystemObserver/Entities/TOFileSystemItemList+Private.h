@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "TOFileSystemItemList.h"
 #import "TOFileSystemItem.h"
+#import "TOFileSystemItemListChanges.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
