@@ -33,6 +33,7 @@ typedef void (^TOFileSystemItemListNotificationBlock)(TOFileSystemItemList * _No
                                                       TOFileSystemItemListChanges * _Nullable changes);
 
 /** The different options for ordering item lists */
+NS_SWIFT_NAME(FileSystemItemListOrder)
 typedef NS_ENUM(NSInteger, TOFileSystemItemListOrder) {
     TOFileSystemItemListOrderAlphanumeric,  // Alphanumeric ordering
     TOFileSystemItemListOrderDate,          // Creation date
@@ -50,6 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
  that it is kept up-to-date with any changes that occur on
  the file system.
  */
+NS_SWIFT_NAME(FileSystemItemList)
 @interface TOFileSystemItemList : NSObject<NSFastEnumeration>
 
 /** The unique UUID string saved in the attributes of this directory. */

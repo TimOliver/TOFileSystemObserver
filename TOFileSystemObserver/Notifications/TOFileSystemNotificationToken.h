@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
  object for the duration that you wish to receive events. It will
  remove itself from the observing object when deallocated.
  */
+NS_SWIFT_NAME(FileSystemNotificationToken)
 @interface TOFileSystemNotificationToken : NSObject
 
 /**

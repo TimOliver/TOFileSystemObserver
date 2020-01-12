@@ -36,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
  An object that represents either a file
  or folder on disk.
  */
+NS_SWIFT_NAME(FileSystemItem)
 @interface TOFileSystemItem : NSObject
 
 /** The absolute URL path to this item. */

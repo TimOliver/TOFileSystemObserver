@@ -34,6 +34,7 @@ typedef void (^TOFileSystemNotificationBlock)(TOFileSystemObserver * _Nonnull ob
 
 NS_ASSUME_NONNULL_BEGIN
 
+NS_SWIFT_NAME(FileSystemObserver)
 @interface TOFileSystemObserver : NSObject
 
 /** Whether the observer is currently active and observing its target directory. */
