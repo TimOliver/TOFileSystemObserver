@@ -21,6 +21,7 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import "NSURL+TOFileSystemAttributes.h"
+#include <dirent.h>
 
 @implementation NSURL (TOFileSystemAttributes)
 
@@ -57,6 +58,26 @@
     NSDate *modificationDate;
     [self getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:nil];
     return modificationDate;
+}
+
+- (NSInteger)to_numberOfSubItems
+{
+    NSInteger numberOfItems = 0;
+    DIR *directory;
+    struct dirent *entry;
+
+    // Do it using POSIX APIs to avoid needing to load in all of the file names
+    const char *path = [self.path cStringUsingEncoding:NSUTF8StringEncoding];
+    directory = opendir(path);
+    while ((entry = readdir(directory)) != NULL) {
+        if (entry->d_name[0] == '.') { continue; }
+        if (entry->d_type == DT_REG || entry->d_type == DT_DIR) {
+             numberOfItems++;
+        }
+    }
+    closedir(directory);
+    
+    return numberOfItems;
 }
 
 @end

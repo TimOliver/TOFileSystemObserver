@@ -45,6 +45,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** The modification date of the item. */
 @property (nonatomic, readonly) NSDate *to_modificationDate;
 
+/** The number of sub-items in this directory. */
+@property (nonatomic, readonly) NSInteger to_numberOfSubItems;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -50,6 +50,7 @@
 @property (nonatomic, strong, readwrite) NSDate *creationDate;
 @property (nonatomic, strong, readwrite) NSDate *modificationDate;
 @property (nonatomic, assign, readwrite) BOOL isCopying;
+@property (nonatomic, assign, readwrite) NSInteger numberOfSubItems;
 
 @end
 
@@ -132,37 +133,16 @@
             hasChanges = YES;
         }
     }
+    else {
+        // Else, it's a directory, count the number of items inside
+        NSInteger numberOfChildItems = [self.fileURL to_numberOfSubItems];
+        if (self.numberOfSubItems != numberOfChildItems) {
+            self.numberOfSubItems = numberOfChildItems;
+            hasChanges = YES;
+        }
+    }
     
     return hasChanges;
-}
-
-- (BOOL)hasChangesComparedToItemAtURL:(NSURL *)itemURL
-{
-    // File name
-    if (![self.name isEqualToString:itemURL.lastPathComponent]) { return YES; }
-
-    // On-disk UUID
-    if (![self.uuid isEqualToString:[itemURL to_fileSystemUUID]]) { return YES; }
-
-    // File type
-    TOFileSystemItemType type = itemURL.to_isDirectory ? TOFileSystemItemTypeDirectory : TOFileSystemItemTypeFile;
-    if (self.type != type) { return YES; }
-
-    // File size
-    if (self.type == TOFileSystemItemTypeFile) {
-        long long fileSize = itemURL.to_size;
-        if(self.size != fileSize) { return YES; }
-    }
-
-    // Creation date
-    NSDate *creationDate = itemURL.to_creationDate;
-    if (![self.creationDate isEqual:creationDate]) { return YES; }
-
-    // Get its modification date
-    NSDate *modificationDate = itemURL.to_modificationDate;
-    if (![self.modificationDate isEqual:modificationDate]) { return YES; }
-
-    return NO;
 }
 
 - (BOOL)isDeleted

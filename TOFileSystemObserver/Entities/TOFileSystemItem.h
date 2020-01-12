@@ -60,6 +60,9 @@ NS_SWIFT_NAME(FileSystemItem)
 /** The last modification date of the item. */
 @property (nonatomic, readonly) NSDate *modificationDate;
 
+/** If a directory, the number of files/subdirectories inside this item. */
+@property (nonatomic, readonly) NSInteger numberOfSubItems;
+
 /** Whether the item is still being copied into the app container. */
 @property (nonatomic, readonly) BOOL isCopying;
 
