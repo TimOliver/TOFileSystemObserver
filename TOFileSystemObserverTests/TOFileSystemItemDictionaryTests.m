@@ -12,44 +12,56 @@
 
 @interface TOFileSystemItemDictionaryTests : XCTestCase
 
+@property (nonatomic, strong) NSString *tempDirectory;
+@property (nonatomic, strong) NSURL *baseURL;
+
 @end
 
 @implementation TOFileSystemItemDictionaryTests
 
+- (void)setUp
+{
+    self.tempDirectory = @"/Users/XD/Documents";
+    self.baseURL = [NSURL fileURLWithPath:self.tempDirectory];
+}
+
 - (void)testCreation
 {
-    TOFileSystemItemDictionary *dict = [[TOFileSystemItemDictionary alloc] init];
+    TOFileSystemItemDictionary *dict = [[TOFileSystemItemDictionary alloc] initWithBaseURL:self.baseURL];
     XCTAssertNotNil(dict);
 }
 
 - (void)testInsertionAndDeletion
 {
-    TOFileSystemItemDictionary *dict = [[TOFileSystemItemDictionary alloc] init];
+    TOFileSystemItemDictionary *dict = [[TOFileSystemItemDictionary alloc] initWithBaseURL:self.baseURL];
     
     // Test first insertion
-    NSURL *url = [NSURL URLWithString:@"https://www.google.com"];
-    dict[@"google"] = url;
-    XCTAssertEqual(dict[@"google"], url);
+    NSString *folder1URL = [NSString stringWithFormat:@"%@/Folder1", self.tempDirectory];
+    NSURL *url = [NSURL fileURLWithPath:folder1URL].URLByStandardizingPath;
+    dict[@"folder1"] = url;
+    XCTAssert([url isEqual:dict[@"folder1"]]);
     
     // Test second insertion
-    url = [NSURL URLWithString:@"https://www.bing.com"];
-    dict[@"google"] = url;
-    XCTAssertEqual(dict[@"google"], url);
+    NSString *folder2URL = [NSString stringWithFormat:@"%@/Folder2", self.tempDirectory];
+    url = [NSURL fileURLWithPath:folder2URL].URLByStandardizingPath;
+    dict[@"folder2"] = url;
+    XCTAssert([url isEqual:dict[@"folder2"]]);
     
     // Test deletion
-    dict[@"google"] = nil;
-    XCTAssertNil(dict[@"google"]);
+    dict[@"folder1"] = nil;
+    XCTAssertNil(dict[@"folder1"]);
 }
 
 - (void)testConcurrentReads
 {
-    TOFileSystemItemDictionary *dict = [[TOFileSystemItemDictionary alloc] init];
+    TOFileSystemItemDictionary *dict = [[TOFileSystemItemDictionary alloc] initWithBaseURL:self.baseURL];
     
-    NSURL *url = [NSURL URLWithString:@"https://www.google.com"];
-    dict[@"google"] = url;
+    NSString *folder1URL = [NSString stringWithFormat:@"%@/Folder1", self.tempDirectory];
+    NSURL *url = [NSURL fileURLWithPath:folder1URL].URLByStandardizingPath;
+    dict[@"folder1"] = url;
     
     // Check read is working on the main thread
-    XCTAssertEqual(dict[@"google"], url);
+    XCTAssert([url isEqual:dict[@"folder1"]]);
     
     // Create expectation to test concurrent execution
     XCTestExpectation *expectation = [[XCTestExpectation alloc]
@@ -61,13 +73,13 @@
     // Kickstart a read on the first thread
     dispatch_queue_t firstQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
     dispatch_group_async(dispatchGroup, firstQueue, ^ {
-        XCTAssertEqual(dict[@"google"], url);
+        XCTAssert([url isEqual:dict[@"folder1"]]);
     });
 
     // Kickstart a read on the second thread
     dispatch_queue_t secondQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
     dispatch_group_async(dispatchGroup, secondQueue, ^ {
-        XCTAssertEqual(dict[@"google"], url);
+        XCTAssert([url isEqual:dict[@"folder1"]]);
     });
     
     // Upon completion of both reads, ensure the dictionary contains both values
@@ -82,11 +94,14 @@
 
 - (void)testConcurrentWrite
 {
-    TOFileSystemItemDictionary *dict = [[TOFileSystemItemDictionary alloc] init];
+    TOFileSystemItemDictionary *dict = [[TOFileSystemItemDictionary alloc] initWithBaseURL:self.baseURL];
     
     // Create some test URLs to inject
-    NSURL *firstUrl = [NSURL URLWithString:@"https://www.google.com"];
-    NSURL *secondUrl = [NSURL URLWithString:@"https://www.bing.com"];
+    NSString *folder1URL = [NSString stringWithFormat:@"%@/Folder1", self.tempDirectory];
+    NSURL *firstUrl = [NSURL fileURLWithPath:folder1URL].URLByStandardizingPath;
+    
+    NSString *folder2URL = [NSString stringWithFormat:@"%@/Folder2", self.tempDirectory];
+    NSURL *secondUrl = [NSURL fileURLWithPath:folder2URL].URLByStandardizingPath;
     
     // Create expectation to test concurrent execution
     XCTestExpectation *expectation = [[XCTestExpectation alloc]
@@ -98,21 +113,21 @@
     // Kickstart a write on the first thread
     dispatch_queue_t firstQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
     dispatch_group_async(dispatchGroup, firstQueue, ^ {
-        [dict setItemURL:firstUrl forUUID:@"google"];
+        [dict setItemURL:firstUrl forUUID:@"folder1"];
     });
 
     // Kickstart a write on the second thread
     dispatch_queue_t secondQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
     dispatch_group_async(dispatchGroup, secondQueue, ^ {
-        [dict setItemURL:secondUrl forUUID:@"bing"];
+        [dict setItemURL:secondUrl forUUID:@"folder2"];
     });
 
     // Upon completion of both writes, ensure the dictionary contains both values
     dispatch_queue_t mainQueue = dispatch_get_main_queue();
     dispatch_group_notify(dispatchGroup, mainQueue, ^ {
-        XCTAssertEqual([dict itemURLForUUID:@"google"], firstUrl);
-        XCTAssertEqual([dict itemURLForUUID:@"bing"], secondUrl);
-        XCTAssertNil([dict itemURLForUUID:@"yahoo"]);
+        XCTAssert([firstUrl isEqual:dict[@"folder1"]]);
+        XCTAssert([secondUrl isEqual:dict[@"folder2"]]);
+        XCTAssertNil([dict itemURLForUUID:@"folder3"]);
         [expectation fulfill];
     });
     
