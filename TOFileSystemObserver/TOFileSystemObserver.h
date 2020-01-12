@@ -76,7 +76,7 @@ NS_SWIFT_NAME(FileSystemObserver)
 + (instancetype)sharedObserver;
 
 /** If desired, promotes a locally created and configured observer to the singleton. */
-+ (instancetype)setSharedObserver:(TOFileSystemObserver *)observer;
++ (void)setSharedObserver:(TOFileSystemObserver *)observer;
 
 /** Starts the file system observer monitoring the target directory for changes. */
 - (void)start;

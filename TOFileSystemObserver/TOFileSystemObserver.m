@@ -31,6 +31,9 @@
 
 #import "NSURL+TOFileSystemUUID.h"
 
+/** The instance held as the app-wide singleton */
+static TOFileSystemObserver *_sharedObserver = nil;
+
 @interface TOFileSystemObserver() <TOFileSystemScanOperationDelegate>
 
 /** The absolute path to our observed directory's super directory so we can build paths. */
@@ -84,6 +87,28 @@
     }
 
     return self;
+}
+
++ (instancetype)sharedObserver
+{
+    if (_sharedObserver) { return _sharedObserver; }
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _sharedObserver = [[TOFileSystemObserver alloc] init];
+    });
+    
+    return _sharedObserver;
+}
+
++ (void)setSharedObserver:(TOFileSystemObserver *)observer
+{
+    if (observer == _sharedObserver) { return; }
+    if (_sharedObserver.isRunning) {
+        [_sharedObserver stop];
+    }
+    
+    _sharedObserver = observer;
 }
 
 - (void)setUp
@@ -147,9 +172,6 @@
     _parentDirectoryURL = [_directoryURL URLByDeletingLastPathComponent];
     _baseDirectoryUUID = self.directoryItem.uuid;
 
-    // Configure the source observer to send change events to us
-    [self configureFilePresenter];
-
     // Start the observer to watch for any system level changes
     [self beginObservingBaseDirectory];
     
@@ -196,17 +218,19 @@
     // Create a block to generate or re-fetch a list object
     __block TOFileSystemItemList *itemList = nil;
     void (^getListBlock)(void) = ^{
-        // Fetch the UUID for this item and see if we've cached it already
-        NSString *uuid = [directoryURL to_fileSystemUUID];
-        uuid = [self verifiedUniqueUUIDForItemAtURL:directoryURL uuid:uuid];
-        itemList = [self.itemListTable objectForKey:uuid];
-        if (itemList) { return; }
-        
-        // Create a new one, and save it to the map table
-        itemList = [[TOFileSystemItemList alloc] initWithDirectoryURL:directoryURL
-                                                                         fileSystemObserver:self];
-        [self.itemListTable setObject:itemList forKey:itemList.uuid];
-        self.allItems[uuid] = directoryURL;
+        @autoreleasepool {
+            // Fetch the UUID for this item and see if we've cached it already
+            NSString *uuid = [directoryURL to_fileSystemUUID];
+            uuid = [self verifiedUniqueUUIDForItemAtURL:directoryURL uuid:uuid];
+            itemList = [self.itemListTable objectForKey:uuid];
+            if (itemList) { return; }
+            
+            // Create a new one, and save it to the map table
+            itemList = [[TOFileSystemItemList alloc] initWithDirectoryURL:directoryURL
+                                                       fileSystemObserver:self];
+            [self.itemListTable setObject:itemList forKey:itemList.uuid];
+            self.allItems[uuid] = directoryURL;
+        }
     };
     
     // Since map tables can internally mutate, perform all access on the main thread
@@ -231,16 +255,19 @@
     // Create a block to generate or re-fetch an existing object
     __block TOFileSystemItem *item = nil;
     void (^getItemBlock)(void) = ^{
-        // Fetch the UUID for this item and see if we've cached it already
-        NSString *uuid = [fileURL to_fileSystemUUID];
-        uuid = [self verifiedUniqueUUIDForItemAtURL:fileURL uuid:uuid];
-        item = [self.itemTable objectForKey:uuid];
-        if (item) { return; }
-        
-        // Create a new one, and save it to the map table
-        item = [[TOFileSystemItem alloc] initWithItemAtFileURL:fileURL fileSystemObserver:self];
-        [self.itemTable setObject:item forKey:item.uuid];
-        self.allItems[uuid] = fileURL;
+        @autoreleasepool {
+            // Fetch the UUID for this item and see if we've cached it already
+            NSString *uuid = [fileURL to_fileSystemUUID];
+            uuid = [self verifiedUniqueUUIDForItemAtURL:fileURL uuid:uuid];
+            item = [self.itemTable objectForKey:uuid];
+            if (item) { return; }
+            
+            // Create a new one, and save it to the map table
+            item = [[TOFileSystemItem alloc] initWithItemAtFileURL:fileURL
+                                                fileSystemObserver:self];
+            [self.itemTable setObject:item forKey:item.uuid];
+            self.allItems[uuid] = fileURL;
+        }
     };
     
     // Since map tables can internally mutate, perform all access on the main thread
@@ -312,8 +339,10 @@
     // See if there is a list had been made for the parent, and add it
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];
     id mainBlock = ^{
-        TOFileSystemItemList *list = [self.itemListTable objectForKey:parentUUID];
-        [list addItemWithUUID:uuid itemURL:itemURL];
+        @autoreleasepool {
+            TOFileSystemItemList *list = [self.itemListTable objectForKey:parentUUID];
+            [list addItemWithUUID:uuid itemURL:itemURL];
+        }
         
         // TODO: Add broadcast notifications
     };
@@ -326,8 +355,10 @@
 {
     id mainBlock = ^{
         // See if this item exists in memory, and if so, trigger a refresh
-        TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
-        [item refreshWithURL:itemURL];
+        @autoreleasepool {
+            TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
+            [item refreshWithURL:itemURL];
+        }
         
         // TODO: Add broadcast notifications
     };
@@ -350,17 +381,19 @@
     NSString *newParentUUID = [newParentURL to_fileSystemUUID];
     
     id mainBlock = ^{
-        // Get the item and refresh its internal state for the new location
-        TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
-        [item refreshWithURL:url];
-        
-        // Potentially remove it from the old list
-        TOFileSystemItemList *oldList = [self.itemListTable objectForKey:oldParentUUID];
-        [item removeFromList:oldList];
-        
-        // Potentially add it to a new list
-        TOFileSystemItemList *newList = [self.itemListTable objectForKey:newParentUUID];
-        [item addToList:newList];
+        @autoreleasepool {
+            // Get the item and refresh its internal state for the new location
+            TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
+            [item refreshWithURL:url];
+            
+            // Potentially remove it from the old list
+            TOFileSystemItemList *oldList = [self.itemListTable objectForKey:oldParentUUID];
+            [item removeFromList:oldList];
+            
+            // Potentially add it to a new list
+            TOFileSystemItemList *newList = [self.itemListTable objectForKey:newParentUUID];
+            [item addToList:newList];
+        }
         
         // TODO: Add broadcast notifications
     };
@@ -372,10 +405,12 @@
              withUUID:(NSString *)uuid
 {
     id mainBlock = ^{
-        // If we have this item in memory, remove it from everywhere
-        TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
-        [item removeFromAllLists];
-        [self.itemTable removeObjectForKey:uuid];
+        @autoreleasepool {
+            // If we have this item in memory, remove it from everywhere
+            TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
+            [item removeFromAllLists];
+            [self.itemTable removeObjectForKey:uuid];
+        }
         
         // TODO: Add broadcast notifications
     };
