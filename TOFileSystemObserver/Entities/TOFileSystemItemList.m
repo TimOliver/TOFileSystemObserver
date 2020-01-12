@@ -328,10 +328,11 @@
     [self rebuildItemListForListingOrder];
 }
 
-- (void)updateDirectoryURL
+- (void)refreshWithURL:(NSURL *)directoryURL
 {
-    if (self.directoryURL == directoryURL) { return; }
-    self.directoryURL = directoryURL;
+    if (self.directoryURL != directoryURL) {
+        self.directoryURL = directoryURL;
+    }
 }
 
 #pragma mark - Debugging -
