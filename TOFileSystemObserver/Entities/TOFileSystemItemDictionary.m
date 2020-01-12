@@ -102,7 +102,10 @@
     // Look up the URL in the dictionary
     __block NSString *uuid = nil;
     dispatch_sync(self.itemQueue, ^{
-        uuid = [self.items allKeysForObject:[NSURL fileURLWithPath:relativePath]].firstObject;
+        @autoreleasepool {
+            NSURL *url = [NSURL fileURLWithPath:relativePath];
+            uuid = [self.items allKeysForObject:url].firstObject;
+        }
     });
     
     return uuid;

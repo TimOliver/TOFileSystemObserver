@@ -107,13 +107,14 @@
         if (!self.isRunning) { return; }
         self.isTiming = NO;
 
-        NSArray *items = [NSArray arrayWithArray:self.items];
-        [self.items removeAllObjects];
+        @autoreleasepool {
+            NSArray *items = [self.items copy];
+            [self.items removeAllObjects];
+            if (items.count == 0) { return; }
 
-        if (items.count == 0) { return; }
-
-        if (self.itemsDidChangeHandler) {
-            self.itemsDidChangeHandler(items);
+            if (self.itemsDidChangeHandler) {
+                self.itemsDidChangeHandler(items);
+            }
         }
     };
 
