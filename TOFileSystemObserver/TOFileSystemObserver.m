@@ -308,7 +308,11 @@ static TOFileSystemObserver *_sharedObserver = nil;
     // Create a new UUID for this item
     __block NSString *newUUID = nil;
     [self.fileSystemPresenter performCoordinatedWrite:^{
-        newUUID = [itemURL to_generateFileSystemUUID];
+        // Do a sanity check to verify the UUID didn't change while this queue was waiting
+        newUUID = [itemURL to_fileSystemUUID];
+        if ([uuid isEqualToString:newUUID]) {
+            newUUID = [itemURL to_generateFileSystemUUID];
+        }
     }];
     
     return newUUID;

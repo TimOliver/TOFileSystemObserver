@@ -326,7 +326,11 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     // and assign it to this file
     __block NSString *newUUID;
     [self.filePresenter performCoordinatedWrite:^{
-        newUUID = [url to_generateFileSystemUUID];
+        // Do a sanity check to verify the UUID didn't change while this queue was waiting
+        newUUID = [url to_fileSystemUUID];
+        if ([uuid isEqualToString:newUUID]) {
+            newUUID = [url to_generateFileSystemUUID];
+        }
     }];
         
     return newUUID;
