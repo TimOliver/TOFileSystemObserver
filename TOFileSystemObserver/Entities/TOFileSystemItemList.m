@@ -44,9 +44,6 @@
 /** A writeable copy of the location of this directory */
 @property (nonatomic, strong, readwrite) NSURL *directoryURL;
 
-/** Store a bookmark to this item in case the user moves it while it's open. */
-@property (nonatomic, strong) NSData *bookmarkData;
-
 /** An dictionary of the items in this dictionary, stored by their UUID. */
 @property (nonatomic, strong) NSMutableDictionary<NSString *, TOFileSystemItem *> *items;
 
@@ -75,12 +72,6 @@
 
 - (void)commonInit
 {
-    // Create a bookmark object to let us track this URL if the user moves it
-    _bookmarkData = [_directoryURL bookmarkDataWithOptions:NSURLBookmarkCreationMinimalBookmark
-                            includingResourceValuesForKeys:nil
-                                             relativeToURL:[TOFileSystemPath applicationSandboxURL]
-                                                     error:nil];
-    
     // Create the file list stores
     _items = [NSMutableDictionary dictionary];
     _sortedItems = [NSMutableArray array];
@@ -335,6 +326,12 @@
     if (_isDescending == isDescending) { return; }
     _isDescending = isDescending;
     [self rebuildItemListForListingOrder];
+}
+
+- (void)updateDirectoryURL
+{
+    if (self.directoryURL == directoryURL) { return; }
+    self.directoryURL = directoryURL;
 }
 
 #pragma mark - Debugging -

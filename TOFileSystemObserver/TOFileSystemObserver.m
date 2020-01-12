@@ -344,7 +344,16 @@ static TOFileSystemObserver *_sharedObserver = nil;
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];
     id mainBlock = ^{
         @autoreleasepool {
-            TOFileSystemItemList *list = [self.itemListTable objectForKey:parentUUID];
+            // If this UUID is already in our list, refresh it
+            TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
+            [item refreshWithURL:itemURL];
+            
+            // If this item is a list itself, update itself
+            TOFileSystemItemList *list = [self.itemListTable objectForKey:uuid];
+            [list refreshWithURL:itemURL];
+            
+            // If this is a new item that belongs to an existing list, append it
+            list = [self.itemListTable objectForKey:parentUUID];
             [list addItemWithUUID:uuid itemURL:itemURL];
         }
         
@@ -362,6 +371,10 @@ static TOFileSystemObserver *_sharedObserver = nil;
         @autoreleasepool {
             TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
             [item refreshWithURL:itemURL];
+            
+            // If this item is a list itself, update itself
+            TOFileSystemItemList *list = [self.itemListTable objectForKey:uuid];
+            [list refreshWithURL:itemURL];
         }
         
         // TODO: Add broadcast notifications
@@ -390,6 +403,10 @@ static TOFileSystemObserver *_sharedObserver = nil;
             TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
             [item refreshWithURL:url];
             
+            // If this item is a list itself, update itself
+            TOFileSystemItemList *list = [self.itemListTable objectForKey:uuid];
+            [list refreshWithURL:url];
+            
             // Potentially remove it from the old list
             TOFileSystemItemList *oldList = [self.itemListTable objectForKey:oldParentUUID];
             [item removeFromList:oldList];
@@ -414,6 +431,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
             TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
             [item removeFromAllLists];
             [self.itemTable removeObjectForKey:uuid];
+            [self.itemListTable removeObjectForKey:uuid];
         }
         
         // TODO: Add broadcast notifications

@@ -45,6 +45,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** Remove an object from the list (It was deleted or moved away). */
 - (void)removeItemWithUUID:(NSString *)uuid fileURL:(NSURL *)url;
 
+/** If the folder was moved, update it's own reference to its file path. */
+- (void)refreshWithURL:(NSURL *)directoryURL;
+
 @end
 
 NS_ASSUME_NONNULL_END
