@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Since multiple events can come through, a timer is used to
- coalesce batchs of events and trigger an update periodically.
+ coalesce batches of events and trigger an update periodically.
  (Default is 100 miliseconds)
 */
 @property (nonatomic, assign) NSTimeInterval timerInterval;

@@ -29,8 +29,8 @@
 
 @class TOFileSystemObserver;
 
-typedef void (^TOFileSystemNotificationBlock)(TOFileSystemObserver * _Nonnull observer,
-                                              TOFileSystemChanges * _Nullable changes);
+//typedef void (^TOFileSystemNotificationBlock)(TOFileSystemObserver * _Nonnull observer,
+//                                              TOFileSystemChanges * _Nullable changes);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -119,37 +119,7 @@ NS_SWIFT_NAME(FileSystemObserver)
 
  @param block A block that will be called each time a file system event is detected.
 */
-- (TOFileSystemNotificationToken *)addNotificationBlock:(TOFileSystemNotificationBlock)block;
-
-/**
- When the app itself is performing an operation to add a new item, this method
- can be used to disable the observer briefly while adding these items to
- avoid triggering a full scan in the process.
-
- @param itemURLs A list of all of the paths to the files that will be added.
- @param addAction Perfom the actual file add operations in this block. Scanning will be disabled for its duration.
- */
-- (void)addItemsWithURLs:(NSArray<NSURL *> *)itemURLs addAction:(void (^)(void))addAction;
-
-/**
-When the app itself is performing an operation to more or rename an existing item, this method
-can be used to disable the observer briefly while modifying these items to
-avoid triggering a full scan in the process.
-
-@param itemURLs A dictionary where the key is the old location, and the value is the new location of each item
-@param moveAction Perfom the actual file move operations in this block. Scanning will be disabled for its duration.
-*/
-- (void)moveItemsWithURLs:(NSDictionary<NSURL *, NSURL *> *)itemURLs moveAction:(void (^)(void))moveAction;
-
-/**
-When the app itself is performing an operation to delete items, this method
-can be used to disable the observer briefly while the deletion is in progress to
-avoid triggering a full scan.
-
-@param itemURLs A list of all of the paths to the files that will be added.
-@param deleteAction Perfom the actual file move operations in this block. Scanning will be disabled for its duration.
-*/
-- (void)deleteItemsWithURLs:(NSArray<NSURL *> *)itemURLs moveAction:(void (^)(void))deleteAction;
+//- (TOFileSystemNotificationToken *)addNotificationBlock:(TOFileSystemNotificationBlock)block;
 
 @end
 
