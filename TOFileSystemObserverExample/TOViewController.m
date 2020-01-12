@@ -111,7 +111,17 @@
         cell.detailTextLabel.text = @"Copying";
     }
     else {
-        cell.detailTextLabel.text = fileItem.type == TOFileSystemItemTypeDirectory ? @"Dicrectory" : @"File";
+        if (fileItem.type == TOFileSystemItemTypeDirectory) {
+            if (fileItem.numberOfSubItems == 1) {
+                cell.detailTextLabel.text = @"1 item";
+            }
+            else {
+                cell.detailTextLabel.text = [NSString stringWithFormat:@"%ld items", (long)fileItem.numberOfSubItems];
+            }
+        }
+        else {
+            cell.detailTextLabel.text = @"File";
+        }
     }
     
     return cell;
