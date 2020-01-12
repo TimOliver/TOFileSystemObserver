@@ -43,7 +43,7 @@
 @property (nonatomic, strong) dispatch_semaphore_t pausingSemaphore;
 
 /** A concurrent queue used to coordinate writing UUIDs to files. */
-@property (nonatomic, strong) dispatch_queue_t fileCoordinatorQueue;
+@property (nonatomic, readonly) dispatch_queue_t fileCoordinatorQueue;
 
 @end
 
@@ -70,6 +70,20 @@
     return self;
 }
 
+- (dispatch_queue_t)fileCoordinatorQueue
+{
+    // In case we have multiple file observers, we must share this
+    // coordinator amongst all of them in case two separate instances
+    // try and write to the same file.
+    static dispatch_queue_t _fileCoordinatorQueue = NULL;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _fileCoordinatorQueue = dispatch_queue_create("TOFileSystemObserver.fileCoordinatorQueue",
+                                                      DISPATCH_QUEUE_CONCURRENT);
+    });
+    return _fileCoordinatorQueue;
+}
+
 - (void)commonInit
 {
     // Create the queue to receive events
@@ -82,9 +96,6 @@
     // Create the dispatch queue for the items
     _itemListAccessQueue = dispatch_queue_create("TOFileSystemObserver.itemListAccessQueue", DISPATCH_QUEUE_SERIAL);
 
-    // Create a dispatch queue for writing
-    _fileCoordinatorQueue = dispatch_queue_create("TOFileSystemObserver.fileCoordinatorQueue", DISPATCH_QUEUE_CONCURRENT);
-    
     // Create the dispatch semaphore when serializing paused work
     _pausingSemaphore = dispatch_semaphore_create(1);
 
