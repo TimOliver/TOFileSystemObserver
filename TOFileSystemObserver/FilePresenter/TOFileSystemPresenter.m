@@ -28,6 +28,9 @@
 /** A dispatch semaphore used to serialize execution when paused. */
 @property (nonatomic, strong) dispatch_semaphore_t pausingSemaphore;
 
+/** A concurrent queue used to coordinate writing UUIDs to files. */
+@property (nonatomic, strong) dispatch_queue_t fileCoordinatorQueue;
+
 @end
 
 @implementation TOFileSystemPresenter
@@ -63,8 +66,11 @@
     _items = [NSMutableArray array];
 
     // Create the dispatch queue for the items
-    _itemListAccessQueue = dispatch_queue_create("dev.tim.itemListAccessQueue", DISPATCH_QUEUE_SERIAL);
+    _itemListAccessQueue = dispatch_queue_create("TOFileSystemObserver.itemListAccessQueue", DISPATCH_QUEUE_SERIAL);
 
+    // Create a dispatch queue for writing
+    _fileCoordinatorQueue = dispatch_queue_create("TOFileSystemObserver.fileCoordinatorQueue", DISPATCH_QUEUE_CONCURRENT);
+    
     // Create the dispatch semaphore when serializing paused work
     _pausingSemaphore = dispatch_semaphore_create(1);
 
@@ -147,6 +153,24 @@
     }
     // Resume the semaphore
     dispatch_semaphore_signal(self.pausingSemaphore);
+}
+
+- (void)performCoordinatedRead:(void (^)(void))block
+{
+    dispatch_sync(self.fileCoordinatorQueue, ^{
+        @autoreleasepool {
+            if (block) { block(); }
+        }
+    });
+}
+
+- (void)performCoordinatedWrite:(void (^)(void))block
+{
+    dispatch_barrier_sync(self.fileCoordinatorQueue, ^{
+        @autoreleasepool {
+            if (block) { block(); }
+        }
+    });
 }
 
 - (void)stop

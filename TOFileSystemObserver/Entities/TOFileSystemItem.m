@@ -80,7 +80,7 @@
 - (void)configureUUIDForceRefresh:(BOOL)forceRefresh
 {
     TOFileSystemPresenter *presenter = self.fileSystemObserver.fileSystemPresenter;
-    [presenter pauseWhileExecutingBlock:^{
+    [presenter performCoordinatedWrite:^{
         self.uuid = [self.fileURL to_makeFileSystemUUIDIfNeeded];
     }];
 }
@@ -120,6 +120,9 @@
         self.modificationDate = modificationDate;
         hasChanges = YES;
     }
+    
+    // Check if it is copying
+    self.isCopying = [modificationDate timeIntervalSinceDate:[NSDate date]] > (-1.0f - FLT_EPSILON);
     
     // If the type is a file, fetch its size
     if (self.type == TOFileSystemItemTypeFile) {

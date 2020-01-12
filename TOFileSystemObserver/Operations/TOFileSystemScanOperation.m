@@ -325,11 +325,10 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     // Otherwise, the user must have duplicated a file, so re-gen the UUID
     // and assign it to this file
     __block NSString *newUUID;
-    NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:self.filePresenter];
-    [fileCoordinator coordinateWritingItemAtURL:url options:0 error:nil byAccessor:^(NSURL * _Nonnull newURL) {
+    [self.filePresenter performCoordinatedWrite:^{
         newUUID = [url to_generateFileSystemUUID];
     }];
-
+        
     return newUUID;
 }
 

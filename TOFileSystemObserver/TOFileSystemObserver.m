@@ -280,9 +280,8 @@
     // If another file with the same UUID exists alongside this one, they are clearly duplicated.
     // Create a new UUID for this item
     __block NSString *newUUID = nil;
-    NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:self.fileSystemPresenter];
-    [fileCoordinator coordinateWritingItemAtURL:itemURL options:0 error:nil byAccessor:^(NSURL * _Nonnull newURL) {
-        newUUID = [newURL to_generateFileSystemUUID];
+    [self.fileSystemPresenter performCoordinatedWrite:^{
+        newUUID = [itemURL to_generateFileSystemUUID];
     }];
     
     return newUUID;

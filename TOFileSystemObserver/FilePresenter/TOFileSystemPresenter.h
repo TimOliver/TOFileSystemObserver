@@ -44,6 +44,12 @@ NS_ASSUME_NONNULL_BEGIN
 /** Pause listening, execute the provided block, and then resume. */
 - (void)pauseWhileExecutingBlock:(void (^)(void))block;
 
+/** Perform a synchronous coordinated read on a file. */
+- (void)performCoordinatedRead:(void (^)(void))block;
+
+/** Perform a synchronous write operation on a file */
+- (void)performCoordinatedWrite:(void (^)(void))block;
+
 /** Stop listening and cancel any pending timer events. */
 - (void)stop;
 
