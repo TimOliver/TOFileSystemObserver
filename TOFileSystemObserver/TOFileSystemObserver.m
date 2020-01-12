@@ -340,19 +340,15 @@ static TOFileSystemObserver *_sharedObserver = nil;
  didDiscoverItemAtURL:(NSURL *)itemURL
              withUUID:(NSString *)uuid
 {
-    // See if there is a list had been made for the parent, and add it
+    // Fetch the UUID of the parent in case it needs to be appended to a list
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];
     id mainBlock = ^{
         @autoreleasepool {
-            // If this UUID is already in our item list, refresh it
-            TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
-            [item refreshWithURL:itemURL];
-            
-            // If this item is a child of another item, update that one
-            item = [self.itemTable objectForKey:parentUUID];
+            // If this item is a child of another item, update the parent item
+            TOFileSystemItem *item = [self.itemTable objectForKey:parentUUID];
             [item refreshWithURL:item.fileURL];
             
-            // If this item is a list itself, update itself
+            // If this item is a list itself, update it's list entry
             TOFileSystemItemList *list = [self.itemListTable objectForKey:uuid];
             [list refreshWithURL:itemURL];
             
@@ -382,7 +378,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
             item = [self.itemTable objectForKey:parentUUID];
             [item refreshWithURL:item.fileURL];
             
-            // If this item is a list itself, update itself
+            // If this item is a list itself, update its list entry
             TOFileSystemItemList *list = [self.itemListTable objectForKey:uuid];
             [list refreshWithURL:itemURL];
         }
@@ -413,11 +409,11 @@ static TOFileSystemObserver *_sharedObserver = nil;
             TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
             [item refreshWithURL:url];
             
-            // If this item is a list itself, update itself
+            // If this item is a list itself, update its list entry too
             TOFileSystemItemList *list = [self.itemListTable objectForKey:uuid];
             [list refreshWithURL:url];
             
-            // Potentially remove it from the old list
+            // Potentially remove it from an old list
             TOFileSystemItemList *oldList = [self.itemListTable objectForKey:oldParentUUID];
             [item removeFromList:oldList];
             
