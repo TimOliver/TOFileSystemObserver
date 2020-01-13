@@ -39,7 +39,6 @@
     {
         UITableView *tableView = weakSelf.tableView;
         TOFileSystemItemListUpdateTableView(tableView, changes, 0);
-
     }];
     
     // Add test button for flipping direction
@@ -112,6 +111,7 @@
     }
     else {
         if (fileItem.type == TOFileSystemItemTypeDirectory) {
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
             if (fileItem.numberOfSubItems == 1) {
                 cell.detailTextLabel.text = @"1 item";
             }
@@ -120,11 +120,17 @@
             }
         }
         else {
+            cell.accessoryType = UITableViewCellAccessoryNone;
             cell.detailTextLabel.text = @"File";
         }
     }
     
     return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 @end
