@@ -339,18 +339,19 @@ static TOFileSystemObserver *_sharedObserver = nil;
 {
     // Fetch the UUID of the parent in case it needs to be appended to a list
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];
+    
+    // If this item is a child of another item, update the parent item
+    TOFileSystemItem *item = self.itemTable[parentUUID];
+    [item refreshWithURL:item.fileURL];
+    
+    // If this item is a list itself, update it's list entry
+    TOFileSystemItemList *list = self.itemListTable[uuid];
+    [list refreshWithURL:itemURL];
+    
     id mainBlock = ^{
         @autoreleasepool {
-            // If this item is a child of another item, update the parent item
-            TOFileSystemItem *item = self.itemTable[parentUUID];
-            [item refreshWithURL:item.fileURL];
-            
-            // If this item is a list itself, update it's list entry
-            TOFileSystemItemList *list = self.itemListTable[uuid];
-            [list refreshWithURL:itemURL];
-            
             // If this is a new item that belongs to an existing list, append it
-            list = self.itemListTable[parentUUID];
+            TOFileSystemItemList *list = self.itemListTable[parentUUID];
             [list addItemWithUUID:uuid itemURL:itemURL];
         }
         
@@ -365,20 +366,20 @@ static TOFileSystemObserver *_sharedObserver = nil;
 {
     // See if there is a list had been made for the parent, and add it
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];
+    
+    // See if this item exists in memory, and if so, trigger a refresh
+    TOFileSystemItem *item = self.itemTable[uuid];
+    [item refreshWithURL:itemURL];
+    
+    // If this item is a child of another item, update that one
+    item = self.itemTable[parentUUID];
+    [item refreshWithURL:item.fileURL];
+    
+    // If this item is a list itself, update its list entry
+    TOFileSystemItemList *list = self.itemListTable[uuid];
+    [list refreshWithURL:itemURL];
+    
     id mainBlock = ^{
-        // See if this item exists in memory, and if so, trigger a refresh
-        @autoreleasepool {
-            TOFileSystemItem *item = self.itemTable[uuid];
-            [item refreshWithURL:itemURL];
-            
-            // If this item is a child of another item, update that one
-            item = self.itemTable[parentUUID];
-            [item refreshWithURL:item.fileURL];
-            
-            // If this item is a list itself, update its list entry
-            TOFileSystemItemList *list = self.itemListTable[uuid];
-            [list refreshWithURL:itemURL];
-        }
         
         // TODO: Add broadcast notifications
     };
@@ -400,33 +401,31 @@ static TOFileSystemObserver *_sharedObserver = nil;
     NSString *oldParentUUID = [oldParentURL to_fileSystemUUID];
     NSString *newParentUUID = [newParentURL to_fileSystemUUID];
     
+    // Get the item and refresh its internal state for the new location
+    TOFileSystemItem *item = self.itemTable[uuid];
+    [item refreshWithURL:url];
+    
+    // If this item is a list itself, update its list entry too
+    TOFileSystemItemList *list = self.itemListTable[uuid];
+    [list refreshWithURL:url];
+    
+    // Potentially remove it from an old list
+    TOFileSystemItemList *oldList = self.itemListTable[oldParentUUID];
+    [item removeFromList:oldList];
+    
+    // If the old list was also an item, refresh it's state
+    TOFileSystemItem *oldListItem = self.itemTable[oldParentUUID];
+    [oldListItem refreshWithURL:oldListItem.fileURL];
+    
+    // Potentially add it to a new list
+    TOFileSystemItemList *newList = self.itemListTable[newParentUUID];
+    [item addToList:newList];
+    
+    // If the new list was also an item, refresh it's state
+    TOFileSystemItem *newListItem = self.itemTable[newParentUUID];
+    [newListItem refreshWithURL:newListItem.fileURL];
+    
     id mainBlock = ^{
-        @autoreleasepool {
-            // Get the item and refresh its internal state for the new location
-            TOFileSystemItem *item = self.itemTable[uuid];
-            [item refreshWithURL:url];
-            
-            // If this item is a list itself, update its list entry too
-            TOFileSystemItemList *list = self.itemListTable[uuid];
-            [list refreshWithURL:url];
-            
-            // Potentially remove it from an old list
-            TOFileSystemItemList *oldList = self.itemListTable[oldParentUUID];
-            [item removeFromList:oldList];
-            
-            // If the old list was also an item, refresh it's state
-            TOFileSystemItem *oldListItem = self.itemTable[oldParentUUID];
-            [oldListItem refreshWithURL:oldListItem.fileURL];
-            
-            // Potentially add it to a new list
-            TOFileSystemItemList *newList = self.itemListTable[newParentUUID];
-            [item addToList:newList];
-            
-            // If the new list was also an item, refresh it's state
-            TOFileSystemItem *newListItem = self.itemTable[newParentUUID];
-            [newListItem refreshWithURL:newListItem.fileURL];
-        }
-        
         // TODO: Add broadcast notifications
     };
     dispatch_async(dispatch_get_main_queue(), mainBlock);
@@ -437,19 +436,18 @@ static TOFileSystemObserver *_sharedObserver = nil;
              withUUID:(NSString *)uuid
 {
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];
+    
+    // If we have this item in memory, remove it from everywhere
+    TOFileSystemItem *item = self.itemTable[uuid];
+    [item removeFromAllLists];
+    [self.itemTable removeItemForUUID:uuid];
+    [self.itemListTable removeItemForUUID:uuid];
+    
+    // If this item is a child of a list, update that list
+    TOFileSystemItem *listItem = self.itemTable[parentUUID];
+    [listItem refreshWithURL:listItem.fileURL];
+    
     id mainBlock = ^{
-        @autoreleasepool {
-            // If we have this item in memory, remove it from everywhere
-            TOFileSystemItem *item = self.itemTable[uuid];
-            [item removeFromAllLists];
-            [self.itemTable removeItemForUUID:uuid];
-            [self.itemListTable removeItemForUUID:uuid];
-            
-            // If this item is a child of a list, update that list
-            TOFileSystemItem *listItem = self.itemTable[parentUUID];
-            [listItem refreshWithURL:listItem.fileURL];
-        }
-        
         // TODO: Add broadcast notifications
     };
     dispatch_async(dispatch_get_main_queue(), mainBlock);
