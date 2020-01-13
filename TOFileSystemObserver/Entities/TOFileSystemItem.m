@@ -91,7 +91,9 @@
     BOOL hasChanges = NO;
     
     // Copy the new URL to this item
-    self.fileURL = url;
+    if (url) {
+        self.fileURL = url;
+    }
     
     // Copy the name of the item
     NSString *name = [url lastPathComponent];
@@ -164,10 +166,15 @@
 
 - (void)refreshWithURL:(NSURL *)itemURL
 {
-    [self refreshFromItemAtURL:itemURL];
-    for (TOFileSystemItemList *list in self.listTable) {
-        [list itemDidRefreshWithUUID:self.uuid];
+    @synchronized (self) {
+        [self refreshFromItemAtURL:itemURL];
     }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (TOFileSystemItemList *list in self.listTable) {
+            [list itemDidRefreshWithUUID:self.uuid];
+        }
+    });
 }
 
 - (void)removeFromList:(TOFileSystemItemList *)list

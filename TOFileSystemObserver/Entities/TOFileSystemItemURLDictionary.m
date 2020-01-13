@@ -20,9 +20,9 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import "TOFileSystemItemDictionary.h"
+#import "TOFileSystemItemURLDictionary.h"
 
-@interface TOFileSystemItemDictionary ()
+@interface TOFileSystemItemURLDictionary ()
 
 /** The base URL against which all other URLs are saved. */
 @property (nonatomic, strong) NSURL *baseURL;
@@ -35,7 +35,7 @@
 
 @end
 
-@implementation TOFileSystemItemDictionary
+@implementation TOFileSystemItemURLDictionary
 
 - (instancetype)initWithBaseURL:(NSURL *)baseURL
 {

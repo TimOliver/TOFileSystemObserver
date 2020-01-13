@@ -25,6 +25,8 @@
 
 @class TOFileSystemObserver;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /** Private interface for creating item objects */
 @interface TOFileSystemItem (Private)
 
@@ -39,7 +41,7 @@
 - (void)addToList:(TOFileSystemItemList *)list;
 
 /** Notify this object that it should re-fetch all its properties from disk */
-- (void)refreshWithURL:(NSURL *)itemURL;
+- (void)refreshWithURL:(nullable NSURL *)itemURL;
 
 /** Remove this item from a specific */
 - (void)removeFromList:(TOFileSystemItemList *)list;
@@ -48,3 +50,5 @@
 - (void)removeFromAllLists;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -26,7 +26,7 @@
 #import "TOFileSystemScanOperation.h"
 #import "TOFileSystemPresenter.h"
 #import "TOFileSystemItemList+Private.h"
-#import "TOFileSystemItemDictionary.h"
+#import "TOFileSystemItemURLDictionary.h"
 #import "TOFileSystemItem+Private.h"
 
 #import "NSURL+TOFileSystemUUID.h"
@@ -55,7 +55,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
 
 /** A store for every item URL discovered on disk to ensure there are no duplicate UUIDs. */
-@property (nonatomic, strong) TOFileSystemItemDictionary *allItems;
+@property (nonatomic, strong) TOFileSystemItemURLDictionary *allItems;
 
 /** A map table that weakly holds item list objects */
 @property (nonatomic, strong) NSMapTable *itemListTable;
@@ -134,7 +134,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
                                                capacity:0];
     
     // Set up the stores for tracking items
-    _allItems = [[TOFileSystemItemDictionary alloc] initWithBaseURL:self.directoryURL];
+    _allItems = [[TOFileSystemItemURLDictionary alloc] initWithBaseURL:self.directoryURL];
 }
 
 #pragma mark - Observer Setup -

@@ -8,7 +8,7 @@
 
 #import <XCTest/XCTest.h>
 
-#import "TOFileSystemItemDictionary.h"
+#import "TOFileSystemItemURLDictionary.h"
 
 @interface TOFileSystemItemDictionaryTests : XCTestCase
 
@@ -27,13 +27,13 @@
 
 - (void)testCreation
 {
-    TOFileSystemItemDictionary *dict = [[TOFileSystemItemDictionary alloc] initWithBaseURL:self.baseURL];
+    TOFileSystemItemURLDictionary *dict = [[TOFileSystemItemURLDictionary alloc] initWithBaseURL:self.baseURL];
     XCTAssertNotNil(dict);
 }
 
 - (void)testInsertionAndDeletion
 {
-    TOFileSystemItemDictionary *dict = [[TOFileSystemItemDictionary alloc] initWithBaseURL:self.baseURL];
+    TOFileSystemItemURLDictionary *dict = [[TOFileSystemItemURLDictionary alloc] initWithBaseURL:self.baseURL];
     
     // Test first insertion
     NSString *folder1URL = [NSString stringWithFormat:@"%@/Folder1", self.tempDirectory];
@@ -54,7 +54,7 @@
 
 - (void)testConcurrentReads
 {
-    TOFileSystemItemDictionary *dict = [[TOFileSystemItemDictionary alloc] initWithBaseURL:self.baseURL];
+    TOFileSystemItemURLDictionary *dict = [[TOFileSystemItemURLDictionary alloc] initWithBaseURL:self.baseURL];
     
     NSString *folder1URL = [NSString stringWithFormat:@"%@/Folder1", self.tempDirectory];
     NSURL *url = [NSURL fileURLWithPath:folder1URL].URLByStandardizingPath;
@@ -94,7 +94,7 @@
 
 - (void)testConcurrentWrite
 {
-    TOFileSystemItemDictionary *dict = [[TOFileSystemItemDictionary alloc] initWithBaseURL:self.baseURL];
+    TOFileSystemItemURLDictionary *dict = [[TOFileSystemItemURLDictionary alloc] initWithBaseURL:self.baseURL];
     
     // Create some test URLs to inject
     NSString *folder1URL = [NSString stringWithFormat:@"%@/Folder1", self.tempDirectory];

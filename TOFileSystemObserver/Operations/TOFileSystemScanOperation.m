@@ -23,7 +23,7 @@
 #import "TOFileSystemScanOperation.h"
 #import "TOFileSystemItem.h"
 #import "TOFileSystemPresenter.h"
-#import "TOFileSystemItemDictionary.h"
+#import "TOFileSystemItemURLDictionary.h"
 
 #import "NSURL+TOFileSystemUUID.h"
 #import "NSURL+TOFileSystemAttributes.h"
@@ -50,7 +50,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 @property (nonatomic, strong) NSMutableArray *pendingDirectories;
 
 /** A reference to the master list of items maintained by this observer. */
-@property (nonatomic, strong) TOFileSystemItemDictionary *allItems;
+@property (nonatomic, strong) TOFileSystemItemURLDictionary *allItems;
 
 /** A store for items that have disappeared inside this operation, either deleted or moved. */
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSURL *> *missingItems;
@@ -62,7 +62,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 #pragma - Class Lifecycle -
 
 - (instancetype)initWithDirectoryAtURL:(NSURL *)directoryURL
-                    allItemsDictionary:(nonnull TOFileSystemItemDictionary *)allItems
+                    allItemsDictionary:(nonnull TOFileSystemItemURLDictionary *)allItems
                          filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
 {
     if (self = [super init]) {
@@ -77,7 +77,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 }
 
 - (instancetype)initWithItemURLs:(NSArray<NSURL *> *)itemURLs
-              allItemsDictionary:(nonnull TOFileSystemItemDictionary *)allItems
+              allItemsDictionary:(nonnull TOFileSystemItemURLDictionary *)allItems
                    filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
 {
     if (self = [super init]) {

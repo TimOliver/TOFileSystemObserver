@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
  as they were at the start of the app session, so that any
  detected changes to the file system can be compared.
  */
-@interface TOFileSystemItemDictionary : NSObject
+@interface TOFileSystemItemURLDictionary : NSObject
 
 /** The number of items currently in the dictionary. */
 @property (nonatomic, readonly) NSUInteger count;
