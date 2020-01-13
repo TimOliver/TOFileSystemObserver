@@ -26,6 +26,7 @@
 		22C7FEAC23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FEAB23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m */; };
 		22C7FEAD23B5E74E0017CABD /* TOFileSystemItemURLDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FE9B23B5BD120017CABD /* TOFileSystemItemURLDictionary.m */; };
 		22D601C923657FA500275AD9 /* TOFileSystemPresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */; };
+		22F4E42B23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F4E42A23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,6 +81,8 @@
 		22C7FEAB23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemItemDictionaryTests.m; sourceTree = "<group>"; };
 		22D601C723657FA500275AD9 /* TOFileSystemPresenter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemPresenter.h; sourceTree = "<group>"; };
 		22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemPresenter.m; sourceTree = "<group>"; };
+		22F4E42923CC8BE400F7EEC6 /* TOFileSystemItemMapTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemItemMapTable.h; sourceTree = "<group>"; };
+		22F4E42A23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemItemMapTable.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -184,6 +187,8 @@
 			children = (
 				22C7FE9A23B5BD120017CABD /* TOFileSystemItemURLDictionary.h */,
 				22C7FE9B23B5BD120017CABD /* TOFileSystemItemURLDictionary.m */,
+				22F4E42923CC8BE400F7EEC6 /* TOFileSystemItemMapTable.h */,
+				22F4E42A23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m */,
 				22ADAEBA237815DA0088D31E /* TOFileSystemItemList.h */,
 				22ADAEC3237AD24E0088D31E /* TOFileSystemItemList+Private.h */,
 				22ADAEBB237815DA0088D31E /* TOFileSystemItemList.m */,
@@ -344,6 +349,7 @@
 			files = (
 				22ADAEC0237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */,
 				2254ED2E2340F04800331B47 /* TOFileSystemScanOperation.m in Sources */,
+				22F4E42B23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m in Sources */,
 				22498E5923BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m in Sources */,
 				2254ED2A2340588F00331B47 /* TOFileSystemPath.m in Sources */,
 				2254ED3C2341060000331B47 /* NSURL+TOFileSystemUUID.m in Sources */,
