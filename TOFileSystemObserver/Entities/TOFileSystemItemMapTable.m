@@ -22,6 +22,61 @@
 
 #import "TOFileSystemItemMapTable.h"
 
+@interface TOFileSystemItemMapTable ()
+
+/** The map table to hold the items */
+@property (nonatomic, strong) NSMapTable *mapTable;
+
+/** The dispatch queue for synchronzing reads */
+@property (nonatomic, strong) dispatch_queue_t dispatchQueue;
+
+@end
+
 @implementation TOFileSystemItemMapTable
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _mapTable = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsStrongMemory
+                                          valueOptions:NSMapTableWeakMemory];
+        _dispatchQueue = dispatch_queue_create("TOFileSystemObserver.itemMapTable", DISPATCH_QUEUE_CONCURRENT);
+    }
+    
+    return self;
+}
+
+- (void)setItem:(id)object forUUID:(NSString *)uuid
+{
+    dispatch_barrier_async(self.dispatchQueue, ^{
+        [self.mapTable setObject:object forKey:uuid];
+    });
+}
+
+- (id)itemForUUID:(NSString *)uuid
+{
+    __block id item = nil;
+    dispatch_sync(self.dispatchQueue, ^{
+        item = [self.mapTable objectForKey:uuid];
+    });
+    
+    return item;
+}
+
+- (void)removeItemForUUID:(NSString *)uuid
+{
+    dispatch_barrier_async(self.dispatchQueue, ^{
+        [self.mapTable removeObjectForKey:uuid];
+    });
+}
+
+- (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key
+{
+    [self setItem:object forUUID:key];
+}
+
+- (nullable id)objectForKeyedSubscript:(NSString *)key
+{
+    return [self itemForUUID:key];
+}
 
 @end

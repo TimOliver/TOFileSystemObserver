@@ -24,7 +24,20 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ A thread-safe wrapper for the NSMapTable objects
+ used to store re-usable instances of item and list
+ objects.
+ */
 @interface TOFileSystemItemMapTable : NSObject
+
+- (void)setItem:(id)object forUUID:(NSString *)uuid;
+- (id)itemForUUID:(NSString *)uuid;
+- (void)removeItemForUUID:(NSString *)uuid;
+
+/** Implementations for allowing dictionary style literal syntax. */
+- (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key;
+- (nullable id)objectForKeyedSubscript:(NSString *)key;
 
 @end
 

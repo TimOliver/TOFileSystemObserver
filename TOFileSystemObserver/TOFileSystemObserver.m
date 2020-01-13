@@ -27,6 +27,7 @@
 #import "TOFileSystemPresenter.h"
 #import "TOFileSystemItemList+Private.h"
 #import "TOFileSystemItemURLDictionary.h"
+#import "TOFileSystemItemMapTable.h"
 #import "TOFileSystemItem+Private.h"
 
 #import "NSURL+TOFileSystemUUID.h"
@@ -58,10 +59,10 @@ static TOFileSystemObserver *_sharedObserver = nil;
 @property (nonatomic, strong) TOFileSystemItemURLDictionary *allItems;
 
 /** A map table that weakly holds item list objects */
-@property (nonatomic, strong) NSMapTable *itemListTable;
+@property (nonatomic, strong) TOFileSystemItemMapTable *itemListTable;
 
 /** A map table that weakly holds any items currently being presented. */
-@property (nonatomic, strong) NSMapTable *itemTable;
+@property (nonatomic, strong) TOFileSystemItemMapTable *itemTable;
 
 @end
 
@@ -126,12 +127,8 @@ static TOFileSystemObserver *_sharedObserver = nil;
     _fileSystemPresenter = [[TOFileSystemPresenter alloc] init];
     
     // Set up the map tables
-    _itemListTable = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsStrongMemory
-                                               valueOptions:NSPointerFunctionsWeakMemory
-                                                   capacity:0];
-    _itemTable = [[NSMapTable alloc] initWithKeyOptions:NSPointerFunctionsStrongMemory
-                                           valueOptions:NSPointerFunctionsWeakMemory
-                                               capacity:0];
+    _itemListTable  = [[TOFileSystemItemMapTable alloc] init];
+    _itemTable      = [[TOFileSystemItemMapTable alloc] init];
     
     // Set up the stores for tracking items
     _allItems = [[TOFileSystemItemURLDictionary alloc] initWithBaseURL:self.directoryURL];
@@ -222,13 +219,13 @@ static TOFileSystemObserver *_sharedObserver = nil;
             // Fetch the UUID for this item and see if we've cached it already
             NSString *uuid = [directoryURL to_fileSystemUUID];
             uuid = [self verifiedUniqueUUIDForItemAtURL:directoryURL uuid:uuid];
-            itemList = [self.itemListTable objectForKey:uuid];
+            itemList = self.itemListTable[uuid];
             if (itemList) { return; }
             
             // Create a new one, and save it to the map table
             itemList = [[TOFileSystemItemList alloc] initWithDirectoryURL:directoryURL
                                                        fileSystemObserver:self];
-            [self.itemListTable setObject:itemList forKey:itemList.uuid];
+            self.itemListTable[uuid] = itemList;
             self.allItems[uuid] = directoryURL;
         }
     };
@@ -259,13 +256,13 @@ static TOFileSystemObserver *_sharedObserver = nil;
             // Fetch the UUID for this item and see if we've cached it already
             NSString *uuid = [fileURL to_fileSystemUUID];
             uuid = [self verifiedUniqueUUIDForItemAtURL:fileURL uuid:uuid];
-            item = [self.itemTable objectForKey:uuid];
+            item = self.itemTable[uuid];
             if (item) { return; }
             
             // Create a new one, and save it to the map table
             item = [[TOFileSystemItem alloc] initWithItemAtFileURL:fileURL
                                                 fileSystemObserver:self];
-            [self.itemTable setObject:item forKey:item.uuid];
+            self.itemTable[uuid] = item;
             self.allItems[uuid] = fileURL;
         }
     };
@@ -345,15 +342,15 @@ static TOFileSystemObserver *_sharedObserver = nil;
     id mainBlock = ^{
         @autoreleasepool {
             // If this item is a child of another item, update the parent item
-            TOFileSystemItem *item = [self.itemTable objectForKey:parentUUID];
+            TOFileSystemItem *item = self.itemTable[parentUUID];
             [item refreshWithURL:item.fileURL];
             
             // If this item is a list itself, update it's list entry
-            TOFileSystemItemList *list = [self.itemListTable objectForKey:uuid];
+            TOFileSystemItemList *list = self.itemListTable[uuid];
             [list refreshWithURL:itemURL];
             
             // If this is a new item that belongs to an existing list, append it
-            list = [self.itemListTable objectForKey:parentUUID];
+            list = self.itemListTable[parentUUID];
             [list addItemWithUUID:uuid itemURL:itemURL];
         }
         
@@ -371,15 +368,15 @@ static TOFileSystemObserver *_sharedObserver = nil;
     id mainBlock = ^{
         // See if this item exists in memory, and if so, trigger a refresh
         @autoreleasepool {
-            TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
+            TOFileSystemItem *item = self.itemTable[uuid];
             [item refreshWithURL:itemURL];
             
             // If this item is a child of another item, update that one
-            item = [self.itemTable objectForKey:parentUUID];
+            item = self.itemTable[parentUUID];
             [item refreshWithURL:item.fileURL];
             
             // If this item is a list itself, update its list entry
-            TOFileSystemItemList *list = [self.itemListTable objectForKey:uuid];
+            TOFileSystemItemList *list = self.itemListTable[uuid];
             [list refreshWithURL:itemURL];
         }
         
@@ -406,27 +403,27 @@ static TOFileSystemObserver *_sharedObserver = nil;
     id mainBlock = ^{
         @autoreleasepool {
             // Get the item and refresh its internal state for the new location
-            TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
+            TOFileSystemItem *item = self.itemTable[uuid];
             [item refreshWithURL:url];
             
             // If this item is a list itself, update its list entry too
-            TOFileSystemItemList *list = [self.itemListTable objectForKey:uuid];
+            TOFileSystemItemList *list = self.itemListTable[uuid];
             [list refreshWithURL:url];
             
             // Potentially remove it from an old list
-            TOFileSystemItemList *oldList = [self.itemListTable objectForKey:oldParentUUID];
+            TOFileSystemItemList *oldList = self.itemListTable[oldParentUUID];
             [item removeFromList:oldList];
             
             // If the old list was also an item, refresh it's state
-            TOFileSystemItem *oldListItem = [self.itemTable objectForKey:oldParentUUID];
+            TOFileSystemItem *oldListItem = self.itemTable[oldParentUUID];
             [oldListItem refreshWithURL:oldListItem.fileURL];
             
             // Potentially add it to a new list
-            TOFileSystemItemList *newList = [self.itemListTable objectForKey:newParentUUID];
+            TOFileSystemItemList *newList = self.itemListTable[newParentUUID];
             [item addToList:newList];
             
             // If the new list was also an item, refresh it's state
-            TOFileSystemItem *newListItem = [self.itemTable objectForKey:newParentUUID];
+            TOFileSystemItem *newListItem = self.itemTable[newParentUUID];
             [newListItem refreshWithURL:newListItem.fileURL];
         }
         
@@ -443,13 +440,13 @@ static TOFileSystemObserver *_sharedObserver = nil;
     id mainBlock = ^{
         @autoreleasepool {
             // If we have this item in memory, remove it from everywhere
-            TOFileSystemItem *item = [self.itemTable objectForKey:uuid];
+            TOFileSystemItem *item = self.itemTable[uuid];
             [item removeFromAllLists];
-            [self.itemTable removeObjectForKey:uuid];
-            [self.itemListTable removeObjectForKey:uuid];
+            [self.itemTable removeItemForUUID:uuid];
+            [self.itemListTable removeItemForUUID:uuid];
             
             // If this item is a child of a list, update that list
-            TOFileSystemItem *listItem = [self.itemTable objectForKey:parentUUID];
+            TOFileSystemItem *listItem = self.itemTable[parentUUID];
             [listItem refreshWithURL:listItem.fileURL];
         }
         
