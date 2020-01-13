@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeItemWithUUID:(NSString *)uuid fileURL:(NSURL *)url;
 
 /** If the folder was moved, update it's own reference to its file path. */
-- (void)refreshWithURL:(NSURL *)directoryURL;
+- (void)refreshWithURL:(nullable NSURL *)directoryURL;
 
 @end
 

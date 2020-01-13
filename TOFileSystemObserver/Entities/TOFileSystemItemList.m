@@ -330,6 +330,8 @@
 
 - (void)refreshWithURL:(NSURL *)directoryURL
 {
+    if (directoryURL == nil) { return; }
+    
     @synchronized (self) {
         if (self.directoryURL != directoryURL) {
             self.directoryURL = directoryURL;

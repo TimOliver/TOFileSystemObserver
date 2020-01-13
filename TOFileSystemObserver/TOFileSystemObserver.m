@@ -344,16 +344,13 @@ static TOFileSystemObserver *_sharedObserver = nil;
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];
     
     // If this item has an entry, refresh it
-    TOFileSystemItem *item = self.itemTable[uuid];
-    [item refreshWithURL:itemURL];
+    [self.itemTable[uuid] refreshWithURL:itemURL];
     
     // If this item is a child of another item, update the parent item
-    item = self.itemTable[parentUUID];
-    [item refreshWithURL:item.fileURL];
+    [self.itemTable[parentUUID] refreshWithURL:nil];
     
     // If this item is a list itself, update it's list entry
-    TOFileSystemItemList *list = self.itemListTable[uuid];
-    [list refreshWithURL:itemURL];
+    [self.itemListTable[uuid] refreshWithURL:itemURL];
     
     id mainBlock = ^{
         @autoreleasepool {
@@ -374,17 +371,12 @@ static TOFileSystemObserver *_sharedObserver = nil;
     // See if there is a list had been made for the parent, and add it
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];
     
-    // See if this item exists in memory, and if so, trigger a refresh
-    TOFileSystemItem *item = self.itemTable[uuid];
-    [item refreshWithURL:itemURL];
+    // See if this item exists in either of our stores, and if so, trigger a refresh
+    [self.itemTable[uuid] refreshWithURL:itemURL];
+    [self.itemListTable[uuid] refreshWithURL:itemURL];
     
     // If this item is a child of another item, update that one
-    item = self.itemTable[parentUUID];
-    [item refreshWithURL:item.fileURL];
-    
-    // If this item is a list itself, update its list entry
-    TOFileSystemItemList *list = self.itemListTable[uuid];
-    [list refreshWithURL:itemURL];
+    [self.itemTable[parentUUID] refreshWithURL:nil];
     
     id mainBlock = ^{
         // TODO: Add broadcast notifications

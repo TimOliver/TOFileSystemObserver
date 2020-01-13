@@ -164,7 +164,7 @@
     [self.listTable addObject:list];
 }
 
-- (void)refreshWithURL:(NSURL *)itemURL
+- (void)refreshWithURL:(nullable NSURL *)itemURL
 {
     @synchronized (self) {
         [self refreshFromItemAtURL:itemURL];
