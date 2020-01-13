@@ -37,7 +37,7 @@
     
     // Create 5 folders
     for (NSInteger i = 0; i < 5; i++) {
-        NSString *folderName = [NSString stringWithFormat:@"Folder %ld", i+1];
+        NSString *folderName = [NSString stringWithFormat:@"Folder %d", i+1];
         NSURL *folderURL = [documentsDirectory URLByAppendingPathComponent:folderName];
         [fileManager createDirectoryAtURL:folderURL withIntermediateDirectories:YES attributes:nil error:nil];
     }
@@ -45,7 +45,7 @@
     // Create 5 arbitrary files
     NSArray *sizes = @[@(5), @(12), @(33), @(15), @(20)];
     for (NSInteger i = 0; i < sizes.count; i++) {
-        NSString *fileName = [NSString stringWithFormat:@"File-%ld.dat", i+1];
+        NSString *fileName = [NSString stringWithFormat:@"File-%d.dat", i+1];
         NSURL *fileURL = [documentsDirectory URLByAppendingPathComponent:fileName];
         FILE *file = fopen([fileURL.path cStringUsingEncoding:NSUTF8StringEncoding], "wb");
         
