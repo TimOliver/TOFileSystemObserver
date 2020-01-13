@@ -87,7 +87,7 @@
         TOFileSystemItem *item = [self.fileSystemObserver itemForFileAtURL:url];
 
         // Add the list to the item's store so it can notify of updates
-        [item addToList:self];
+        item.list = self;
         
         // Capture the item with its UUID in the dictionary
         _items[item.uuid] = item;
@@ -226,7 +226,7 @@
     
     // Generate a new item and add it to our list
     TOFileSystemItem *item = [self.fileSystemObserver itemForFileAtURL:url];
-    [item addToList:self];
+    item.list = self;
     self.items[item.uuid] = item;
     
     // Work out where the item should go in our sorted list
@@ -290,11 +290,9 @@
     [changes addModificationIndex:newIndex];
     
     // Broadcast the changes
-    dispatch_async(dispatch_get_main_queue(), ^{
-        for (TOFileSystemNotificationToken *token in self.notificationTokens) {
-            token.notificationBlock(self, changes);
-        }
-    });
+    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+        token.notificationBlock(self, changes);
+    }
 }
 
 - (void)synchronizeWithDisk

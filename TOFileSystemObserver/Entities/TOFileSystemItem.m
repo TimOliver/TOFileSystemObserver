@@ -35,12 +35,6 @@
 
 @interface TOFileSystemItem ()
 
-/**
- Stores any lists this item is a part of so if
- any properties here change, we can notify them.
- */
-@property (nonatomic, strong) NSHashTable *listTable;
-
 /** Internal writing overrides for public properties */
 @property (nonatomic, strong, readwrite) NSURL *fileURL;
 @property (nonatomic, assign, readwrite) TOFileSystemItemType type;
@@ -67,7 +61,6 @@
         
         // If this item represents a deleted file, skip gathering the data
         if (!self.isDeleted) {
-            _listTable = [[NSHashTable alloc] initWithOptions:NSPointerFunctionsWeakMemory capacity:0];
             [self configureUUIDForceRefresh:NO];
             [self refreshFromItemAtURL:fileURL];
         }
@@ -159,11 +152,6 @@
 
 #pragma mark - Lists -
 
-- (void)addToList:(TOFileSystemItemList *)list
-{
-    [self.listTable addObject:list];
-}
-
 - (void)refreshWithURL:(nullable NSURL *)itemURL
 {
     @synchronized (self) {
@@ -171,24 +159,20 @@
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        for (TOFileSystemItemList *list in self.listTable) {
-            [list itemDidRefreshWithUUID:self.uuid];
-        }
+        [self.list itemDidRefreshWithUUID:self.uuid];
     });
 }
 
-- (void)removeFromList:(TOFileSystemItemList *)list
+- (void)setList:(TOFileSystemItemList *)list
 {
-    [list removeItemWithUUID:self.uuid fileURL:self.fileURL];
-    [self.listTable removeObject:list];
-}
-
-- (void)removeFromAllLists
-{
-    for (TOFileSystemItemList *list in self.listTable) {
-        [list removeItemWithUUID:self.uuid fileURL:self.fileURL];
+    if (list == _list) { return; }
+    
+    // Remove this item from the old list
+    if (_list) {
+        [_list removeItemWithUUID:self.uuid fileURL:self.fileURL];
     }
-    [self.listTable removeAllObjects];
+    
+    _list = list;
 }
 
 #pragma mark - Equality -

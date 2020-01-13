@@ -334,23 +334,32 @@ static TOFileSystemObserver *_sharedObserver = nil;
     [self.operationQueue addOperation:scanOperation];
 }
 
+#pragma mark - Item Refreshing -
+
+- (void)refreshItemAtURL:(NSURL *)itemURL
+                    uuid:(NSString *)uuid
+              parentUUID:(NSString *)parentUUID
+{
+    // If this item has an entry, refresh it
+    [self.itemTable[uuid] refreshWithURL:itemURL];
+    [self.itemListTable[uuid] refreshWithURL:itemURL];
+    
+    // If this item is a child of another item, update the parent item
+    [self.itemTable[parentUUID] refreshWithURL:nil];
+    [self.itemListTable[parentUUID] refreshWithURL:nil];
+}
+
 #pragma mark - Scan Operation Delegate -
 
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
  didDiscoverItemAtURL:(NSURL *)itemURL
              withUUID:(NSString *)uuid
 {
-    // Fetch the UUID of the parent in case it needs to be appended to a list
+    // Get the UUID of the parent so we can see if there is a list for it
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];
     
-    // If this item has an entry, refresh it
-    [self.itemTable[uuid] refreshWithURL:itemURL];
-    
-    // If this item is a child of another item, update the parent item
-    [self.itemTable[parentUUID] refreshWithURL:nil];
-    
-    // If this item is a list itself, update it's list entry
-    [self.itemListTable[uuid] refreshWithURL:itemURL];
+    // Refresh all of the properties of this item
+    [self refreshItemAtURL:itemURL uuid:uuid parentUUID:parentUUID];
     
     id mainBlock = ^{
         @autoreleasepool {
@@ -370,13 +379,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
 {
     // See if there is a list had been made for the parent, and add it
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];
-    
-    // See if this item exists in either of our stores, and if so, trigger a refresh
-    [self.itemTable[uuid] refreshWithURL:itemURL];
-    [self.itemListTable[uuid] refreshWithURL:itemURL];
-    
-    // If this item is a child of another item, update that one
-    [self.itemTable[parentUUID] refreshWithURL:nil];
+    [self refreshItemAtURL:itemURL uuid:uuid parentUUID:parentUUID];
     
     id mainBlock = ^{
         // TODO: Add broadcast notifications
@@ -407,17 +410,21 @@ static TOFileSystemObserver *_sharedObserver = nil;
     TOFileSystemItemList *list = self.itemListTable[uuid];
     [list refreshWithURL:url];
     
+    // Remove the item from the list
+    item.list = nil;
+    
     // If the item used to be in a specific list, remove it
     TOFileSystemItemList *oldList = self.itemListTable[oldParentUUID];
-    [item removeFromList:oldList];
+    [oldList refreshWithURL:nil];
     
     // If that old list is represented as an item, refresh it
     TOFileSystemItem *oldListItem = self.itemTable[oldParentUUID];
-    [oldListItem refreshWithURL:oldListItem.fileURL];
+    [oldListItem refreshWithURL:nil];
     
     // If the item was moved to a new list, add it to that list
     TOFileSystemItemList *newList = self.itemListTable[newParentUUID];
-    [item addToList:newList];
+    item.list = newList;
+    [newList refreshWithURL:nil];
     
     // If the new list is an item, refresh that too
     TOFileSystemItem *newListItem = self.itemTable[newParentUUID];
@@ -438,7 +445,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
     id mainBlock = ^{
         // If we have this item in memory, remove it from everywhere
         TOFileSystemItem *item = self.itemTable[uuid];
-        [item removeFromAllLists];
+        item.list = nil;
         [self.itemTable removeItemForUUID:uuid];
         [self.itemListTable removeItemForUUID:uuid];
         

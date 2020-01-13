@@ -37,8 +37,7 @@
     self.listToken = [self.fileItemList addNotificationBlock:^(TOFileSystemItemList *itemList,
                                                                TOFileSystemItemListChanges *changes)
     {
-        UITableView *tableView = weakSelf.tableView;
-        TOFileSystemItemListUpdateTableView(tableView, changes, 0);
+        TOFileSystemItemListUpdateTableView(weakSelf.tableView, changes, 0);
     }];
     
     // Add test button for flipping direction

@@ -29,6 +29,7 @@ typedef NS_ENUM(NSInteger, TOFileSystemItemType) {
 };
 
 @class TOFileSystemObserver;
+@class TOFileSystemItemList;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -71,6 +72,9 @@ NS_SWIFT_NAME(FileSystemItem)
 
 /** The file system observer backing this object. */
 @property (nonatomic, weak, readonly) TOFileSystemObserver *fileSystemObserver;
+
+/** Returns the list this item belongs to (if a list has separately been created.) */
+@property (nonatomic, weak, nullable, readonly) TOFileSystemItemList *list;
 
 @end
 
