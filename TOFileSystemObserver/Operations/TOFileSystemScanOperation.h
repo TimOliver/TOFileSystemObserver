@@ -30,6 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol TOFileSystemScanOperationDelegate <NSObject>
 
+@required
+
 /**
  Called when a new item is discovered is discovered during a scan.
  This is called every time for full-system scans, but will then only be called on items not previously found before
@@ -47,6 +49,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** Called when the file has been deleted. */
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation didDeleteItemAtURL:(NSURL *)itemURL withUUID:(NSString *)uuid;
+
+/** Called when a full directory scan has been completed so we can do some final clean-up. */
+- (void)scanOperationDidCompleteFullScan:(TOFileSystemScanOperation *)scanOperation;
 
 @end
 

@@ -79,4 +79,13 @@
     return [self itemForUUID:key];
 }
 
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                  objects:(id __unsafe_unretained _Nullable [_Nonnull])buffer
+                                    count:(NSUInteger)len
+{
+    return [_mapTable countByEnumeratingWithState:state
+                                       objects:buffer
+                                         count:len];
+}
+
 @end

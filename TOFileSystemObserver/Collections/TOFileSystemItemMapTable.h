@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
  used to store re-usable instances of item and list
  objects.
  */
-@interface TOFileSystemItemMapTable : NSObject
+@interface TOFileSystemItemMapTable : NSObject<NSFastEnumeration>
 
 - (void)setItem:(id)object forUUID:(NSString *)uuid;
 - (id)itemForUUID:(NSString *)uuid;

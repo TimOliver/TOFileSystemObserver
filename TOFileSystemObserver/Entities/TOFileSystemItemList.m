@@ -290,9 +290,43 @@
     [changes addModificationIndex:newIndex];
     
     // Broadcast the changes
-    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
-        token.notificationBlock(self, changes);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+            token.notificationBlock(self, changes);
+        }
+    });
+}
+
+- (void)synchronizeWithDisk
+{
+    // After a scan and all present files have been verified, it's possible there
+    // are some items lingering from files that were deleted.
+    
+    // Loop through every file in this list, and doublecheck it's still on disk
+    TOFileSystemItemListChanges *changes = [[TOFileSystemItemListChanges alloc] init];
+    for (NSInteger i = 0; i < self.sortedItems.count; i++) {
+        TOFileSystemItem *item = self.items[self.sortedItems[i]];
+        if (item.isDeleted) {
+            [changes addDeletionIndex:i];
+        }
     }
+    
+    // Skip if every file was accounted for
+    if (changes.deletions.count == 0) { return; }
+    
+    // Remove all of the deleted files from the list
+    for (NSNumber *deletedIndex in changes.deletions) {
+        NSString *uuid = self.sortedItems[deletedIndex.intValue];
+        [self.sortedItems removeObjectAtIndex:deletedIndex.intValue];
+        [self.items removeObjectForKey:uuid];
+    }
+    
+    // Broadcast the changes
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+            token.notificationBlock(self, changes);
+        }
+    });
 }
 
 #pragma mark - Notification Token -
@@ -352,7 +386,3 @@
 }
 
 @end
-
-#pragma mark - Convenience UI Change Implementations -
-
-

@@ -132,13 +132,23 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
          pendingDirectories:self.pendingDirectories];
     }
 
+    void (^didCompletedNotification)(void) = ^{
+        [self.delegate scanOperationDidCompleteFullScan:self];
+    };
+    
     // If we were only scanning the immediate contents
     // of the base directory, we can exit here
-    if (self.subDirectoryLevelLimit == 0) { return; }
+    if (self.subDirectoryLevelLimit == 0) {
+        didCompletedNotification();
+        return;
+    }
 
     // Otherwise, scan all of the directories discovered in the base
     // directory (and then scan their directories).
     [self scanPendingSubdirectories];
+    
+    // Send a notification so we can do some final clean up
+    didCompletedNotification();
 }
 
 - (void)scanPendingSubdirectories
@@ -260,9 +270,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     [self.missingItems removeObjectForKey:uuid];
     
     // Post a notification that this operation happened
-    if ([self.delegate respondsToSelector:@selector(scanOperation:itemWithUUID:didMoveFromURL:toURL:)]) {
-        [self.delegate scanOperation:self itemWithUUID:uuid didMoveFromURL:savedURL toURL:url];
-    }
+    [self.delegate scanOperation:self itemWithUUID:uuid didMoveFromURL:savedURL toURL:url];
     
     return YES;
 }
@@ -276,16 +284,12 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     // If this item wasn't in the master store yet, trigger an alert that it was discovered
     // (On full scans, this happens regardless)
     if (!savedURL || self.directoryURL) {
-        if ([self.delegate respondsToSelector:@selector(scanOperation:didDiscoverItemAtURL:withUUID:)]) {
-            [self.delegate scanOperation:self didDiscoverItemAtURL:url withUUID:uuid];
-        }
+        [self.delegate scanOperation:self didDiscoverItemAtURL:url withUUID:uuid];
         return;
     }
     
     // Otherwise, post a notification that "something" changed, so we should update it's state
-    if ([self.delegate respondsToSelector:@selector(scanOperation:itemDidChangeAtURL:withUUID:)]) {
-        [self.delegate scanOperation:self itemDidChangeAtURL:url withUUID:uuid];
-    }
+    [self.delegate scanOperation:self itemDidChangeAtURL:url withUUID:uuid];
 }
 
 - (void)cleanUpFilesPendingDeletion
@@ -298,9 +302,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
         [self.allItems removeItemURLForUUID:uuid];
         
         // Trigger a delegate update event
-        if ([self.delegate respondsToSelector:@selector(scanOperation:didDeleteItemAtURL:withUUID:)]) {
-            [self.delegate scanOperation:self didDeleteItemAtURL:self.missingItems[uuid] withUUID:uuid];
-        }
+        [self.delegate scanOperation:self didDeleteItemAtURL:self.missingItems[uuid] withUUID:uuid];
     }
 }
 

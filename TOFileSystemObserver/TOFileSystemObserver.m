@@ -451,4 +451,11 @@ static TOFileSystemObserver *_sharedObserver = nil;
     dispatch_async(dispatch_get_main_queue(), mainBlock);
 }
 
+- (void)scanOperationDidCompleteFullScan:(TOFileSystemScanOperation *)scanOperation
+{
+    for (NSString *listUUID in self.itemListTable) {
+        [self.itemListTable[listUUID] synchronizeWithDisk];
+    }
+}
+
 @end
