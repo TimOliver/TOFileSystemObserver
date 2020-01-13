@@ -125,6 +125,13 @@
     });
 }
 
+- (void)removeAllItems
+{
+    dispatch_barrier_async(self.itemQueue, ^{
+        [self.items removeAllObjects];
+    });
+}
+
 - (nullable id)objectForKeyedSubscript:(NSString *)key
 {
     return [self itemURLForUUID:key];

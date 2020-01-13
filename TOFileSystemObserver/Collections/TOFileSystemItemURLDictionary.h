@@ -52,6 +52,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** Delete an entry from the store. */
 - (void)removeItemURLForUUID:(NSString *)uuid;
 
+/** Remove all items */
+- (void)removeAllItems;
+
 /** Implementations for allowing dictionary style literal syntax. */
 - (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key;
 - (nullable id)objectForKeyedSubscript:(NSString *)key;

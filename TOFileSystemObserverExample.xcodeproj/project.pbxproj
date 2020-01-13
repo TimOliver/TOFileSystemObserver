@@ -172,6 +172,7 @@
 				223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */,
 				2254ED392341060000331B47 /* Categories */,
 				2232B651233FAFC000358B05 /* Changes */,
+				22F4E42C23CC974400F7EEC6 /* Collections */,
 				223A8958233F4AB5008FFE1A /* Entities */,
 				22D601C623657F5B00275AD9 /* FilePresenter */,
 				2254ED27234055BB00331B47 /* FilePaths */,
@@ -185,10 +186,6 @@
 		223A8958233F4AB5008FFE1A /* Entities */ = {
 			isa = PBXGroup;
 			children = (
-				22C7FE9A23B5BD120017CABD /* TOFileSystemItemURLDictionary.h */,
-				22C7FE9B23B5BD120017CABD /* TOFileSystemItemURLDictionary.m */,
-				22F4E42923CC8BE400F7EEC6 /* TOFileSystemItemMapTable.h */,
-				22F4E42A23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m */,
 				22ADAEBA237815DA0088D31E /* TOFileSystemItemList.h */,
 				22ADAEC3237AD24E0088D31E /* TOFileSystemItemList+Private.h */,
 				22ADAEBB237815DA0088D31E /* TOFileSystemItemList.m */,
@@ -246,6 +243,17 @@
 				22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */,
 			);
 			path = FilePresenter;
+			sourceTree = "<group>";
+		};
+		22F4E42C23CC974400F7EEC6 /* Collections */ = {
+			isa = PBXGroup;
+			children = (
+				22C7FE9A23B5BD120017CABD /* TOFileSystemItemURLDictionary.h */,
+				22C7FE9B23B5BD120017CABD /* TOFileSystemItemURLDictionary.m */,
+				22F4E42923CC8BE400F7EEC6 /* TOFileSystemItemMapTable.h */,
+				22F4E42A23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m */,
+			);
+			path = Collections;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
