@@ -179,10 +179,13 @@ static TOFileSystemObserver *_sharedObserver = nil;
 - (void)stop
 {
     if (!self.isRunning) { return; }
-
+    
     // Set the running state to off
     self.isRunning = NO;
 
+    // Clear out all of the items in memory (since we'll do a rebuild next time)
+    [self.allItems removeAllItems];
+    
     // Remove all of the observers
     [self.fileSystemPresenter stop];
 }
@@ -340,8 +343,12 @@ static TOFileSystemObserver *_sharedObserver = nil;
     // Fetch the UUID of the parent in case it needs to be appended to a list
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];
     
+    // If this item has an entry, refresh it
+    TOFileSystemItem *item = self.itemTable[uuid];
+    [item refreshWithURL:itemURL];
+    
     // If this item is a child of another item, update the parent item
-    TOFileSystemItem *item = self.itemTable[parentUUID];
+    item = self.itemTable[parentUUID];
     [item refreshWithURL:item.fileURL];
     
     // If this item is a list itself, update it's list entry
@@ -380,7 +387,6 @@ static TOFileSystemObserver *_sharedObserver = nil;
     [list refreshWithURL:itemURL];
     
     id mainBlock = ^{
-        
         // TODO: Add broadcast notifications
     };
     dispatch_async(dispatch_get_main_queue(), mainBlock);
