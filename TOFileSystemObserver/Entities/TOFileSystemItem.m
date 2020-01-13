@@ -89,14 +89,14 @@
     }
     
     // Copy the name of the item
-    NSString *name = [url lastPathComponent];
+    NSString *name = [self.fileURL lastPathComponent];
     if (self.name.length == 0 || ![name isEqualToString:self.name]) {
         self.name = name;
         hasChanges = YES;
     }
 
     // Check if it is a file or directory
-    TOFileSystemItemType type = url.to_isDirectory ? TOFileSystemItemTypeDirectory :
+    TOFileSystemItemType type = self.fileURL.to_isDirectory ? TOFileSystemItemTypeDirectory :
                                                         TOFileSystemItemTypeFile;
     if (type != self.type) {
         self.type = type;
@@ -104,14 +104,14 @@
     }
 
     // Get its creation date
-    NSDate *creationDate = url.to_creationDate;
+    NSDate *creationDate = self.fileURL.to_creationDate;
     if (![self.creationDate isEqualToDate:creationDate]) {
         self.creationDate = creationDate;
         hasChanges = YES;
     }
     
     // Get its modification date
-    NSDate *modificationDate = url.to_modificationDate;
+    NSDate *modificationDate = self.fileURL.to_modificationDate;
     if (![self.modificationDate isEqualToDate:modificationDate]) {
         self.modificationDate = modificationDate;
         hasChanges = YES;
@@ -122,7 +122,7 @@
     
     // If the type is a file, fetch its size
     if (self.type == TOFileSystemItemTypeFile) {
-        long long fileSize = url.to_size;
+        long long fileSize = self.fileURL.to_size;
         if (fileSize != self.size) {
             self.size = fileSize;
             hasChanges = YES;
@@ -169,7 +169,10 @@
     
     // Remove this item from the old list
     if (_list) {
-        [_list removeItemWithUUID:self.uuid fileURL:self.fileURL];
+        TOFileSystemItemList *list = _list;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [list removeItemWithUUID:self.uuid fileURL:self.fileURL];
+        });
     }
     
     _list = list;

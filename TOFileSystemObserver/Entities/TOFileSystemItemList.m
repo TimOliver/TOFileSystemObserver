@@ -257,6 +257,7 @@
     // Trigger the notification blocks
     TOFileSystemItemListChanges *changes = [[TOFileSystemItemListChanges alloc] init];
     [changes addDeletionIndex:index];
+    
     for (TOFileSystemNotificationToken *token in self.notificationTokens) {
         token.notificationBlock(self, changes);
     }

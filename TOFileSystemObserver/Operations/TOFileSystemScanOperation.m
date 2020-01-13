@@ -193,6 +193,10 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 
 - (void)scanItemAtURL:(NSURL *)url pendingDirectories:(NSMutableArray *)pendingDirectories
 {
+    // Make sure it's not a hidden file
+    NSString *name = url.lastPathComponent;
+    if ([name characterAtIndex:0] == '.') { return; }
+    
     // Double-check the file is still at that URL
     // (The file presenter will sometimes provide the old URL for moved files)
     if (![self verifyItemIsNotMissingAtURL:url]) {

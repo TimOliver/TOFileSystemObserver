@@ -410,9 +410,6 @@ static TOFileSystemObserver *_sharedObserver = nil;
     TOFileSystemItemList *list = self.itemListTable[uuid];
     [list refreshWithURL:url];
     
-    // Remove the item from the list
-    item.list = nil;
-    
     // If the item used to be in a specific list, remove it
     TOFileSystemItemList *oldList = self.itemListTable[oldParentUUID];
     [oldList refreshWithURL:nil];
@@ -431,6 +428,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
     [newListItem refreshWithURL:newListItem.fileURL];
     
     id mainBlock = ^{
+        
         // TODO: Add broadcast notifications
     };
     dispatch_async(dispatch_get_main_queue(), mainBlock);
