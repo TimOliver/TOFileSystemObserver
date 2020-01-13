@@ -30,18 +30,22 @@ NS_ASSUME_NONNULL_BEGIN
 /** Private interface for creating item objects */
 @interface TOFileSystemItem (Private)
 
-/** The list that this item belongs to. */
-@property (nonatomic, weak, nullable, readwrite) TOFileSystemItemList *list;
-
 /** Creates a new instance of an item for the target item. */
 - (instancetype)initWithItemAtFileURL:(NSURL *)fileURL
                    fileSystemObserver:(TOFileSystemObserver *)observer;
 
+/** Adds this item as a child of a list. */
+- (void)addToList:(TOFileSystemItemList *)list;
+
+/** Remove this item from a list. */
+- (void)removeFromList;
+
 /** Forces a refresh of the UUID (in cases where the file seems to have been duplicated) */
 - (void)regenerateUUID;
 
-/** Notify this object that it should re-fetch all its properties from disk */
-- (void)refreshWithURL:(nullable NSURL *)itemURL;
+/** Notify this object that it should re-fetch all its properties from disk.
+    Returns true if there were changes. */
+- (BOOL)refreshWithURL:(nullable NSURL *)itemURL;
 
 @end
 

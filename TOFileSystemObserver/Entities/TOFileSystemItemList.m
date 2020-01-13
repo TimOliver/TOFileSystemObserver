@@ -87,7 +87,7 @@
         TOFileSystemItem *item = [self.fileSystemObserver itemForFileAtURL:url];
 
         // Add the list to the item's store so it can notify of updates
-        item.list = self;
+        [item addToList:self];
         
         // Capture the item with its UUID in the dictionary
         _items[item.uuid] = item;
@@ -226,7 +226,7 @@
     
     // Generate a new item and add it to our list
     TOFileSystemItem *item = [self.fileSystemObserver itemForFileAtURL:url];
-    item.list = self;
+    [item addToList:self];
     self.items[item.uuid] = item;
     
     // Work out where the item should go in our sorted list
@@ -249,6 +249,9 @@
     // Work out where the item is in the list
     NSInteger index = [self.sortedItems indexOfObject:uuid];
     NSAssert(index != NSNotFound, @"items and sortedItems should never be out of sync");
+    
+    // Un-assign the list
+    [self.items[uuid] removeFromList];
     
     // Remove the item from both stores
     [self.items removeObjectForKey:uuid];
@@ -361,15 +364,19 @@
     [self rebuildItemListForListingOrder];
 }
 
-- (void)refreshWithURL:(NSURL *)directoryURL
+- (BOOL)refreshWithURL:(NSURL *)directoryURL
 {
-    if (directoryURL == nil) { return; }
+    if (directoryURL == nil) { return NO; }
     
+    BOOL hasChanges = NO;
     @synchronized (self) {
         if (self.directoryURL != directoryURL) {
             self.directoryURL = directoryURL;
+            hasChanges = YES;
         }
     }
+    
+    return hasChanges;
 }
 
 #pragma mark - Debugging -

@@ -35,6 +35,9 @@
 
 @interface TOFileSystemItem ()
 
+/** The list that this item belongs to. */
+@property (nonatomic, weak, nullable, readwrite) TOFileSystemItemList *list;
+
 /** Internal writing overrides for public properties */
 @property (nonatomic, strong, readwrite) NSURL *fileURL;
 @property (nonatomic, assign, readwrite) TOFileSystemItemType type;
@@ -152,30 +155,23 @@
 
 #pragma mark - Lists -
 
-- (void)refreshWithURL:(nullable NSURL *)itemURL
+- (BOOL)refreshWithURL:(nullable NSURL *)itemURL
 {
+    BOOL hasChanges = NO;
     @synchronized (self) {
-        [self refreshFromItemAtURL:itemURL];
+        hasChanges = [self refreshFromItemAtURL:itemURL];
     }
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.list itemDidRefreshWithUUID:self.uuid];
-    });
+    return hasChanges;
 }
 
-- (void)setList:(TOFileSystemItemList *)list
+- (void)addToList:(TOFileSystemItemList *)list
 {
-    if (list == _list) { return; }
-    
-    // Remove this item from the old list
-    if (_list) {
-        TOFileSystemItemList *list = _list;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [list removeItemWithUUID:self.uuid fileURL:self.fileURL];
-        });
-    }
-    
-    _list = list;
+    self.list = list;
+}
+
+- (void)removeFromList
+{
+    self.list = nil;
 }
 
 #pragma mark - Equality -
