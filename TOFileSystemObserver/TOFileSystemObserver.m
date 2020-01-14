@@ -473,7 +473,8 @@ static TOFileSystemObserver *_sharedObserver = nil;
    didDeleteItemAtURL:(NSURL *)itemURL
              withUUID:(NSString *)uuid
 {
-    NSString *parentUUID = [itemURL to_uuidForParentDirectory];
+    TOFileSystemItem *item = self.itemTable[uuid];
+    NSString *parentUUID = [item.fileURL to_uuidForParentDirectory];
     
     id mainBlock = ^{
         // If we have this item in memory, remove it from everywhere
@@ -484,7 +485,8 @@ static TOFileSystemObserver *_sharedObserver = nil;
         
         // If this item is a child of a list, update that list
         TOFileSystemItem *listItem = self.itemTable[parentUUID];
-        [listItem refreshWithURL:listItem.fileURL];
+        [listItem refreshWithURL:nil];
+        [listItem.list itemDidRefreshWithUUID:parentUUID];
         
         // TODO: Add broadcast notifications
     };
