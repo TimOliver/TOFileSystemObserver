@@ -371,18 +371,22 @@ static TOFileSystemObserver *_sharedObserver = nil;
     
     // Refresh all of the properties of this item and its parent
     BOOL itemHadChanges = [self refreshItemAtURL:itemURL uuid:uuid];
-    [self refreshParentItemWithUUID:parentUUID];
+    BOOL parentItemHadChanges = [self refreshParentItemWithUUID:parentUUID];
     
     id mainBlock = ^{
-        @autoreleasepool {
-            // If this is a new item that belongs to an existing list, append it
-            TOFileSystemItemList *list = self.itemListTable[parentUUID];
-            [list addItemWithUUID:uuid itemURL:itemURL];
-            
-            // If the item had changed, in this update, perform a UI refresh
-            if (itemHadChanges) {
-                [list itemDidRefreshWithUUID:uuid];
-            }
+        // If this is a new item that belongs to an existing list, append it
+        TOFileSystemItemList *list = self.itemListTable[parentUUID];
+        [list addItemWithUUID:uuid itemURL:itemURL];
+        
+        // If the item had changed, in this update, perform a UI refresh
+        if (itemHadChanges) {
+            [list itemDidRefreshWithUUID:uuid];
+        }
+        
+        // If the parent item belongs to a list, update its list
+        if (parentItemHadChanges) {
+            TOFileSystemItem *parentItem = self.itemTable[parentUUID];
+            [parentItem.list itemDidRefreshWithUUID:parentUUID];
         }
         
         // TODO: Add broadcast notifications
@@ -397,13 +401,19 @@ static TOFileSystemObserver *_sharedObserver = nil;
     // See if there is a list had been made for the parent, and add it
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];
     BOOL itemHadChanges = [self refreshItemAtURL:itemURL uuid:uuid];
-    [self refreshParentItemWithUUID:parentUUID];
+    BOOL parentItemHadChanges = [self refreshParentItemWithUUID:parentUUID];
     
     id mainBlock = ^{
         // If the item had changes trigger a UI update
         if (itemHadChanges) {
             TOFileSystemItemList *list = self.itemListTable[parentUUID];
             [list itemDidRefreshWithUUID:uuid];
+        }
+        
+        // If the parent item belongs to a list, update that list
+        if (parentItemHadChanges) {
+            TOFileSystemItem *parentItem = self.itemTable[parentUUID];
+            [parentItem.list itemDidRefreshWithUUID:parentUUID];
         }
     };
     dispatch_async(dispatch_get_main_queue(), mainBlock);
