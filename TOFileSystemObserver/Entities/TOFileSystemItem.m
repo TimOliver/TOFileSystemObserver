@@ -157,10 +157,26 @@
 
 - (BOOL)refreshWithURL:(nullable NSURL *)itemURL
 {
+    // Perform a re-fetch of all of the properties of the
+    // item from disk, and re-populate all of the properties.
+    
+    // A lock needs to be used as this operation will ideally be done
+    // in the background due to how heavy it could potentially be
     BOOL hasChanges = NO;
     @synchronized (self) {
         hasChanges = [self refreshFromItemAtURL:itemURL];
     }
+    
+    // If it was detected one or more of the properties were
+    // different, if the item is a member of a list, inform
+    // the list that the UI state of this item will need to be updated.
+    if (hasChanges) {
+        [NSOperationQueue.mainQueue addOperationWithBlock:^{
+            if (self.list == nil) { return; }
+            [self.list itemDidRefreshWithUUID:self.uuid];
+        }];
+    }
+    
     return hasChanges;
 }
 

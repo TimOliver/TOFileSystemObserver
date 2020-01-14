@@ -21,7 +21,6 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import "TOFileSystemScanOperation.h"
-#import "TOFileSystemItem.h"
 #import "TOFileSystemPresenter.h"
 #import "TOFileSystemItemURLDictionary.h"
 

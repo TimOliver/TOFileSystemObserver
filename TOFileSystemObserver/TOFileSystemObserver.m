@@ -370,28 +370,18 @@ static TOFileSystemObserver *_sharedObserver = nil;
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];
     
     // Refresh all of the properties of this item and its parent
-    BOOL itemHadChanges = [self refreshItemAtURL:itemURL uuid:uuid];
-    BOOL parentItemHadChanges = [self refreshParentItemWithUUID:parentUUID];
+    [self refreshItemAtURL:itemURL uuid:uuid];
+    [self refreshParentItemWithUUID:parentUUID];
     
     id mainBlock = ^{
         // If this is a new item that belongs to an existing list, append it
-        TOFileSystemItemList *list = self.itemListTable[parentUUID];
-        [list addItemWithUUID:uuid itemURL:itemURL];
+        TOFileSystemItemList *parentList = self.itemListTable[parentUUID];
+        if (parentList) { [parentList addItemWithUUID:uuid itemURL:itemURL]; }
         
-        // If the item had changed, in this update, perform a UI refresh
-        if (itemHadChanges) {
-            [list itemDidRefreshWithUUID:uuid];
-        }
-        
-        // If the parent item belongs to a list, update its list
-        if (parentItemHadChanges) {
-            TOFileSystemItem *parentItem = self.itemTable[parentUUID];
-            [parentItem.list itemDidRefreshWithUUID:parentUUID];
-        }
         
         // TODO: Add broadcast notifications
     };
-    dispatch_async(dispatch_get_main_queue(), mainBlock);
+    [[NSOperationQueue mainQueue] addOperationWithBlock:mainBlock];
 }
 
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
@@ -400,23 +390,13 @@ static TOFileSystemObserver *_sharedObserver = nil;
 {
     // See if there is a list had been made for the parent, and add it
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];
-    BOOL itemHadChanges = [self refreshItemAtURL:itemURL uuid:uuid];
-    BOOL parentItemHadChanges = [self refreshParentItemWithUUID:parentUUID];
+    [self refreshItemAtURL:itemURL uuid:uuid];
+    [self refreshParentItemWithUUID:parentUUID];
     
     id mainBlock = ^{
-        // If the item had changes trigger a UI update
-        if (itemHadChanges) {
-            TOFileSystemItemList *list = self.itemListTable[parentUUID];
-            [list itemDidRefreshWithUUID:uuid];
-        }
-        
-        // If the parent item belongs to a list, update that list
-        if (parentItemHadChanges) {
-            TOFileSystemItem *parentItem = self.itemTable[parentUUID];
-            [parentItem.list itemDidRefreshWithUUID:parentUUID];
-        }
+
     };
-    dispatch_async(dispatch_get_main_queue(), mainBlock);
+    [[NSOperationQueue mainQueue] addOperationWithBlock:mainBlock];
 }
 
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
@@ -437,36 +417,22 @@ static TOFileSystemObserver *_sharedObserver = nil;
     // Get the item and refresh its internal state with the new location
     [self refreshItemAtURL:url uuid:uuid];
     
-    // If that old list is represented as an item, refresh it
-    TOFileSystemItem *oldParentItem = self.itemTable[oldParentUUID];
-    BOOL oldParentItemHadChanges = [oldParentItem refreshWithURL:nil];
-    
-    // If the new list is an item, refresh that too
-    TOFileSystemItem *newParentItem = self.itemTable[newParentUUID];
-    BOOL newParentItemHadChanges = [newParentItem refreshWithURL:nil];
-    
+    // Refresh both of the parents to update the children counts in each
+    [self refreshParentItemWithUUID:oldParentUUID];
+    [self refreshParentItemWithUUID:newParentUUID];
+
     id mainBlock = ^{
-        // If the item used to be in a specific list, remove it from that list
+        // If the item used to be in a list item, remove it from that list
         TOFileSystemItemList *oldList = self.itemListTable[oldParentUUID];
         [oldList removeItemWithUUID:uuid fileURL:url];
         
-        // If the item was moved to a new list, add it to that list
+        // If the destination also had a list, append it to that list
         TOFileSystemItemList *newList = self.itemListTable[newParentUUID];
         [newList addItemWithUUID:uuid itemURL:url];
         
-        // If the old parent had changes, trigger a UI refresh
-        if (oldParentItemHadChanges) {
-            [oldParentItem.list itemDidRefreshWithUUID:oldParentUUID];
-        }
-        
-        //Repeat for new list
-        if (newParentItemHadChanges) {
-            [newParentItem.list itemDidRefreshWithUUID:newParentUUID];
-        }
-        
         // TODO: Add broadcast notifications
     };
-    dispatch_async(dispatch_get_main_queue(), mainBlock);
+    [[NSOperationQueue mainQueue] addOperationWithBlock:mainBlock];
 }
 
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
@@ -485,11 +451,10 @@ static TOFileSystemObserver *_sharedObserver = nil;
         // If this item is a child of a list, update that list
         TOFileSystemItem *listItem = self.itemTable[parentUUID];
         [listItem refreshWithURL:nil];
-        [listItem.list itemDidRefreshWithUUID:parentUUID];
         
         // TODO: Add broadcast notifications
     };
-    dispatch_async(dispatch_get_main_queue(), mainBlock);
+    [[NSOperationQueue mainQueue] addOperationWithBlock:mainBlock];
 }
 
 - (void)scanOperationDidCompleteFullScan:(TOFileSystemScanOperation *)scanOperation
