@@ -473,8 +473,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
    didDeleteItemAtURL:(NSURL *)itemURL
              withUUID:(NSString *)uuid
 {
-    TOFileSystemItem *item = self.itemTable[uuid];
-    NSString *parentUUID = [item.fileURL to_uuidForParentDirectory];
+    NSString *parentUUID = [itemURL to_uuidForParentDirectory];
     
     id mainBlock = ^{
         // If we have this item in memory, remove it from everywhere

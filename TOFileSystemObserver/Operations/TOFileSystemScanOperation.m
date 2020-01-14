@@ -261,9 +261,10 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     // We've confirmed that this file is has been moved, renamed, or deleted.
     
     // If it's new destination is the iOS Trash folder, it's defintely been deleted.
+    // Inform the delegate, remove it from the master list, and return
     if ([url.path rangeOfString:kTOFileSystemTrashFolderName].location != NSNotFound) {
-        // Add it to the list of missing items so we can clean it out at the end of this scan
-        self.missingItems[uuid] = url;
+        [self.allItems removeItemURLForUUID:uuid];
+        [self.delegate scanOperation:self didDeleteItemAtURL:savedURL withUUID:uuid];
         return NO;
     }
     
