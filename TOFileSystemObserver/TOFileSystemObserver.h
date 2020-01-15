@@ -26,13 +26,27 @@
 #import "TOFileSystemItem.h"
 #import "TOFileSystemNotificationToken.h"
 #import "TOFileSystemItemListChanges.h"
+#import "TOFileSystemChanges.h"
 
 @class TOFileSystemObserver;
 
-//typedef void (^TOFileSystemNotificationBlock)(TOFileSystemObserver * _Nonnull observer,
-//                                              TOFileSystemChanges * _Nullable changes);
-
 NS_ASSUME_NONNULL_BEGIN
+
+typedef void (^TOFileSystemNotificationBlock)(TOFileSystemObserver * _Nonnull observer,
+                                               TOFileSystemChanges * _Nullable changes);
+
+/**
+ Whenever a change to the target directory or any of it's sub-items is detected and
+ `broadcastNotifications` is YES, an `NSNotification` containing the changes that happened
+ will be broadcasted to the application.
+ */
+extern NSNotificationName const TOFileSystemObserverDidChangeNotification;
+
+/**
+ When a notification is broadcasted, all of the changes that were detected
+ will be provided in the notification `userInfo` dictionary under this key.
+ */
+extern NSString * const TOFileSystemObserverChangesUserInfoKey;
 
 NS_SWIFT_NAME(FileSystemObserver)
 @interface TOFileSystemObserver : NSObject

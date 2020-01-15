@@ -32,6 +32,12 @@
 
 #import "NSURL+TOFileSystemUUID.h"
 
+NSNotificationName const TOFileSystemObserverDidChangeNotification
+                            = @"TOFileSystemObserverDidChangeNotification";
+
+NSString * const TOFileSystemObserverChangesUserInfoKey
+                            = @"TOFileSystemObserverChangesUserInfoKey";
+
 /** The instance held as the app-wide singleton */
 static TOFileSystemObserver *_sharedObserver = nil;
 
