@@ -239,14 +239,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
         }
     };
     
-    // Since map tables can internally mutate, perform all access on the main thread
-    if (![NSThread isMainThread]) {
-        dispatch_queue_t mainQueue = dispatch_get_main_queue();
-        dispatch_sync(mainQueue, getListBlock);
-    }
-    else {
-        getListBlock();
-    }
+    getListBlock();
 
     return itemList;
 }
