@@ -260,18 +260,20 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
         return YES;
     }
     
-    // We've confirmed that this file is has been moved, renamed, or deleted.
-    
-    // If it's new destination is the iOS Trash folder, it's defintely been deleted.
-    // Inform the delegate, remove it from the master list, and return
-    if ([url.path rangeOfString:kTOFileSystemTrashFolderName].location != NSNotFound) {
+    // If the file still exists, but it was moved to the Trashes folder, this means
+    // the user deleted it via the Files app. Instead of moving the file, override
+    // and treat it like it was deleted.
+    BOOL movedToTrashes = ([url.path rangeOfString:kTOFileSystemTrashFolderName].location != NSNotFound);
+    if (movedToTrashes) {
         [self.allItems removeItemURLForUUID:uuid];
         [self.delegate scanOperation:self didDeleteItemAtURL:savedURL withUUID:uuid];
         return NO;
     }
     
+    // We've confirmed that this file has been moved or renamed.
+    
     // Update the store for the new location
-    self.allItems[uuid] = url;
+    [self.allItems setItemURL:url forUUID:uuid];
     
     // If it was marked as potentially deleted, remove it from the deletion list
     [self.missingItems removeObjectForKey:uuid];
@@ -284,6 +286,20 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 - (void)verifyItemAtURL:(NSURL *)url uuid:(NSString *)uuid
 {
     NSURL *savedURL = self.allItems[uuid];
+    
+    // There's an extremely specific edge case here.
+    // If a user suspends the app, deletes an item, and then imports
+    // a new item with the same name, we can import the new item easily,
+    // but there's no easy way to work out which file entry was deleted.
+    
+    // To remedy this, use an inverse dictionary to access any previous UUID
+    // values stored against this current URL, and if they don't match,
+    // delete the previous entry
+    NSString *savedUUID = [self.allItems uuidForItemWithURL:url];
+    if (![savedUUID isEqualToString:uuid]) {
+        [self.allItems removeItemURLForUUID:savedUUID];
+        [self.delegate scanOperation:self didDeleteItemAtURL:url withUUID:savedUUID];
+    }
     
     // Save/update the item to our master items list
     [self.allItems setItemURL:url forUUID:uuid];
