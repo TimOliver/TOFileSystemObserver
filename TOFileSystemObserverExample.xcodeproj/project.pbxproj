@@ -22,6 +22,8 @@
 		22925B3F23D2991E00FC166C /* NSURL+TOFileSystemUUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */; };
 		22925B4123D35E4600FC166C /* TOFileSystemFileAttributesTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 22925B4023D35E4600FC166C /* TOFileSystemFileAttributesTest.m */; };
 		22925B4223D3613100FC166C /* NSURL+TOFileSystemAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 22498E5823BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m */; };
+		22925B4423D36D0000FC166C /* TOFileSystemEnumeratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22925B4323D36D0000FC166C /* TOFileSystemEnumeratorTests.m */; };
+		22925B4523D36D0D00FC166C /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */; };
 		229E0BA823C8503C0019937C /* TOFileSystemItemListChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 229E0BA723C8503C0019937C /* TOFileSystemItemListChanges.m */; };
 		22ADAEBC237815DA0088D31E /* TOFileSystemItemList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBB237815DA0088D31E /* TOFileSystemItemList.m */; };
 		22ADAEBD2378177F0088D31E /* TOFileSystemItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */; };
@@ -72,6 +74,7 @@
 		22838BA423CF65F700CBE2FE /* TOFileSystemChanges.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemChanges.h; sourceTree = "<group>"; };
 		22838BA523CF65F700CBE2FE /* TOFileSystemChanges.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemChanges.m; sourceTree = "<group>"; };
 		22925B4023D35E4600FC166C /* TOFileSystemFileAttributesTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TOFileSystemFileAttributesTest.m; path = TOFileSystemObserverTests/TOFileSystemFileAttributesTest.m; sourceTree = SOURCE_ROOT; };
+		22925B4323D36D0000FC166C /* TOFileSystemEnumeratorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TOFileSystemEnumeratorTests.m; path = TOFileSystemObserverTests/TOFileSystemEnumeratorTests.m; sourceTree = SOURCE_ROOT; };
 		229E0BA623C8503C0019937C /* TOFileSystemItemListChanges.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemItemListChanges.h; sourceTree = "<group>"; };
 		229E0BA723C8503C0019937C /* TOFileSystemItemListChanges.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemItemListChanges.m; sourceTree = "<group>"; };
 		229E0BA923C850510019937C /* TOFileSystemItemListChanges+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TOFileSystemItemListChanges+Private.h"; sourceTree = "<group>"; };
@@ -243,6 +246,7 @@
 			children = (
 				22925B4023D35E4600FC166C /* TOFileSystemFileAttributesTest.m */,
 				22C7FEAB23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m */,
+				22925B4323D36D0000FC166C /* TOFileSystemEnumeratorTests.m */,
 				22DA1C1023D1947900AA8444 /* TOFileSystemUUIDTests.m */,
 				22C7FEA523B5E70E0017CABD /* Info.plist */,
 			);
@@ -392,9 +396,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22925B4523D36D0D00FC166C /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */,
 				22C7FEAC23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m in Sources */,
 				22925B3F23D2991E00FC166C /* NSURL+TOFileSystemUUID.m in Sources */,
 				22DA1C1123D1947900AA8444 /* TOFileSystemUUIDTests.m in Sources */,
+				22925B4423D36D0000FC166C /* TOFileSystemEnumeratorTests.m in Sources */,
 				22925B4123D35E4600FC166C /* TOFileSystemFileAttributesTest.m in Sources */,
 				22C7FEAD23B5E74E0017CABD /* TOFileSystemItemURLDictionary.m in Sources */,
 				22925B4223D3613100FC166C /* NSURL+TOFileSystemAttributes.m in Sources */,
