@@ -33,7 +33,7 @@
                                          includingPropertiesForKeys:nil
                                                             options:0
                                                               error:nil].count;
-    if (numberOfItems > 0) { return; }
+    if (numberOfItems > 1) { return; }
     
     // Create 5 folders
     for (NSInteger i = 0; i < 5; i++) {
