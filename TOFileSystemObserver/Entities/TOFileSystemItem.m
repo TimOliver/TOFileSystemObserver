@@ -120,16 +120,17 @@
         hasChanges = YES;
     }
     
-    // Check if it is copying
-    self.isCopying = [modificationDate timeIntervalSinceDate:[NSDate date]] > (-1.0f - FLT_EPSILON);
-    
-    // If the type is a file, fetch its size
+    // If the type is a file
     if (self.type == TOFileSystemItemTypeFile) {
+        // Fetch the item file size
         long long fileSize = self.fileURL.to_size;
         if (fileSize != self.size) {
             self.size = fileSize;
             hasChanges = YES;
         }
+        
+        // Check to see if it is copying
+        self.isCopying = [modificationDate timeIntervalSinceDate:[NSDate date]] > (-1.0f - FLT_EPSILON);
     }
     else {
         // Else, it's a directory, count the number of items inside
