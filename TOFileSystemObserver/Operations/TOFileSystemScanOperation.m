@@ -253,7 +253,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     }
     
     // Check that the saved URL still has a file there, and the UUID of that file matches this one,
-    // (in case the user deleted the file, then replaced it with one with the same name)
+    // (in case the user potentially deleted the file, and replaced it with one with the same name)
     NSString *savedUUID = [savedURL to_fileSystemUUID];
     BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:savedURL.path];
     if (fileExists && [savedUUID isEqualToString:uuid]) {
