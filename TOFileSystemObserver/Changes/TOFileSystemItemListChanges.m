@@ -138,7 +138,9 @@
 
 - (BOOL)hasItemChanges
 {
-    return (self.deletions || self.insertions || self.modificatons);
+    return (self.deletions.count ||
+            self.insertions.count ||
+            self.modificatons.count);
 }
 
 @end

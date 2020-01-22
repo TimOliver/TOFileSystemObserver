@@ -39,7 +39,7 @@
 /** Whether a timer has been set yet or not */
 @property (nonatomic, assign) BOOL isTiming;
 
-/** A dispatch semaphore used to serialize execution when paused. */
+/** A dispatch semaphore used to serialize execution when paused, but maintain the same thread. */
 @property (nonatomic, strong) dispatch_semaphore_t pausingSemaphore;
 
 /** A concurrent queue used to coordinate writing UUIDs to files. */

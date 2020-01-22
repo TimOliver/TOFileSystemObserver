@@ -1,5 +1,5 @@
 //
-//  TOFileSystemChanges.h
+//  TOFileSystemChanges.m
 //
 //  Copyright 2020 Timothy Oliver. All rights reserved.
 //
@@ -24,7 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface TOFileSystemChanges : NSObject
+@interface TOFileSystemChanges (Private)
 
 
 
