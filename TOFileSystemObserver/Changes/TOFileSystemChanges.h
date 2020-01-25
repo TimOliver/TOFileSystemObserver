@@ -24,6 +24,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ Whenever a file system observer object detects a change
+ on disk, it will broadcast an event to any objects that
+ have subscribed. The specific changes that were detected
+ will be contained in an instance of this class.
+ */
 @interface TOFileSystemChanges : NSObject
 
 
