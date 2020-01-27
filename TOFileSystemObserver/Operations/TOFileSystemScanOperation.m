@@ -303,7 +303,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     // values stored against this current URL, and if they don't match,
     // delete the previous entry
     NSString *savedUUID = [self.allItems uuidForItemWithURL:url];
-    if (![savedUUID isEqualToString:uuid]) {
+    if (savedUUID && ![savedUUID isEqualToString:uuid]) {
         [self.allItems removeItemURLForUUID:savedUUID];
         [self.delegate scanOperation:self didDeleteItemAtURL:url withUUID:savedUUID];
     }
@@ -313,7 +313,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     
     // If this item wasn't in the master store yet, trigger an alert that it was discovered
     // (On full scans, this happens regardless)
-    if (!savedURL || self.directoryURL) {
+    if (!savedURL || self.isFullScan) {
         [self.delegate scanOperation:self didDiscoverItemAtURL:url withUUID:uuid];
         return;
     }
