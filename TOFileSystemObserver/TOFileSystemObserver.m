@@ -29,19 +29,34 @@
 #import "TOFileSystemItemURLDictionary.h"
 #import "TOFileSystemItemMapTable.h"
 #import "TOFileSystemItem+Private.h"
+#import "TOFileSystemNotificationToken.h"
+#import "TOFileSystemNotificationToken+Private.h"
+#import "TOFileSystemObserverConstants.h"
 
 #import "NSURL+TOFileSystemUUID.h"
 
+// Because the block is stored as a generic id, we must cast it back before we can call it.
+static inline void TOFileSystemObserverCallBlock(id block, id observer, NSInteger type, id changes) {
+    TOFileSystemNotificationBlock _block = (TOFileSystemNotificationBlock)block;
+    _block(observer, type, changes);
+};
+
+NSNotificationName const TOFileSystemObserverWillBeginFullScanNotification
+                            = @"TOFileSystemObserverWillBeginFullScan";
+NSNotificationName const TOFileSystemObserverDidCompleteFullScanNotification
+                            = @"TOFileSystemObserverDidCompleteFullScan";
 NSNotificationName const TOFileSystemObserverDidChangeNotification
                             = @"TOFileSystemObserverDidChangeNotification";
 
+NSString * const TOFileSystemObserverUserInfoKey
+                            = @"TOFileSystemObserverUserInfoKey";
 NSString * const TOFileSystemObserverChangesUserInfoKey
                             = @"TOFileSystemObserverChangesUserInfoKey";
 
 /** The instance held as the app-wide singleton */
 static TOFileSystemObserver *_sharedObserver = nil;
 
-@interface TOFileSystemObserver() <TOFileSystemScanOperationDelegate>
+@interface TOFileSystemObserver() <TOFileSystemScanOperationDelegate, TOFileSystemNotifying>
 
 /** The absolute path to our observed directory's super directory so we can build paths. */
 @property (nonatomic, strong) NSURL *parentDirectoryURL;
@@ -69,6 +84,9 @@ static TOFileSystemObserver *_sharedObserver = nil;
 
 /** A map table that weakly holds any items currently being presented. */
 @property (nonatomic, strong) TOFileSystemItemMapTable *itemTable;
+
+/** A hash table containing all of the notification blocks/tokens registered to this observer. */
+@property (nonatomic, strong) NSHashTable *notificationTokens;
 
 @end
 
@@ -103,6 +121,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         _sharedObserver = [[TOFileSystemObserver alloc] init];
+        _sharedObserver.broadcastsNotifications = YES;
     });
     
     return _sharedObserver;
@@ -196,13 +215,11 @@ static TOFileSystemObserver *_sharedObserver = nil;
     [self.fileSystemPresenter stop];
 }
 
-#pragma mark - Scanning -
-
 - (void)performFullDirectoryScan
 {
     // Create a new scan operation
     TOFileSystemScanOperation *scanOperation = nil;
-    scanOperation = [[TOFileSystemScanOperation alloc] initWithDirectoryAtURL:self.directoryURL
+    scanOperation = [[TOFileSystemScanOperation alloc] initForFullScanWithDirectoryAtURL:self.directoryURL
                                                            allItemsDictionary:self.allItems
                                                                 filePresenter:self.fileSystemPresenter];
     scanOperation.subDirectoryLevelLimit = self.includedDirectoryLevels;
@@ -210,6 +227,36 @@ static TOFileSystemObserver *_sharedObserver = nil;
     
     // Begin asynchronous execution
     [self.operationQueue addOperation:scanOperation];
+}
+
+- (void)updateObservingObjectsWithChangedItemURLs:(NSArray *)itemURLs
+{
+    // Create a new scan operation to analyse what changed
+    TOFileSystemScanOperation *scanOperation = nil;
+    scanOperation = [[TOFileSystemScanOperation alloc] initForItemScanWithItemURLs:itemURLs
+                                                           allItemsDictionary:self.allItems
+                                                                filePresenter:self.fileSystemPresenter];
+    scanOperation.subDirectoryLevelLimit = self.includedDirectoryLevels;
+    scanOperation.delegate = self;
+
+    // Begin asynchronous execution
+    [self.operationQueue addOperation:scanOperation];
+}
+
+- (TOFileSystemNotificationToken *)addNotificationBlock:(TOFileSystemNotificationBlock)block
+{
+    TOFileSystemNotificationToken *token = [TOFileSystemNotificationToken tokenWithObservingObject:self block:block];
+    if (self.notificationTokens == nil) {
+        self.notificationTokens = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory];
+    }
+    [self.notificationTokens addObject:token];
+    return token;
+}
+
+/** Removes the notification from the observing object. */
+- (void)removeNotificationToken:(TOFileSystemNotificationToken *)token
+{
+    [self.notificationTokens removeObject:token];
 }
 
 #pragma mark - Creating Observing Objects -
@@ -281,8 +328,6 @@ static TOFileSystemObserver *_sharedObserver = nil;
     return item;
 }
 
-#pragma mark - Handling UUID Redundancy -
-
 - (NSString *)verifiedUniqueUUIDForItemAtURL:(NSURL *)itemURL uuid:(NSString *)uuid
 {
     // If it was detected that there are two items with the same UUID
@@ -315,22 +360,6 @@ static TOFileSystemObserver *_sharedObserver = nil;
     }];
     
     return newUUID;
-}
-
-#pragma mark - File System Change Notifications -
-
-- (void)updateObservingObjectsWithChangedItemURLs:(NSArray *)itemURLs
-{
-    // Create a new scan operation to analyse what changed
-    TOFileSystemScanOperation *scanOperation = nil;
-    scanOperation = [[TOFileSystemScanOperation alloc] initWithItemURLs:itemURLs
-                                                           allItemsDictionary:self.allItems
-                                                                filePresenter:self.fileSystemPresenter];
-    scanOperation.subDirectoryLevelLimit = self.includedDirectoryLevels;
-    scanOperation.delegate = self;
-
-    // Begin asynchronous execution
-    [self.operationQueue addOperation:scanOperation];
 }
 
 #pragma mark - Item Refreshing -
@@ -376,7 +405,6 @@ static TOFileSystemObserver *_sharedObserver = nil;
         // If this is a new item that belongs to an existing list, append it
         TOFileSystemItemList *parentList = self.itemListTable[parentUUID];
         if (parentList) { [parentList addItemWithUUID:uuid itemURL:itemURL]; }
-        
         
         // TODO: Add broadcast notifications
     };
@@ -456,11 +484,65 @@ static TOFileSystemObserver *_sharedObserver = nil;
     [[NSOperationQueue mainQueue] addOperationWithBlock:mainBlock];
 }
 
+- (void)scanOperationWillBeginFullScan:(TOFileSystemScanOperation *)scanOperation
+{
+    // Perform the Notification Center broadcast
+    if (self.broadcastsNotifications) {
+        NSDictionary *userInfo = [self userInfoDictionaryWithChanges:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:TOFileSystemObserverWillBeginFullScanNotification
+                                                            object:nil
+                                                          userInfo:userInfo];
+    }
+    
+    // Inform all notification tokens registered
+    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+        TOFileSystemObserverCallBlock(token.notificationBlock,
+                                      self,
+                                      TOFileSystemObserverNotificationTypeWillBeginFullScan,
+                                      nil);
+    }
+}
+
 - (void)scanOperationDidCompleteFullScan:(TOFileSystemScanOperation *)scanOperation
 {
+    // Loop through the list one more time to remove any headless entries
     for (NSString *listUUID in self.itemListTable) {
         [self.itemListTable[listUUID] synchronizeWithDisk];
     }
+    
+    // Perform the Notification Center broadcast
+    if (self.broadcastsNotifications) {
+        NSDictionary *userInfo = [self userInfoDictionaryWithChanges:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:TOFileSystemObserverDidCompleteFullScanNotification
+                                                            object:nil
+                                                          userInfo:userInfo];
+    }
+    
+    // Inform all notification tokens registered
+    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+        TOFileSystemObserverCallBlock(token.notificationBlock,
+                                      self,
+                                      TOFileSystemObserverNotificationTypeDidCompleteFullScan,
+                                      nil);
+    }
+}
+
+#pragma mark - Notifications -
+
+- (NSDictionary *)userInfoDictionaryWithChanges:(TOFileSystemChanges *)changes
+{
+    NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+    dictionary[TOFileSystemObserverUserInfoKey] = self;
+    if (changes) {
+        dictionary[TOFileSystemObserverChangesUserInfoKey] = changes;
+    }
+    
+    return [NSDictionary dictionaryWithDictionary:dictionary];
+}
+
+- (void)postNotificationsWithChanges:(TOFileSystemChanges *)changes
+{
+    
 }
 
 @end
