@@ -21,24 +21,13 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
+#import "TOFileSystemObserverConstants.h"
 
 @class TOFileSystemObserver;
 @class TOFileSystemItem;
 @class TOFileSystemItemListChanges;
 @class TOFileSystemNotificationToken;
 @class TOFileSystemItemList;
-
-/** A block that may be registered in order to observe when items in the list change. */
-typedef void (^TOFileSystemItemListNotificationBlock)(TOFileSystemItemList * _Nonnull itemList,
-                                                      TOFileSystemItemListChanges * _Nullable changes);
-
-/** The different options for ordering item lists */
-NS_SWIFT_NAME(FileSystemItemListOrder)
-typedef NS_ENUM(NSInteger, TOFileSystemItemListOrder) {
-    TOFileSystemItemListOrderAlphanumeric,  // Alphanumeric ordering
-    TOFileSystemItemListOrderDate,          // Creation date
-    TOFileSystemItemListOrderSize           // File size
-};
 
 NS_ASSUME_NONNULL_BEGIN
 

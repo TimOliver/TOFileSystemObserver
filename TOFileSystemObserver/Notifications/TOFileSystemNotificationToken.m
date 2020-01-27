@@ -28,7 +28,7 @@
 #pragma mark - Class Creation -
 
 + (instancetype)tokenWithObservingObject:(id<TOFileSystemNotifying>)observingObject
-                                   block:(void (^)(id _Nonnull, id _Nonnull))block
+                                   block:(id)block
 {
     TOFileSystemNotificationToken *token = [[TOFileSystemNotificationToken alloc] init];
     token.observingObject = observingObject;

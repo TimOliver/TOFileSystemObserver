@@ -33,6 +33,12 @@
 #import "NSURL+TOFileSystemUUID.h"
 #import "NSFileManager+TOFileSystemDirectoryEnumerator.h"
 
+// Because the block is stored as a generic id, we must cast it back before we can call it.
+static inline void TOFileSystemItemListCallBlock(id block, id observer, id changes) {
+    TOFileSystemItemListNotificationBlock _block = (TOFileSystemItemListNotificationBlock)block;
+    _block(observer, changes);
+};
+
 @interface TOFileSystemItemList () <TOFileSystemNotifying>
 
 /** The UUID string of the directory backing this object */
@@ -126,7 +132,7 @@
     
     // Trigger the notification blocks to update any UI with this new order
     for (TOFileSystemNotificationToken *token in self.notificationTokens) {
-        token.notificationBlock(self, changes);
+        TOFileSystemItemListCallBlock(token.notificationBlock, self, changes);
     }
 }
 
@@ -237,7 +243,7 @@
     TOFileSystemItemListChanges *changes = [[TOFileSystemItemListChanges alloc] init];
     [changes addInsertionIndex:sortedIndex];
     for (TOFileSystemNotificationToken *token in self.notificationTokens) {
-        token.notificationBlock(self, changes);
+        TOFileSystemItemListCallBlock(token.notificationBlock, self, changes);
     }
 }
 
@@ -262,7 +268,7 @@
     [changes addDeletionIndex:index];
     
     for (TOFileSystemNotificationToken *token in self.notificationTokens) {
-        token.notificationBlock(self, changes);
+        TOFileSystemItemListCallBlock(token.notificationBlock, self, changes);
     }
 }
 
@@ -295,7 +301,7 @@
     
     // Broadcast the changes
     for (TOFileSystemNotificationToken *token in self.notificationTokens) {
-        token.notificationBlock(self, changes);
+        TOFileSystemItemListCallBlock(token.notificationBlock, self, changes);
     }
 }
 
@@ -304,7 +310,7 @@
     // After a scan and all present files have been verified, it's possible there
     // are some items lingering from files that were deleted.
     
-    // Loop through every file in this list, and doublecheck it's still on disk
+    // Loop through every file in this list, and double-check it's still on disk
     TOFileSystemItemListChanges *changes = [[TOFileSystemItemListChanges alloc] init];
     for (NSInteger i = 0; i < self.sortedItems.count; i++) {
         TOFileSystemItem *item = self.items[self.sortedItems[i]];
@@ -326,7 +332,7 @@
     // Broadcast the changes
     dispatch_async(dispatch_get_main_queue(), ^{
         for (TOFileSystemNotificationToken *token in self.notificationTokens) {
-            token.notificationBlock(self, changes);
+            TOFileSystemItemListCallBlock(token.notificationBlock, self, changes);
         }
     });
 }
