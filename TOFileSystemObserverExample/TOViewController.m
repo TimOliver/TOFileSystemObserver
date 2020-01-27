@@ -8,6 +8,7 @@
 
 #import "TOViewController.h"
 
+#import "TOImages.h"
 #import "TOFileSystemObserver.h"
 #import "TOFileSystemObserver+UIKit.h"
 
@@ -18,6 +19,9 @@
 @property (nonatomic, strong) TOFileSystemNotificationToken *listToken;
 @property (nonatomic, strong) TOFileSystemNotificationToken *observerToken;
 
+@property (nonatomic, strong) UIImage *folderIcon;
+@property (nonatomic, strong) UIImage *fileIcon;
+
 @end
 
 @implementation TOViewController
@@ -26,7 +30,11 @@
     [super viewDidLoad];
     
     self.title = @"TOFileSystemObserver";
-
+    self.tableView.rowHeight = 74;
+    
+    self.folderIcon = [TOImages documentPickerDefaultFolderForStyle:NO];
+    self.fileIcon = [TOImages documentPickerDefaultFileIconWithExtension:@"" tintColor:self.view.tintColor style:NO];
+    
     // Create a file system observer and start it
     self.observer = [[TOFileSystemObserver alloc] init];
     [self.observer start];
@@ -122,7 +130,7 @@
     
     TOFileSystemItem *fileItem = self.fileItemList[indexPath.row];
     cell.textLabel.text = fileItem.name;
-
+    
     if (fileItem.isCopying) {
         cell.detailTextLabel.text = @"Copying";
     }
@@ -135,10 +143,20 @@
             else {
                 cell.detailTextLabel.text = [NSString stringWithFormat:@"%ld items", (long)fileItem.numberOfSubItems];
             }
+            cell.imageView.image = self.folderIcon;
+            
+            UIEdgeInsets insets = cell.layoutMargins;
+            insets.left = 16;
+            cell.layoutMargins = insets;
         }
         else {
             cell.accessoryType = UITableViewCellAccessoryNone;
             cell.detailTextLabel.text = @"File";
+            cell.imageView.image = self.fileIcon;
+            
+            UIEdgeInsets insets = cell.layoutMargins;
+            insets.left = 27;
+            cell.layoutMargins = insets;
         }
     }
     
