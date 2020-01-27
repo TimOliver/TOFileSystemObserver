@@ -296,7 +296,8 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     // There's an extremely specific edge case here.
     // If a user suspends the app, deletes an item, and then imports
     // a new item with the same name, we can import the new item easily,
-    // but there's no easy way to work out which file entry was deleted.
+    // but there's no easy way to work out which file entry was deleted
+    // (Because the reference to the UUID of the first file is lost).
     
     // To remedy this, use an inverse dictionary to access any previous UUID
     // values stored against this current URL, and if they don't match,
