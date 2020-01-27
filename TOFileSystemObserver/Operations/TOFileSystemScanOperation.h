@@ -50,6 +50,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** Called when the file has been deleted. */
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation didDeleteItemAtURL:(NSURL *)itemURL withUUID:(NSString *)uuid;
 
+/** Called before a full directory scan has started to allow any delegates to prepare in advance. */
+- (void)scanOperationWillBeginFullScan:(TOFileSystemScanOperation *)scanOperation;
+
 /** Called when a full directory scan has been completed so we can do some final clean-up. */
 - (void)scanOperationDidCompleteFullScan:(TOFileSystemScanOperation *)scanOperation;
 
@@ -69,14 +72,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger subDirectoryLevelLimit;
 
 /** Create a new instance that will scan all of the child items of the provided directory */
-- (instancetype)initWithDirectoryAtURL:(NSURL *)directoryURL
-                    allItemsDictionary:(nonnull TOFileSystemItemURLDictionary *)allItems
-                         filePresenter:(TOFileSystemPresenter *)filePresenter;
+- (instancetype)initForFullScanWithDirectoryAtURL:(NSURL *)directoryURL
+                               allItemsDictionary:(nonnull TOFileSystemItemURLDictionary *)allItems
+                                    filePresenter:(TOFileSystemPresenter *)filePresenter;
 
 /** Create a new instance that will scan all of the files/folders provided. */
-- (instancetype)initWithItemURLs:(NSArray<NSURL *> *)itemURLs
-              allItemsDictionary:(nonnull TOFileSystemItemURLDictionary *)allItems
-                   filePresenter:(TOFileSystemPresenter *)filePresenter;
+- (instancetype)initForItemScanWithItemURLs:(NSArray<NSURL *> *)itemURLs
+                         allItemsDictionary:(nonnull TOFileSystemItemURLDictionary *)allItems
+                              filePresenter:(TOFileSystemPresenter *)filePresenter;
 
 @end
 

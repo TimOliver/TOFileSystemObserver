@@ -98,6 +98,7 @@
 		22DD02AD23D71A2C0000E69A /* TOFileSystemChanges+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TOFileSystemChanges+Private.h"; sourceTree = "<group>"; };
 		22F4E42923CC8BE400F7EEC6 /* TOFileSystemItemMapTable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemItemMapTable.h; sourceTree = "<group>"; };
 		22F4E42A23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemItemMapTable.m; sourceTree = "<group>"; };
+		22FF4EE823DEADBC00B05C03 /* TOFileSystemObserverConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemObserverConstants.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +123,7 @@
 			isa = PBXGroup;
 			children = (
 				2206C80723C9BECA009FD5DD /* TOFileSystemObserver+UIKit.h */,
+				22FF4EE823DEADBC00B05C03 /* TOFileSystemObserverConstants.h */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";

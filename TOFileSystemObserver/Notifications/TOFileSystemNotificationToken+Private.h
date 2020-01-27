@@ -41,11 +41,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak, readwrite) id<TOFileSystemNotifying> observingObject;
 
 /** The block that will be triggered each time an event occurs. */
-@property (nonatomic, copy, readwrite) void (^notificationBlock)(id observer, id changes);
+@property (nonatomic, copy, readwrite) id notificationBlock;
 
 /** Create a new instance with the observer and the block */
 + (instancetype)tokenWithObservingObject:(id<TOFileSystemNotifying>)observingObject
-                                   block:(void (^)(id, id))block;
+                                   block:(id)block;
 
 @end
 

@@ -27,26 +27,11 @@
 #import "TOFileSystemNotificationToken.h"
 #import "TOFileSystemItemListChanges.h"
 #import "TOFileSystemChanges.h"
-
-@class TOFileSystemObserver;
+#import "TOFileSystemObserverConstants.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^TOFileSystemNotificationBlock)(TOFileSystemObserver * _Nonnull observer,
-                                               TOFileSystemChanges * _Nullable changes);
-
-/**
- Whenever a change to the target directory or any of it's sub-items is detected and
- `broadcastNotifications` is YES, an `NSNotification` containing the changes that happened
- will be broadcasted to the application.
- */
-extern NSNotificationName const TOFileSystemObserverDidChangeNotification;
-
-/**
- When a notification is broadcasted, all of the changes that were detected
- will be provided in the notification `userInfo` dictionary under this key.
- */
-extern NSString * const TOFileSystemObserverChangesUserInfoKey;
+@class TOFileSystemObserver;
 
 NS_SWIFT_NAME(FileSystemObserver)
 @interface TOFileSystemObserver : NSObject
@@ -82,6 +67,12 @@ NS_SWIFT_NAME(FileSystemObserver)
  is kept in an auto-release pool in dispatch queues.)
  */
 @property (nonatomic, readonly) TOFileSystemItem *directoryItem;
+
+/**
+ Turns on system-wide `NSNotification` broadcast events whenever a change is
+ detected. This is YES for the singleton instance by default, but NO for all other instances.
+ */
+@property (nonatomic, assign) BOOL broadcastsNotifications;
 
 /** Create a new instance of the observer with the base URL that will be observed. */
 - (instancetype)initWithDirectoryURL:(NSURL *)directoryURL;
@@ -133,7 +124,16 @@ NS_SWIFT_NAME(FileSystemObserver)
 
  @param block A block that will be called each time a file system event is detected.
 */
-//- (TOFileSystemNotificationToken *)addNotificationBlock:(TOFileSystemNotificationBlock)block;
+- (TOFileSystemNotificationToken *)addNotificationBlock:(TOFileSystemNotificationBlock)block;
+
+/**
+ When a notification token is no longer needed, it can be removed from the observer
+ and freed from memory. This method will automatically be called if `invalidate` is
+ called from the token.
+ 
+ @param token The token that will be removed from the observer and deallocated.
+ */
+- (void)removeNotificationToken:(TOFileSystemNotificationToken *)token;
 
 @end
 

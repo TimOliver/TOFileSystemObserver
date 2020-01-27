@@ -22,6 +22,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class TOFileSystemObserver;
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -32,7 +34,48 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface TOFileSystemChanges : NSObject
 
+/** The observer from where these changes were broadcasted. */
+@property (nonatomic, weak, readonly) TOFileSystemObserver *fileSystemObserver;
 
+/**
+ A dictionary of items that were discovered by the file system observer.
+ These are either files that were already on disk and were just discovered for the
+ first time in this session, or they are brand new files that were just added by the user.
+ 
+ All files in your app will be discovered at least once during an app session. Use
+ this method to compare the files against the current state of your cached information
+ to see if it needs to be updated.
+ 
+ The dictionary key is the unique UUID string assigned to the file on disk, and the value
+ is the absolute file path URL to the file on disk.
+ */
+@property (nonatomic, readonly) NSDictionary<NSString *, NSURL *> *discoveredItems;
+
+/**
+ A dictionary of items that were noted to have had changed during this app session.
+ Sorts of changes include the file-name changing, or if it was still being copied and
+ had just completed.
+
+ The dictionary key is the unique UUID string assigned to the file on disk, and the value
+ is the absolute file path URL to the file on disk.
+ */
+@property (nonatomic, readonly) NSDictionary<NSString *, NSURL *> *updatedItems;
+
+/**
+ A dictionary of items that were noted to have been deleted during this app session.
+
+ The dictionary key is the unique UUID string assigned to the file on disk, and the value
+ is the absolute file path URL to the file on disk.
+ */
+@property (nonatomic, readonly) NSDictionary<NSString *, NSURL *> *deletedItems;
+
+/**
+ A dictionary of items that were noted to have moved during this app session.
+
+ The dictionary key is the unique UUID string assigned to the file on disk, and the value
+ is a 2-element array where the first value is the previous URL and the second is the new URL.
+ */
+@property (nonatomic, readonly) NSDictionary<NSString *, NSArray *> *movedItems;
 
 @end
 
