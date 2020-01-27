@@ -49,6 +49,9 @@
 @property (nonatomic, assign, readwrite) BOOL isCopying;
 @property (nonatomic, assign, readwrite) NSInteger numberOfSubItems;
 
+/** A queue used to ensure the object properties are thread-safe. */
+@property (nonatomic, strong) dispatch_queue_t barrierQueue;
+
 @end
 
 @implementation TOFileSystemItem
@@ -62,10 +65,15 @@
         _fileURL = fileURL;
         _fileSystemObserver = observer;
         
+        NSString *queueName = [NSString stringWithFormat:@"TOFileSystemObserver.Item.%lu", (unsigned long)_fileURL.hash];
+        _barrierQueue = dispatch_queue_create([queueName cStringUsingEncoding:NSUTF8StringEncoding], DISPATCH_QUEUE_CONCURRENT);
+        
         // If this item represents a deleted file, skip gathering the data
         if (!self.isDeleted) {
-            [self configureUUIDForceRefresh:NO];
-            [self refreshFromItemAtURL:fileURL];
+            dispatch_barrier_async(_barrierQueue, ^{
+                [self configureUUIDForceRefresh:NO];
+                [self refreshFromItemAtURL:fileURL];
+            });
         }
     }
 
@@ -78,7 +86,7 @@
 {
     TOFileSystemPresenter *presenter = self.fileSystemObserver.fileSystemPresenter;
     [presenter performCoordinatedWrite:^{
-        self.uuid = [self.fileURL to_makeFileSystemUUIDIfNeeded];
+        self->_uuid = [self->_fileURL to_makeFileSystemUUIDIfNeeded];
     }];
 }
 
@@ -88,55 +96,55 @@
     
     // Copy the new URL to this item
     if (url) {
-        self.fileURL = url;
+        _fileURL = url;
     }
     
     // Copy the name of the item
-    NSString *name = [self.fileURL lastPathComponent];
-    if (self.name.length == 0 || ![name isEqualToString:self.name]) {
-        self.name = name;
+    NSString *name = [_fileURL lastPathComponent];
+    if (_name.length == 0 || ![name isEqualToString:_name]) {
+        _name = name;
         hasChanges = YES;
     }
 
     // Check if it is a file or directory
-    TOFileSystemItemType type = self.fileURL.to_isDirectory ? TOFileSystemItemTypeDirectory :
+    TOFileSystemItemType type = _fileURL.to_isDirectory ? TOFileSystemItemTypeDirectory :
                                                         TOFileSystemItemTypeFile;
-    if (type != self.type) {
-        self.type = type;
+    if (type != _type) {
+        _type = type;
         hasChanges = YES;
     }
 
     // Get its creation date
-    NSDate *creationDate = self.fileURL.to_creationDate;
-    if (![self.creationDate isEqualToDate:creationDate]) {
-        self.creationDate = creationDate;
+    NSDate *creationDate = _fileURL.to_creationDate;
+    if (![_creationDate isEqualToDate:creationDate]) {
+        _creationDate = creationDate;
         hasChanges = YES;
     }
     
     // Get its modification date
-    NSDate *modificationDate = self.fileURL.to_modificationDate;
-    if (![self.modificationDate isEqualToDate:modificationDate]) {
-        self.modificationDate = modificationDate;
+    NSDate *modificationDate = _fileURL.to_modificationDate;
+    if (![_modificationDate isEqualToDate:modificationDate]) {
+        _modificationDate = modificationDate;
         hasChanges = YES;
     }
     
     // If the type is a file
-    if (self.type == TOFileSystemItemTypeFile) {
+    if (_type == TOFileSystemItemTypeFile) {
         // Fetch the item file size
-        long long fileSize = self.fileURL.to_size;
-        if (fileSize != self.size) {
-            self.size = fileSize;
+        long long fileSize = _fileURL.to_size;
+        if (fileSize != _size) {
+            _size = fileSize;
             hasChanges = YES;
         }
         
         // Check to see if it is copying
-        self.isCopying = [modificationDate timeIntervalSinceDate:[NSDate date]] > (-1.0f - FLT_EPSILON);
+        _isCopying = [modificationDate timeIntervalSinceDate:[NSDate date]] > (-1.0f - FLT_EPSILON);
     }
     else {
         // Else, it's a directory, count the number of items inside
-        NSInteger numberOfChildItems = [self.fileURL to_numberOfSubItems];
-        if (self.numberOfSubItems != numberOfChildItems) {
-            self.numberOfSubItems = numberOfChildItems;
+        NSInteger numberOfChildItems = [_fileURL to_numberOfSubItems];
+        if (_numberOfSubItems != numberOfChildItems) {
+            _numberOfSubItems = numberOfChildItems;
             hasChanges = YES;
         }
     }
@@ -151,7 +159,9 @@
 
 - (void)regenerateUUID
 {
-    [self configureUUIDForceRefresh:YES];
+    dispatch_barrier_async(_barrierQueue, ^{
+        [self configureUUIDForceRefresh:YES];
+    });
 }
 
 #pragma mark - Lists -
@@ -163,10 +173,10 @@
     
     // A lock needs to be used as this operation will ideally be done
     // in the background due to how heavy it could potentially be
-    BOOL hasChanges = NO;
-    @synchronized (self) {
+    __block BOOL hasChanges = NO;
+    dispatch_barrier_sync(self.barrierQueue, ^{
         hasChanges = [self refreshFromItemAtURL:itemURL];
-    }
+    });
     
     // If it was detected one or more of the properties were
     // different, if the item is a member of a list, inform
@@ -206,6 +216,39 @@
 {
     return self.uuid.hash;
 }
+
+#pragma mark - Thread-Safe Accessors -
+
+// To ensure thread safety, fetch the value of an object
+// on the barrier queue
+- (id)fetchValueForObject:(NSString *)objectName
+{
+    __block id objectValue = nil;
+    dispatch_sync(self.barrierQueue, ^{
+        objectValue = [self valueForKey:objectName];
+    });
+    
+    return objectValue;
+}
+
+- (NSInteger)fetchValueForInteger:(NSString *)integerName
+{
+    __block long long intValue = 0;
+    dispatch_sync(self.barrierQueue, ^{
+        intValue = [[self valueForKey:integerName] longLongValue];
+    });
+    
+    return intValue;
+}
+
+- (NSURL *)fileURL { return (NSURL *)[self fetchValueForObject:@"_fileURL"]; }
+- (NSString *)uuid { return (NSString *)[self fetchValueForObject:@"_uuid"]; }
+- (NSString *)name { return (NSString *)[self fetchValueForObject:@"_name"]; }
+- (long long)size { return (long long)[self fetchValueForInteger:@"_size"]; }
+- (NSDate *)creationDate { return (NSDate *)[self fetchValueForObject:@"_creationDate"]; }
+- (NSDate *)modificationDate { return (NSDate *)[self fetchValueForObject:@"_modificationDate"]; }
+- (BOOL)isCopying { return (BOOL)[self fetchValueForInteger:@"_isCopying"]; }
+- (NSInteger)numberOfSubItems { return (BOOL)[self fetchValueForInteger:@"_numberOfSubItems"]; }
 
 #pragma mark - Debugging -
 
