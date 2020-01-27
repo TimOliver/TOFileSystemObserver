@@ -22,6 +22,58 @@
 
 #import "TOFileSystemChanges.h"
 
+@interface TOFileSystemChanges ()
+
+@property (nonatomic, weak, readwrite) TOFileSystemObserver *fileSystemObserver;
+@property (nonatomic, strong, readwrite) NSMutableDictionary *discoveredItems;
+@property (nonatomic, strong, readwrite) NSMutableDictionary *modifiedItems;
+@property (nonatomic, strong, readwrite) NSMutableDictionary *deletedItems;
+@property (nonatomic, strong, readwrite) NSMutableDictionary *movedItems;
+
+@end
+
 @implementation TOFileSystemChanges
+
+- (instancetype)initWithFileSystemObserver:(TOFileSystemObserver *)fileSystemObserver
+{
+    if (self = [super init]) {
+        _fileSystemObserver = fileSystemObserver;
+    }
+    return self;
+}
+
+- (void)addDiscoveredItemWithUUID:(NSString *)uuid fileURL:(NSURL *)fileURL
+{
+    if (_discoveredItems == nil) {
+        _discoveredItems = [NSMutableDictionary dictionary];
+    }
+    _discoveredItems[uuid] = fileURL;
+}
+
+- (void)addModifiedItemWithUUID:(NSString *)uuid fileURL:(NSURL *)fileURL
+{
+    if (_modifiedItems == nil) {
+        _modifiedItems = [NSMutableDictionary dictionary];
+    }
+    _modifiedItems[uuid] = fileURL;
+}
+
+- (void)addDeletedItemWithUUID:(NSString *)uuid fileURL:(NSURL *)fileURL
+{
+    if (_deletedItems == nil) {
+        _deletedItems = [NSMutableDictionary dictionary];
+    }
+    _deletedItems[uuid] = fileURL;
+}
+
+- (void)addMovedItemWithUUID:(NSString *)uuid
+                  oldFileURL:(NSURL *)oldFileURL
+                  newFileURL:(NSURL *)newFileURL
+{
+    if (_movedItems == nil) {
+        _movedItems = [NSMutableDictionary dictionary];
+    }
+    _movedItems[uuid] = @[oldFileURL, newFileURL];
+}
 
 @end

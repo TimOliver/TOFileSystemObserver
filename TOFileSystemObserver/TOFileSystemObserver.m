@@ -32,6 +32,7 @@
 #import "TOFileSystemNotificationToken.h"
 #import "TOFileSystemNotificationToken+Private.h"
 #import "TOFileSystemObserverConstants.h"
+#import "TOFileSystemChanges+Private.h"
 
 #import "NSURL+TOFileSystemUUID.h"
 
@@ -405,8 +406,11 @@ static TOFileSystemObserver *_sharedObserver = nil;
         // If this is a new item that belongs to an existing list, append it
         TOFileSystemItemList *parentList = self.itemListTable[parentUUID];
         if (parentList) { [parentList addItemWithUUID:uuid itemURL:itemURL]; }
-        
-        // TODO: Add broadcast notifications
+       
+        // Broadcast this event to all of the observers.
+        TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
+        [changes addDiscoveredItemWithUUID:uuid fileURL:itemURL];
+        [self postNotificationsWithChanges:changes];
     };
     [[NSOperationQueue mainQueue] addOperationWithBlock:mainBlock];
 }
@@ -421,7 +425,10 @@ static TOFileSystemObserver *_sharedObserver = nil;
     [self refreshParentItemWithUUID:parentUUID];
     
     id mainBlock = ^{
-
+        // Broadcast this event to all of the observers.
+        TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
+        [changes addModifiedItemWithUUID:uuid fileURL:itemURL];
+        [self postNotificationsWithChanges:changes];
     };
     [[NSOperationQueue mainQueue] addOperationWithBlock:mainBlock];
 }
@@ -457,7 +464,10 @@ static TOFileSystemObserver *_sharedObserver = nil;
         TOFileSystemItemList *newList = self.itemListTable[newParentUUID];
         [newList addItemWithUUID:uuid itemURL:url];
         
-        // TODO: Add broadcast notifications
+        // Broadcast this event to all of the observers.
+        TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
+        [changes addMovedItemWithUUID:uuid oldFileURL:previousURL newFileURL:url];
+        [self postNotificationsWithChanges:changes];
     };
     [[NSOperationQueue mainQueue] addOperationWithBlock:mainBlock];
 }
@@ -479,7 +489,10 @@ static TOFileSystemObserver *_sharedObserver = nil;
         TOFileSystemItem *listItem = self.itemTable[parentUUID];
         [listItem refreshWithURL:nil];
         
-        // TODO: Add broadcast notifications
+        // Broadcast this event to all of the observers.
+        TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
+        [changes addDeletedItemWithUUID:uuid fileURL:itemURL];
+        [self postNotificationsWithChanges:changes];
     };
     [[NSOperationQueue mainQueue] addOperationWithBlock:mainBlock];
 }
@@ -542,7 +555,25 @@ static TOFileSystemObserver *_sharedObserver = nil;
 
 - (void)postNotificationsWithChanges:(TOFileSystemChanges *)changes
 {
+    if (!self.broadcastsNotifications && self.notificationTokens.count == 0) {
+        return;
+    }
     
+    // Perform the Notification Center broadcast
+    if (self.broadcastsNotifications) {
+        NSDictionary *userInfo = [self userInfoDictionaryWithChanges:changes];
+        [[NSNotificationCenter defaultCenter] postNotificationName:TOFileSystemObserverDidChangeNotification
+                                                            object:nil
+                                                          userInfo:userInfo];
+    }
+    
+    // Inform all notification tokens registered
+    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+        TOFileSystemObserverCallBlock(token.notificationBlock,
+                                      self,
+                                      TOFileSystemObserverNotificationTypeDidChange,
+                                      changes);
+    }
 }
 
 @end

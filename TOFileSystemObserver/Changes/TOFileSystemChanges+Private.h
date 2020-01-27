@@ -22,11 +22,26 @@
 
 #import <Foundation/Foundation.h>
 
+#import "TOFileSystemChanges.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TOFileSystemChanges (Private)
 
+/** Create a new instance. */
+- (instancetype)initWithFileSystemObserver:(TOFileSystemObserver *)fileSystemObserver;
 
+/** Add a new discovered item to the list. */
+- (void)addDiscoveredItemWithUUID:(NSString *)uuid fileURL:(NSURL *)fileURL;
+
+/** Add a new discovered item to the list. */
+- (void)addModifiedItemWithUUID:(NSString *)uuid fileURL:(NSURL *)fileURL;
+
+/** Add a new discovered item to the list. */
+- (void)addDeletedItemWithUUID:(NSString *)uuid fileURL:(NSURL *)fileURL;
+
+/** Add a new discovered item to the list. */
+- (void)addMovedItemWithUUID:(NSString *)uuid oldFileURL:(NSURL *)oldFileURL newFileURL:(NSURL *)newFileURL;
 
 @end
 

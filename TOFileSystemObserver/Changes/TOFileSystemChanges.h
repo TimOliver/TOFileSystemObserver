@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
  The dictionary key is the unique UUID string assigned to the file on disk, and the value
  is the absolute file path URL to the file on disk.
  */
-@property (nonatomic, readonly) NSDictionary<NSString *, NSURL *> *discoveredItems;
+@property (nonatomic, readonly, nullable) NSDictionary<NSString *, NSURL *> *discoveredItems;
 
 /**
  A dictionary of items that were noted to have had changed during this app session.
@@ -59,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
  The dictionary key is the unique UUID string assigned to the file on disk, and the value
  is the absolute file path URL to the file on disk.
  */
-@property (nonatomic, readonly) NSDictionary<NSString *, NSURL *> *updatedItems;
+@property (nonatomic, readonly, nullable) NSDictionary<NSString *, NSURL *> *modifiedItems;
 
 /**
  A dictionary of items that were noted to have been deleted during this app session.
@@ -67,7 +67,7 @@ NS_ASSUME_NONNULL_BEGIN
  The dictionary key is the unique UUID string assigned to the file on disk, and the value
  is the absolute file path URL to the file on disk.
  */
-@property (nonatomic, readonly) NSDictionary<NSString *, NSURL *> *deletedItems;
+@property (nonatomic, readonly, nullable) NSDictionary<NSString *, NSURL *> *deletedItems;
 
 /**
  A dictionary of items that were noted to have moved during this app session.
@@ -75,7 +75,7 @@ NS_ASSUME_NONNULL_BEGIN
  The dictionary key is the unique UUID string assigned to the file on disk, and the value
  is a 2-element array where the first value is the previous URL and the second is the new URL.
  */
-@property (nonatomic, readonly) NSDictionary<NSString *, NSArray *> *movedItems;
+@property (nonatomic, readonly, nullable) NSDictionary<NSString *, NSArray *> *movedItems;
 
 @end
 
