@@ -32,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
  Whenever an item list detects a change has happened, it will
  trigger a notification block and provide an instance of this class.
  */
+
+NS_SWIFT_NAME(FileSystemListChanges)
 @interface TOFileSystemItemListChanges : NSObject
 
 /** State check to see if there are any pending movements. */

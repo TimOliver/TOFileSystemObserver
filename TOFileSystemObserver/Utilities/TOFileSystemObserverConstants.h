@@ -37,12 +37,17 @@ typedef NS_ENUM(NSInteger, TOFileSystemObserverNotificationType) {
 } NS_SWIFT_NAME(FileSystemObserver.NotificationType);
 
 /** The different options for ordering item lists */
-NS_SWIFT_NAME(FileSystemItemListOrder)
 typedef NS_ENUM(NSInteger, TOFileSystemItemListOrder) {
     TOFileSystemItemListOrderAlphanumeric,  // Alphanumeric ordering
     TOFileSystemItemListOrderDate,          // Creation date
     TOFileSystemItemListOrderSize           // File size
-};
+} NS_SWIFT_NAME(FileSystemItemListOrder);
+
+// The different types of items stored in the file system
+typedef NS_ENUM(NSInteger, TOFileSystemItemType) {
+    TOFileSystemItemTypeFile, // A standard file
+    TOFileSystemItemTypeDirectory // A folder
+} NS_SWIFT_NAME(FileSystemItemType);
 
 /** Whenever a scan event occurs, all registered notification blocks will be called with the change information. */
 typedef void (^TOFileSystemNotificationBlock)(TOFileSystemObserver * _Nonnull observer,

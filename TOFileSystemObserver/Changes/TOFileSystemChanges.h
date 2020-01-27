@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
  have subscribed. The specific changes that were detected
  will be contained in an instance of this class.
  */
+NS_SWIFT_NAME(FileSystemChanges)
 @interface TOFileSystemChanges : NSObject
 
 /** The observer from where these changes were broadcasted. */

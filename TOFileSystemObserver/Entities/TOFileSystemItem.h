@@ -21,12 +21,7 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
-
-// The different types of items stored in the file system
-typedef NS_ENUM(NSInteger, TOFileSystemItemType) {
-    TOFileSystemItemTypeFile, // A standard file
-    TOFileSystemItemTypeDirectory // A folder
-};
+#import "TOFileSystemObserverConstants.h"
 
 @class TOFileSystemObserver;
 @class TOFileSystemItemList;

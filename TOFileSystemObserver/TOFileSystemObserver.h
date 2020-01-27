@@ -137,4 +137,7 @@ NS_SWIFT_NAME(FileSystemObserver)
 
 @end
 
+FOUNDATION_EXPORT double TOFileSystemObserverVersionNumber;
+FOUNDATION_EXPORT const unsigned char TOFileSystemObserverVersionString[];
+
 NS_ASSUME_NONNULL_END
