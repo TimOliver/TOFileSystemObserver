@@ -76,4 +76,10 @@
     _movedItems[uuid] = @[oldFileURL, newFileURL];
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"Discovered items: %@\nModified items: %@\nDeleted Items: %@\nMoved items: %@\n",
+            self.discoveredItems, self.modifiedItems, self.deletedItems, self.movedItems];
+}
+
 @end
