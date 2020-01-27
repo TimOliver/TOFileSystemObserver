@@ -34,6 +34,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface NSURL (TOFileSystemUUID)
 
+/** Changes the prefix of the key name under which the UUID is saved.*/
++ (void)to_setKeyNamePrefix:(NSString *)prefix;
+
 /** Returns the unique UUID value assigned to this file. */
 - (nullable NSString *)to_fileSystemUUID;
 

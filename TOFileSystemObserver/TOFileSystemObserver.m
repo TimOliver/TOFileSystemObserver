@@ -143,6 +143,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
     // Set-up default property values
     _isRunning = NO;
     _excludedItems = @[@"Inbox"];
+    _includedDirectoryLevels = -1;
     
     // Set-up the operation queue
     _operationQueue = [[NSOperationQueue alloc] init];
@@ -158,6 +159,10 @@ static TOFileSystemObserver *_sharedObserver = nil;
     
     // Set up the stores for tracking items
     _allItems = [[TOFileSystemItemURLDictionary alloc] initWithBaseURL:self.directoryURL];
+    
+    // Change the UUID key name to match our app (for better visibility)
+    NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+    [NSURL to_setKeyNamePrefix:bundleIdentifier];
 }
 
 #pragma mark - Observer Setup -
@@ -402,15 +407,15 @@ static TOFileSystemObserver *_sharedObserver = nil;
     [self refreshItemAtURL:itemURL uuid:uuid];
     [self refreshParentItemWithUUID:parentUUID];
     
+    // Broadcast this event to all of the observers.
+    TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
+    [changes addDiscoveredItemWithUUID:uuid fileURL:itemURL];
+    [self postNotificationsWithChanges:changes];
+    
     id mainBlock = ^{
         // If this is a new item that belongs to an existing list, append it
         TOFileSystemItemList *parentList = self.itemListTable[parentUUID];
         if (parentList) { [parentList addItemWithUUID:uuid itemURL:itemURL]; }
-       
-        // Broadcast this event to all of the observers.
-        TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
-        [changes addDiscoveredItemWithUUID:uuid fileURL:itemURL];
-        [self postNotificationsWithChanges:changes];
     };
     [[NSOperationQueue mainQueue] addOperationWithBlock:mainBlock];
 }
@@ -424,13 +429,10 @@ static TOFileSystemObserver *_sharedObserver = nil;
     [self refreshItemAtURL:itemURL uuid:uuid];
     [self refreshParentItemWithUUID:parentUUID];
     
-    id mainBlock = ^{
-        // Broadcast this event to all of the observers.
-        TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
-        [changes addModifiedItemWithUUID:uuid fileURL:itemURL];
-        [self postNotificationsWithChanges:changes];
-    };
-    [[NSOperationQueue mainQueue] addOperationWithBlock:mainBlock];
+    // Broadcast this event to all of the observers.
+    TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
+    [changes addModifiedItemWithUUID:uuid fileURL:itemURL];
+    [self postNotificationsWithChanges:changes];
 }
 
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
@@ -455,6 +457,11 @@ static TOFileSystemObserver *_sharedObserver = nil;
     [self refreshParentItemWithUUID:oldParentUUID];
     [self refreshParentItemWithUUID:newParentUUID];
 
+    // Broadcast this event to all of the observers.
+    TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
+    [changes addMovedItemWithUUID:uuid oldFileURL:previousURL newFileURL:url];
+    [self postNotificationsWithChanges:changes];
+    
     id mainBlock = ^{
         // If the item used to be in a list item, remove it from that list
         TOFileSystemItemList *oldList = self.itemListTable[oldParentUUID];
@@ -463,11 +470,6 @@ static TOFileSystemObserver *_sharedObserver = nil;
         // If the destination also had a list, append it to that list
         TOFileSystemItemList *newList = self.itemListTable[newParentUUID];
         [newList addItemWithUUID:uuid itemURL:url];
-        
-        // Broadcast this event to all of the observers.
-        TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
-        [changes addMovedItemWithUUID:uuid oldFileURL:previousURL newFileURL:url];
-        [self postNotificationsWithChanges:changes];
     };
     [[NSOperationQueue mainQueue] addOperationWithBlock:mainBlock];
 }
@@ -477,6 +479,11 @@ static TOFileSystemObserver *_sharedObserver = nil;
              withUUID:(NSString *)uuid
 {
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];
+    
+    // Broadcast this event to all of the observers.
+    TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
+    [changes addDeletedItemWithUUID:uuid fileURL:itemURL];
+    [self postNotificationsWithChanges:changes];
     
     id mainBlock = ^{
         // If we have this item in memory, remove it from everywhere
@@ -488,11 +495,6 @@ static TOFileSystemObserver *_sharedObserver = nil;
         // If this item is a child of a list, update that list
         TOFileSystemItem *listItem = self.itemTable[parentUUID];
         [listItem refreshWithURL:nil];
-        
-        // Broadcast this event to all of the observers.
-        TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
-        [changes addDeletedItemWithUUID:uuid fileURL:itemURL];
-        [self postNotificationsWithChanges:changes];
     };
     [[NSOperationQueue mainQueue] addOperationWithBlock:mainBlock];
 }

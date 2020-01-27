@@ -23,9 +23,14 @@
 #import "NSURL+TOFileSystemUUID.h"
 #import <sys/xattr.h>
 
-static NSString * const kTOFileSystemAttributeKey = @"dev.tim.fileSystemObserver.UUID";
+static NSString *kTOFileSystemAttributeKey = @"dev.tim.fileSystemObserver.UUID";
 
 @implementation NSURL (TOFileSystemUUID)
+
++ (void)to_setKeyNamePrefix:(NSString *)prefix
+{
+    kTOFileSystemAttributeKey = [NSString stringWithFormat:@"%@.fileSystemObserver.UUID", prefix];
+}
 
 - (NSString *)to_fileSystemUUID
 {
