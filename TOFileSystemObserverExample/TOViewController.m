@@ -16,6 +16,7 @@
 @property (nonatomic, strong) TOFileSystemObserver *observer;
 @property (nonatomic, strong) TOFileSystemItemList *fileItemList;
 @property (nonatomic, strong) TOFileSystemNotificationToken *listToken;
+@property (nonatomic, strong) TOFileSystemNotificationToken *observerToken;
 
 @end
 
@@ -38,6 +39,23 @@
                                                                TOFileSystemItemListChanges *changes)
     {
         TOFileSystemItemListUpdateTableView(weakSelf.tableView, changes, 0);
+    }];
+    
+    self.observerToken = [self.observer addNotificationBlock:^(TOFileSystemObserver *observer,
+                                                               TOFileSystemObserverNotificationType type,
+                                                               TOFileSystemChanges *changes)
+    {
+        if (type == TOFileSystemObserverNotificationTypeWillBeginFullScan) {
+            NSLog(@"Scan Will Start!");
+            return;
+        }
+        
+        if (type == TOFileSystemObserverNotificationTypeDidCompleteFullScan) {
+            NSLog(@"Scan Complete!");
+            return;
+        }
+        
+        NSLog(@"%@", changes);
     }];
     
     // Add test button for flipping direction
