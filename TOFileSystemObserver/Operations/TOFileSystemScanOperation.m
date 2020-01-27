@@ -54,13 +54,16 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 /** A store for items that have disappeared inside this operation, either deleted or moved. */
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSURL *> *missingItems;
 
+/** A check to see if we are performing a full scan, or just focusing on one or two items. */
+@property (nonatomic, readonly) BOOL isFullScan;
+
 @end
 
 @implementation TOFileSystemScanOperation
 
 #pragma - Class Lifecycle -
 
-- (instancetype)initWithDirectoryAtURL:(NSURL *)directoryURL
+- (instancetype)initForFullScanWithDirectoryAtURL:(NSURL *)directoryURL
                     allItemsDictionary:(nonnull TOFileSystemItemURLDictionary *)allItems
                          filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
 {
@@ -75,7 +78,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     return self;
 }
 
-- (instancetype)initWithItemURLs:(NSArray<NSURL *> *)itemURLs
+- (instancetype)initForItemScanWithItemURLs:(NSArray<NSURL *> *)itemURLs
               allItemsDictionary:(nonnull TOFileSystemItemURLDictionary *)allItems
                    filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
 {
@@ -109,7 +112,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     // Depending on if a base directory,
     // or a flat list of files was provided, perform
     // different scan patterns
-    if (self.directoryURL) {
+    if (self.isFullScan) {
         [self scanAllSubdirectoriesFromBaseURL];
     }
     else if (self.itemURLs) {
@@ -125,6 +128,9 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     NSArray *childItemURLs = [self.fileManager to_fileSystemEnumeratorForDirectoryAtURL:self.directoryURL].allObjects;
     if (childItemURLs.count == 0) { return; }
 
+    // Post the "will begin" notification
+    [self.delegate scanOperationWillBeginFullScan:self];
+    
     // Scan all of the items in the base directory
     for (NSURL *url in childItemURLs) {
         [self scanItemAtURL:url.URLByStandardizingPath
@@ -375,6 +381,11 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     }
 
     return MAX(levels, -1);
+}
+
+- (BOOL)isFullScan
+{
+    return (self.directoryURL != nil);
 }
 
 @end
