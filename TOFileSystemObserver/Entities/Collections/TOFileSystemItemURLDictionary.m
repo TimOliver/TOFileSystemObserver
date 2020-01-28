@@ -131,10 +131,9 @@
 {
     if (uuid == nil) { return; }
     
-    NSURL *url = self.uuidItems[uuid];
-    if (url == nil) { return; }
-    
     dispatch_barrier_async(self.itemQueue, ^{
+        NSURL *url = self.uuidItems[uuid];
+        if (url == nil) { return; }
         [self.urlItems removeObjectForKey:url];
         [self.uuidItems removeObjectForKey:uuid];
     });
