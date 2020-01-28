@@ -41,13 +41,13 @@ typedef NS_ENUM(NSInteger, TOFileSystemItemListOrder) {
     TOFileSystemItemListOrderAlphanumeric,  // Alphanumeric ordering
     TOFileSystemItemListOrderDate,          // Creation date
     TOFileSystemItemListOrderSize           // File size
-} NS_SWIFT_NAME(FileSystemItemListOrder);
+} NS_SWIFT_NAME(FileSystemItemList.Order);
 
 // The different types of items stored in the file system
 typedef NS_ENUM(NSInteger, TOFileSystemItemType) {
     TOFileSystemItemTypeFile, // A standard file
     TOFileSystemItemTypeDirectory // A folder
-} NS_SWIFT_NAME(FileSystemItemType);
+} NS_SWIFT_NAME(FileSystemItem.Type);
 
 /** Whenever a scan event occurs, all registered notification blocks will be called with the change information. */
 typedef void (^TOFileSystemNotificationBlock)(TOFileSystemObserver * _Nonnull observer,
@@ -57,7 +57,8 @@ typedef void (^TOFileSystemNotificationBlock)(TOFileSystemObserver * _Nonnull ob
 
 /** A block that may be registered in order to observe when items in the list change. */
 typedef void (^TOFileSystemItemListNotificationBlock)(TOFileSystemItemList * _Nonnull itemList,
-                                                      TOFileSystemItemListChanges * _Nullable changes);
+                                                      TOFileSystemItemListChanges * _Nullable changes)
+                                                        NS_SWIFT_NAME(FileSystemItemListNotificationBlock);
 
 /**
  A notification that will be broadcast before a full file system scan starts.
