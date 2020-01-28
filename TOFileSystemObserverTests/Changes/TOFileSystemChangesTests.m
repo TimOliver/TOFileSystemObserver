@@ -29,6 +29,7 @@
     self.url = [NSURL fileURLWithPath:@"/Documents"];
     self.uuid = @"0256d425-f081-4bc3-8db5-bcb158568abb";
     
+    // Create test objects
     self.observer = [[TOFileSystemObserver alloc] init];
     self.changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self.observer];
 }
@@ -48,24 +49,28 @@
 
 - (void)testDiscoveries
 {
+    // Test we can properly retrieve discovered items that were added
     [self.changes addDiscoveredItemWithUUID:self.uuid fileURL:self.url];
     XCTAssert(self.changes.discoveredItems[self.uuid] == self.url);
 }
 
 - (void)testModifications
 {
+    // Test we can properly retrieve modified items that were added
     [self.changes addModifiedItemWithUUID:self.uuid fileURL:self.url];
     XCTAssert(self.changes.modifiedItems[self.uuid] == self.url);
 }
 
 - (void)testDeletions
 {
+    // Test we can properly retrieve deleted items that were added
     [self.changes addDeletedItemWithUUID:self.uuid fileURL:self.url];
     XCTAssert(self.changes.deletedItems[self.uuid] == self.url);
 }
 
 - (void)testMovedItems
 {
+    // Test we can properly retrieve moved items that were added
     NSURL *newURL = [NSURL fileURLWithPath:@"/Documents/Folder"];
     [self.changes addMovedItemWithUUID:self.uuid oldFileURL:self.url newFileURL:newURL];
     XCTAssert(self.changes.movedItems[self.uuid].firstObject == self.url);
