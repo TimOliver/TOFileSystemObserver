@@ -58,9 +58,7 @@
 - (void)setItem:(id)object forUUID:(NSString *)uuid
 {
     dispatch_barrier_async(self.dispatchQueue, ^{
-        @autoreleasepool {
-            [self.mapTable setObject:object forKey:uuid];
-        }
+        [self.mapTable setObject:object forKey:uuid];
     });
 }
 
@@ -79,9 +77,7 @@
 - (void)removeItemForUUID:(NSString *)uuid
 {
     dispatch_barrier_async(self.dispatchQueue, ^{
-        @autoreleasepool {
-            [self.mapTable removeObjectForKey:uuid];
-        }
+        [self.mapTable removeObjectForKey:uuid];
     });
 }
 
