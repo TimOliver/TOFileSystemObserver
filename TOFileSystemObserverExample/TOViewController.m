@@ -151,7 +151,8 @@
         }
         else {
             cell.accessoryType = UITableViewCellAccessoryNone;
-            cell.detailTextLabel.text = @"File";
+            cell.detailTextLabel.text = [NSByteCountFormatter stringFromByteCount:fileItem.size
+                                                                       countStyle:NSByteCountFormatterCountStyleFile];
             cell.imageView.image = self.fileIcon;
             
             UIEdgeInsets insets = cell.layoutMargins;
