@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2225238E23DFF2E400032C10 /* TOFileSystemChangesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2225238D23DFF2E400032C10 /* TOFileSystemChangesTests.m */; };
 		2225239223DFFC9C00032C10 /* TOFileSystemItemURLDictionaryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2225239123DFFC9C00032C10 /* TOFileSystemItemURLDictionaryTests.m */; };
+		2225239423E00A7000032C10 /* TOFileSystemItemMapTableTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2225239323E00A7000032C10 /* TOFileSystemItemMapTableTests.m */; };
 		2232B64C233F6C1800358B05 /* TOFileSystemNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232B64B233F6C1800358B05 /* TOFileSystemNotificationToken.m */; };
 		223A893D233F13CA008FFE1A /* TOAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A893C233F13CA008FFE1A /* TOAppDelegate.m */; };
 		223A8943233F13CA008FFE1A /* TOViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A8942233F13CA008FFE1A /* TOViewController.m */; };
@@ -94,6 +95,7 @@
 		2206C80723C9BECA009FD5DD /* TOFileSystemObserver+UIKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TOFileSystemObserver+UIKit.h"; sourceTree = "<group>"; };
 		2225238D23DFF2E400032C10 /* TOFileSystemChangesTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemChangesTests.m; sourceTree = "<group>"; };
 		2225239123DFFC9C00032C10 /* TOFileSystemItemURLDictionaryTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemItemURLDictionaryTests.m; sourceTree = "<group>"; };
+		2225239323E00A7000032C10 /* TOFileSystemItemMapTableTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemItemMapTableTests.m; sourceTree = "<group>"; };
 		2232B64A233F6C1800358B05 /* TOFileSystemNotificationToken.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemNotificationToken.h; sourceTree = "<group>"; };
 		2232B64B233F6C1800358B05 /* TOFileSystemNotificationToken.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemNotificationToken.m; sourceTree = "<group>"; };
 		223A8938233F13CA008FFE1A /* TOFileSystemObserverExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TOFileSystemObserverExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -334,6 +336,7 @@
 				2225238D23DFF2E400032C10 /* TOFileSystemChangesTests.m */,
 				22C7FEAB23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m */,
 				2225239123DFFC9C00032C10 /* TOFileSystemItemURLDictionaryTests.m */,
+				2225239323E00A7000032C10 /* TOFileSystemItemMapTableTests.m */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -558,6 +561,7 @@
 				22925B3F23D2991E00FC166C /* NSURL+TOFileSystemUUID.m in Sources */,
 				2225238E23DFF2E400032C10 /* TOFileSystemChangesTests.m in Sources */,
 				22DA1C1123D1947900AA8444 /* TOFileSystemUUIDTests.m in Sources */,
+				2225239423E00A7000032C10 /* TOFileSystemItemMapTableTests.m in Sources */,
 				22BC8D5923D8575A008A310D /* TOFileSystemItemListChangesTests.m in Sources */,
 				22925B4423D36D0000FC166C /* TOFileSystemEnumeratorTests.m in Sources */,
 				22925B4123D35E4600FC166C /* TOFileSystemFileAttributesTests.m in Sources */,

@@ -38,17 +38,29 @@
 {
     if (self = [super init]) {
         _mapTable = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsStrongMemory
-                                          valueOptions:NSMapTableWeakMemory];
+                                          valueOptions:NSPointerFunctionsWeakMemory];
         _dispatchQueue = dispatch_queue_create("TOFileSystemObserver.itemMapTable", DISPATCH_QUEUE_CONCURRENT);
     }
     
     return self;
 }
 
+- (NSInteger)count
+{
+    __block NSInteger count = 0;
+    dispatch_sync(self.dispatchQueue, ^{
+        count = self.mapTable.count;
+    });
+    
+    return count;
+}
+
 - (void)setItem:(id)object forUUID:(NSString *)uuid
 {
     dispatch_barrier_async(self.dispatchQueue, ^{
-        [self.mapTable setObject:object forKey:uuid];
+        @autoreleasepool {
+            [self.mapTable setObject:object forKey:uuid];
+        }
     });
 }
 
@@ -56,7 +68,9 @@
 {
     __block id item = nil;
     dispatch_sync(self.dispatchQueue, ^{
-        item = [self.mapTable objectForKey:uuid];
+        @autoreleasepool {
+            item = [self.mapTable objectForKey:uuid];
+        }
     });
     
     return item;
@@ -65,7 +79,9 @@
 - (void)removeItemForUUID:(NSString *)uuid
 {
     dispatch_barrier_async(self.dispatchQueue, ^{
-        [self.mapTable removeObjectForKey:uuid];
+        @autoreleasepool {
+            [self.mapTable removeObjectForKey:uuid];
+        }
     });
 }
 

@@ -31,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface TOFileSystemItemMapTable : NSObject<NSFastEnumeration>
 
+@property (nonatomic, readonly) NSInteger count;
+
 - (void)setItem:(id)object forUUID:(NSString *)uuid;
 - (id)itemForUUID:(NSString *)uuid;
 - (void)removeItemForUUID:(NSString *)uuid;
