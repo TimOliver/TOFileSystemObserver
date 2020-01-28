@@ -67,7 +67,6 @@
     XCTAssertNotNil(indexPath);
     XCTAssertEqual(indexPath.row, 1);
     XCTAssertEqual(indexPath.section, 1);
-
 }
 
 - (void)testModificationIndices
