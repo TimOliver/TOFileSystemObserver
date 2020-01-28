@@ -35,18 +35,6 @@
     return [fileManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].lastObject;
 }
 
-+ (NSURL *)cachesDirectoryURL
-{
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    return [fileManager URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask].lastObject;
-}
-
-+ (NSString *)defaultDatabaseFileName
-{
-    NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
-    return [NSString stringWithFormat:@"%@.fileSystemSnapshots.realm", bundleIdentifier];
-}
-
 + (NSString *)relativePathWithPath:(NSURL *)fileURL
 {
     NSString *sandboxPath = [TOFileSystemPath applicationSandboxURL].path;
