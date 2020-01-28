@@ -57,7 +57,12 @@
 
 - (NSUInteger)count
 {
-    return self.uuidItems.count;
+    __block NSInteger count = 0;
+    dispatch_sync(self.itemQueue, ^{
+        count = self.uuidItems.count;
+    });
+    
+    return count;
 }
 
 - (void)setItemURL:(nullable NSURL *)itemURL forUUID:(nullable NSString *)uuid
@@ -66,21 +71,20 @@
     
     // If the item is nil, remove it from the store
     if (itemURL == nil) {
-        NSURL *url = self.uuidItems[uuid];
         dispatch_barrier_async(self.itemQueue, ^{
+            NSURL *url = self.uuidItems[uuid];
             [self.urlItems removeObjectForKey:url];
             [self.uuidItems removeObjectForKey:uuid];
         });
         return;
     }
     
-    // Remove the un-needed absolute path to save memory
-    NSURL *url = [self relativeURLForURL:itemURL];
-    
-    NSString *savedUUID = self.urlItems[url];
-    
     // Use dispatch barriers to block all reads when we mutate the dictionary
     dispatch_barrier_async(self.itemQueue, ^{
+        // Remove the un-needed absolute path to save memory
+        NSURL *url = [self relativeURLForURL:itemURL];
+        NSString *savedUUID = self.urlItems[url];
+        
         // Clean out any stale data still in there
         if (savedUUID) { [self.uuidItems removeObjectForKey:savedUUID]; }
         if (url) { [self.urlItems removeObjectForKey:url]; }
