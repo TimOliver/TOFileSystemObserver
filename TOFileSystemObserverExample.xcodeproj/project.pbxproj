@@ -183,6 +183,30 @@
 			path = Utilities;
 			sourceTree = "<group>";
 		};
+		2225238F23DFF9F400032C10 /* Items */ = {
+			isa = PBXGroup;
+			children = (
+				22ADAEBA237815DA0088D31E /* TOFileSystemItemList.h */,
+				22ADAEC3237AD24E0088D31E /* TOFileSystemItemList+Private.h */,
+				22ADAEBB237815DA0088D31E /* TOFileSystemItemList.m */,
+				223A8959233F4B3B008FFE1A /* TOFileSystemItem.h */,
+				22ADAEC1237AD1A40088D31E /* TOFileSystemItem+Private.h */,
+				223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */,
+			);
+			path = Items;
+			sourceTree = "<group>";
+		};
+		2225239023DFFA3A00032C10 /* Scanning */ = {
+			isa = PBXGroup;
+			children = (
+				22D601C723657FA500275AD9 /* TOFileSystemPresenter.h */,
+				22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */,
+				2254ED2C2340F04800331B47 /* TOFileSystemScanOperation.h */,
+				2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */,
+			);
+			path = Scanning;
+			sourceTree = "<group>";
+		};
 		2232B649233F6BF900358B05 /* Notifications */ = {
 			isa = PBXGroup;
 			children = (
@@ -250,13 +274,8 @@
 				223A8955233F4AB0008FFE1A /* TOFileSystemObserver.h */,
 				223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */,
 				2254ED392341060000331B47 /* Categories */,
-				2232B651233FAFC000358B05 /* Changes */,
-				22F4E42C23CC974400F7EEC6 /* Collections */,
 				223A8958233F4AB5008FFE1A /* Entities */,
-				22D601C623657F5B00275AD9 /* FilePresenter */,
-				2254ED27234055BB00331B47 /* FilePaths */,
-				2232B649233F6BF900358B05 /* Notifications */,
-				2254ED2B2340EF0F00331B47 /* Operations */,
+				2225239023DFFA3A00032C10 /* Scanning */,
 				2206C80A23C9BFDF009FD5DD /* Utilities */,
 			);
 			path = TOFileSystemObserver;
@@ -265,12 +284,11 @@
 		223A8958233F4AB5008FFE1A /* Entities */ = {
 			isa = PBXGroup;
 			children = (
-				22ADAEBA237815DA0088D31E /* TOFileSystemItemList.h */,
-				22ADAEC3237AD24E0088D31E /* TOFileSystemItemList+Private.h */,
-				22ADAEBB237815DA0088D31E /* TOFileSystemItemList.m */,
-				223A8959233F4B3B008FFE1A /* TOFileSystemItem.h */,
-				22ADAEC1237AD1A40088D31E /* TOFileSystemItem+Private.h */,
-				223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */,
+				2232B651233FAFC000358B05 /* Changes */,
+				22F4E42C23CC974400F7EEC6 /* Collections */,
+				2254ED27234055BB00331B47 /* FilePaths */,
+				2232B649233F6BF900358B05 /* Notifications */,
+				2225238F23DFF9F400032C10 /* Items */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -282,15 +300,6 @@
 				2254ED292340588F00331B47 /* TOFileSystemPath.m */,
 			);
 			path = FilePaths;
-			sourceTree = "<group>";
-		};
-		2254ED2B2340EF0F00331B47 /* Operations */ = {
-			isa = PBXGroup;
-			children = (
-				2254ED2C2340F04800331B47 /* TOFileSystemScanOperation.h */,
-				2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */,
-			);
-			path = Operations;
 			sourceTree = "<group>";
 		};
 		2254ED392341060000331B47 /* Categories */ = {
@@ -310,8 +319,8 @@
 			isa = PBXGroup;
 			children = (
 				22925B4023D35E4600FC166C /* TOFileSystemFileAttributesTests.m */,
-				22925B4323D36D0000FC166C /* TOFileSystemEnumeratorTests.m */,
 				22DA1C1023D1947900AA8444 /* TOFileSystemUUIDTests.m */,
+				22925B4323D36D0000FC166C /* TOFileSystemEnumeratorTests.m */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -336,21 +345,12 @@
 		22C7FEA223B5E70E0017CABD /* TOFileSystemObserverTests */ = {
 			isa = PBXGroup;
 			children = (
-				22925B4723D3701100FC166C /* Entities */,
 				22925B4623D36FFB00FC166C /* Categories */,
 				22BC8D5723D85705008A310D /* Changes */,
+				22925B4723D3701100FC166C /* Entities */,
 				22C7FEA523B5E70E0017CABD /* Info.plist */,
 			);
 			path = TOFileSystemObserverTests;
-			sourceTree = "<group>";
-		};
-		22D601C623657F5B00275AD9 /* FilePresenter */ = {
-			isa = PBXGroup;
-			children = (
-				22D601C723657FA500275AD9 /* TOFileSystemPresenter.h */,
-				22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */,
-			);
-			path = FilePresenter;
 			sourceTree = "<group>";
 		};
 		22F4E42C23CC974400F7EEC6 /* Collections */ = {

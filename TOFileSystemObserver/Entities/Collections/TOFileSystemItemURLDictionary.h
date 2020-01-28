@@ -31,6 +31,9 @@ NS_ASSUME_NONNULL_BEGIN
  This is used to store an in-memory graph of all of the files
  as they were at the start of the app session, so that any
  detected changes to the file system can be compared.
+ 
+ The URLs are converted to and stored as relative URLs to
+ save memory, and are converted back to absolute URLs when retrieved.
  */
 @interface TOFileSystemItemURLDictionary : NSObject
 
@@ -52,7 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** Delete an entry from the store. */
 - (void)removeItemURLForUUID:(NSString *)uuid;
 
-/** Remove all items */
+/** Remove all items. */
 - (void)removeAllItems;
 
 /** Implementations for allowing dictionary style literal syntax. */
