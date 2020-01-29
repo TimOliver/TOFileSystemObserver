@@ -231,7 +231,7 @@
     return objectValue;
 }
 
-- (NSInteger)fetchValueForInteger:(NSString *)integerName
+- (long long)fetchValueForInteger:(NSString *)integerName
 {
     __block long long intValue = 0;
     dispatch_sync(self.barrierQueue, ^{
