@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface TOFileSystemNotificationToken (Private)
+@interface TOFileSystemNotificationToken ()
 
 /** The object for which this token was generated from. */
 @property (nonatomic, weak, readwrite) id<TOFileSystemNotifying> observingObject;

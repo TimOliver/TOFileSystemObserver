@@ -25,7 +25,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface TOFileSystemItemListChanges (Private)
+@interface TOFileSystemItemListChanges ()
 
 /** Add the index of an item to be deleted. */
 - (void)addDeletionIndex:(NSInteger)index;

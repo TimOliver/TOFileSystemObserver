@@ -29,7 +29,7 @@
 #import "NSURL+TOFileSystemUUID.h"
 
 /** Private interface to expose the file presenter for coordinated writes. */
-@interface TOFileSystemObserver (Private)
+@interface TOFileSystemObserver ()
 @property (nonatomic, readonly) TOFileSystemPresenter *fileSystemPresenter;
 @end
 

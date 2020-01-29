@@ -28,7 +28,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /** Private interface for creating item objects */
-@interface TOFileSystemItem (Private)
+@interface TOFileSystemItem ()
 
 /** Creates a new instance of an item for the target item. */
 - (instancetype)initWithItemAtFileURL:(NSURL *)fileURL

@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class TOFileSystemObserver;
 
 /** Private interface for creating item objects */
-@interface TOFileSystemItemList (Private)
+@interface TOFileSystemItemList ()
 
 /** Creates a new instance of an item for the target item. */
 - (instancetype)initWithDirectoryURL:(NSURL *)directoryURL
