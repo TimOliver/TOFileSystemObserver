@@ -10,75 +10,45 @@
 		2225238E23DFF2E400032C10 /* TOFileSystemChangesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2225238D23DFF2E400032C10 /* TOFileSystemChangesTests.m */; };
 		2225239223DFFC9C00032C10 /* TOFileSystemItemURLDictionaryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2225239123DFFC9C00032C10 /* TOFileSystemItemURLDictionaryTests.m */; };
 		2225239423E00A7000032C10 /* TOFileSystemItemMapTableTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2225239323E00A7000032C10 /* TOFileSystemItemMapTableTests.m */; };
-		2232B64C233F6C1800358B05 /* TOFileSystemNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232B64B233F6C1800358B05 /* TOFileSystemNotificationToken.m */; };
 		223A893D233F13CA008FFE1A /* TOAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A893C233F13CA008FFE1A /* TOAppDelegate.m */; };
 		223A8943233F13CA008FFE1A /* TOViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A8942233F13CA008FFE1A /* TOViewController.m */; };
 		223A8948233F13CA008FFE1A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 223A8947233F13CA008FFE1A /* Assets.xcassets */; };
 		223A894B233F13CA008FFE1A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 223A8949233F13CA008FFE1A /* LaunchScreen.storyboard */; };
 		223A894E233F13CA008FFE1A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A894D233F13CA008FFE1A /* main.m */; };
-		223A8957233F4AB0008FFE1A /* TOFileSystemObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */; };
-		22498E5923BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 22498E5823BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m */; };
-		2254ED2A2340588F00331B47 /* TOFileSystemPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED292340588F00331B47 /* TOFileSystemPath.m */; };
-		2254ED2E2340F04800331B47 /* TOFileSystemScanOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */; };
-		2254ED3C2341060000331B47 /* NSURL+TOFileSystemUUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */; };
-		22838BA623CF65F700CBE2FE /* TOFileSystemChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 22838BA523CF65F700CBE2FE /* TOFileSystemChanges.m */; };
+		22713F8423E1B14E005D12E2 /* TOFileSystemObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */; };
+		22713F8523E1B14E005D12E2 /* TOFileSystemItemListChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 229E0BA723C8503C0019937C /* TOFileSystemItemListChanges.m */; };
+		22713F8623E1B14E005D12E2 /* TOFileSystemChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 22838BA523CF65F700CBE2FE /* TOFileSystemChanges.m */; };
+		22713F8723E1B14E005D12E2 /* TOFileSystemItemMapTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F4E42A23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m */; };
+		22713F8823E1B14E005D12E2 /* TOFileSystemPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED292340588F00331B47 /* TOFileSystemPath.m */; };
+		22713F8923E1B14E005D12E2 /* TOFileSystemNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232B64B233F6C1800358B05 /* TOFileSystemNotificationToken.m */; };
+		22713F8A23E1B14E005D12E2 /* TOFileSystemItemList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBB237815DA0088D31E /* TOFileSystemItemList.m */; };
+		22713F8B23E1B14E005D12E2 /* TOFileSystemItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */; };
+		22713F8C23E1B14E005D12E2 /* TOFileSystemPresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */; };
+		22713F8D23E1B14E005D12E2 /* TOFileSystemScanOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */; };
+		22713FA323E1B4E7005D12E2 /* TOFileSystemObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */; };
+		22713FA423E1B4E7005D12E2 /* NSURL+TOFileSystemAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 22498E5823BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m */; };
+		22713FA523E1B4E7005D12E2 /* NSURL+TOFileSystemUUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */; };
+		22713FA623E1B4E7005D12E2 /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */; };
+		22713FA723E1B4E7005D12E2 /* TOFileSystemItemListChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 229E0BA723C8503C0019937C /* TOFileSystemItemListChanges.m */; };
+		22713FA823E1B4E7005D12E2 /* TOFileSystemChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 22838BA523CF65F700CBE2FE /* TOFileSystemChanges.m */; };
+		22713FA923E1B4E7005D12E2 /* TOFileSystemItemURLDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FE9B23B5BD120017CABD /* TOFileSystemItemURLDictionary.m */; };
+		22713FAA23E1B4E7005D12E2 /* TOFileSystemItemMapTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F4E42A23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m */; };
+		22713FAB23E1B4E7005D12E2 /* TOFileSystemPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED292340588F00331B47 /* TOFileSystemPath.m */; };
+		22713FAC23E1B4E7005D12E2 /* TOFileSystemNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232B64B233F6C1800358B05 /* TOFileSystemNotificationToken.m */; };
+		22713FAD23E1B4E7005D12E2 /* TOFileSystemItemList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBB237815DA0088D31E /* TOFileSystemItemList.m */; };
+		22713FAE23E1B4E7005D12E2 /* TOFileSystemItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */; };
+		22713FAF23E1B4E7005D12E2 /* TOFileSystemPresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */; };
+		22713FB023E1B4E7005D12E2 /* TOFileSystemScanOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */; };
 		22925B3F23D2991E00FC166C /* NSURL+TOFileSystemUUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */; };
 		22925B4123D35E4600FC166C /* TOFileSystemFileAttributesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22925B4023D35E4600FC166C /* TOFileSystemFileAttributesTests.m */; };
 		22925B4223D3613100FC166C /* NSURL+TOFileSystemAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 22498E5823BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m */; };
 		22925B4423D36D0000FC166C /* TOFileSystemEnumeratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22925B4323D36D0000FC166C /* TOFileSystemEnumeratorTests.m */; };
 		22925B4523D36D0D00FC166C /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */; };
-		229E0BA823C8503C0019937C /* TOFileSystemItemListChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 229E0BA723C8503C0019937C /* TOFileSystemItemListChanges.m */; };
-		22ADAEBC237815DA0088D31E /* TOFileSystemItemList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBB237815DA0088D31E /* TOFileSystemItemList.m */; };
-		22ADAEBD2378177F0088D31E /* TOFileSystemItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */; };
-		22ADAEC0237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */; };
 		22BC8D5923D8575A008A310D /* TOFileSystemItemListChangesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BC8D5823D8575A008A310D /* TOFileSystemItemListChangesTests.m */; };
-		22C7FE9C23B5BD120017CABD /* TOFileSystemItemURLDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FE9B23B5BD120017CABD /* TOFileSystemItemURLDictionary.m */; };
 		22C7FEAC23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FEAB23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m */; };
 		22C7FEAD23B5E74E0017CABD /* TOFileSystemItemURLDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FE9B23B5BD120017CABD /* TOFileSystemItemURLDictionary.m */; };
-		22D601C923657FA500275AD9 /* TOFileSystemPresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */; };
 		22DA1C1123D1947900AA8444 /* TOFileSystemUUIDTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DA1C1023D1947900AA8444 /* TOFileSystemUUIDTests.m */; };
-		22F4E42B23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F4E42A23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m */; };
 		22FF4EEB23DED9EE00B05C03 /* TOImages.m in Sources */ = {isa = PBXBuildFile; fileRef = 22FF4EEA23DED9EE00B05C03 /* TOImages.m */; };
-		22FF4EF523DEE1E400B05C03 /* TOFileSystemObserver.h in Headers */ = {isa = PBXBuildFile; fileRef = 22FF4EF323DEE1E400B05C03 /* TOFileSystemObserver.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		22FF4EFA23DEE20000B05C03 /* TOFileSystemObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */; };
-		22FF4EFC23DEE20000B05C03 /* NSURL+TOFileSystemAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 22498E5823BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m */; };
-		22FF4EFE23DEE20000B05C03 /* NSURL+TOFileSystemUUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */; };
-		22FF4F0023DEE20000B05C03 /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */; };
-		22FF4F0223DEE20000B05C03 /* TOFileSystemItemListChanges+Private.h in Sources */ = {isa = PBXBuildFile; fileRef = 229E0BA923C850510019937C /* TOFileSystemItemListChanges+Private.h */; };
-		22FF4F0323DEE20000B05C03 /* TOFileSystemItemListChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 229E0BA723C8503C0019937C /* TOFileSystemItemListChanges.m */; };
-		22FF4F0523DEE20000B05C03 /* TOFileSystemChanges+Private.h in Sources */ = {isa = PBXBuildFile; fileRef = 22DD02AD23D71A2C0000E69A /* TOFileSystemChanges+Private.h */; };
-		22FF4F0623DEE20000B05C03 /* TOFileSystemChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 22838BA523CF65F700CBE2FE /* TOFileSystemChanges.m */; };
-		22FF4F0823DEE20000B05C03 /* TOFileSystemItemURLDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FE9B23B5BD120017CABD /* TOFileSystemItemURLDictionary.m */; };
-		22FF4F0A23DEE20000B05C03 /* TOFileSystemItemMapTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F4E42A23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m */; };
-		22FF4F0C23DEE20000B05C03 /* TOFileSystemItemList+Private.h in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEC3237AD24E0088D31E /* TOFileSystemItemList+Private.h */; };
-		22FF4F0D23DEE20000B05C03 /* TOFileSystemItemList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBB237815DA0088D31E /* TOFileSystemItemList.m */; };
-		22FF4F0F23DEE20000B05C03 /* TOFileSystemItem+Private.h in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEC1237AD1A40088D31E /* TOFileSystemItem+Private.h */; };
-		22FF4F1023DEE20000B05C03 /* TOFileSystemItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */; };
-		22FF4F1223DEE20000B05C03 /* TOFileSystemPresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */; };
-		22FF4F1423DEE20000B05C03 /* TOFileSystemPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED292340588F00331B47 /* TOFileSystemPath.m */; };
-		22FF4F1623DEE20000B05C03 /* TOFileSystemNotificationToken+Private.h in Sources */ = {isa = PBXBuildFile; fileRef = 229E0BAA23C85ACD0019937C /* TOFileSystemNotificationToken+Private.h */; };
-		22FF4F1723DEE20000B05C03 /* TOFileSystemNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232B64B233F6C1800358B05 /* TOFileSystemNotificationToken.m */; };
-		22FF4F1923DEE20000B05C03 /* TOFileSystemScanOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */; };
-		22FF4F1C23DEE26800B05C03 /* TOFileSystemItemListChanges.h in Headers */ = {isa = PBXBuildFile; fileRef = 229E0BA623C8503C0019937C /* TOFileSystemItemListChanges.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		22FF4F1D23DEE26800B05C03 /* TOFileSystemChanges.h in Headers */ = {isa = PBXBuildFile; fileRef = 22838BA423CF65F700CBE2FE /* TOFileSystemChanges.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		22FF4F1E23DEE26800B05C03 /* TOFileSystemItemList.h in Headers */ = {isa = PBXBuildFile; fileRef = 22ADAEBA237815DA0088D31E /* TOFileSystemItemList.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		22FF4F1F23DEE26800B05C03 /* TOFileSystemItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 223A8959233F4B3B008FFE1A /* TOFileSystemItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		22FF4F2023DEE26800B05C03 /* TOFileSystemNotificationToken.h in Headers */ = {isa = PBXBuildFile; fileRef = 2232B64A233F6C1800358B05 /* TOFileSystemNotificationToken.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		22FF4F2123DEE26800B05C03 /* TOFileSystemObserver+UIKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 2206C80723C9BECA009FD5DD /* TOFileSystemObserver+UIKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		22FF4F2223DEE28600B05C03 /* NSURL+TOFileSystemAttributes.h in Headers */ = {isa = PBXBuildFile; fileRef = 22498E5723BF030C00D0C345 /* NSURL+TOFileSystemAttributes.h */; };
-		22FF4F2323DEE28600B05C03 /* NSURL+TOFileSystemUUID.h in Headers */ = {isa = PBXBuildFile; fileRef = 2254ED3B2341060000331B47 /* NSURL+TOFileSystemUUID.h */; };
-		22FF4F2423DEE28600B05C03 /* NSFileManager+TOFileSystemDirectoryEnumerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 22ADAEBE237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.h */; };
-		22FF4F2523DEE28600B05C03 /* TOFileSystemItemListChanges+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 229E0BA923C850510019937C /* TOFileSystemItemListChanges+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		22FF4F2623DEE28600B05C03 /* TOFileSystemChanges+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 22DD02AD23D71A2C0000E69A /* TOFileSystemChanges+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		22FF4F2723DEE28600B05C03 /* TOFileSystemItemURLDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 22C7FE9A23B5BD120017CABD /* TOFileSystemItemURLDictionary.h */; };
-		22FF4F2823DEE28600B05C03 /* TOFileSystemItemMapTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 22F4E42923CC8BE400F7EEC6 /* TOFileSystemItemMapTable.h */; };
-		22FF4F2923DEE28600B05C03 /* TOFileSystemItemList+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 22ADAEC3237AD24E0088D31E /* TOFileSystemItemList+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		22FF4F2A23DEE28600B05C03 /* TOFileSystemItem+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 22ADAEC1237AD1A40088D31E /* TOFileSystemItem+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		22FF4F2B23DEE28600B05C03 /* TOFileSystemPresenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 22D601C723657FA500275AD9 /* TOFileSystemPresenter.h */; };
-		22FF4F2C23DEE28600B05C03 /* TOFileSystemPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 2254ED282340588F00331B47 /* TOFileSystemPath.h */; };
-		22FF4F2D23DEE28600B05C03 /* TOFileSystemNotificationToken+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 229E0BAA23C85ACD0019937C /* TOFileSystemNotificationToken+Private.h */; };
-		22FF4F2E23DEE28600B05C03 /* TOFileSystemScanOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 2254ED2C2340F04800331B47 /* TOFileSystemScanOperation.h */; };
-		22FF4F2F23DEE28600B05C03 /* TOFileSystemObserverConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 22FF4EE823DEADBC00B05C03 /* TOFileSystemObserverConstants.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -90,6 +60,19 @@
 			remoteInfo = TOFileSystemObserverExample;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		22713F9423E1B193005D12E2 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		2206C80723C9BECA009FD5DD /* TOFileSystemObserver+UIKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TOFileSystemObserver+UIKit.h"; sourceTree = "<group>"; };
@@ -148,9 +131,6 @@
 		22FF4EE823DEADBC00B05C03 /* TOFileSystemObserverConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemObserverConstants.h; sourceTree = "<group>"; };
 		22FF4EE923DED9EE00B05C03 /* TOImages.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOImages.h; sourceTree = "<group>"; };
 		22FF4EEA23DED9EE00B05C03 /* TOImages.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOImages.m; sourceTree = "<group>"; };
-		22FF4EF123DEE1E400B05C03 /* TOFileSystemObserver.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TOFileSystemObserver.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		22FF4EF323DEE1E400B05C03 /* TOFileSystemObserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemObserver.h; sourceTree = "<group>"; };
-		22FF4EF423DEE1E400B05C03 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -162,13 +142,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		22C7FE9E23B5E70E0017CABD /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		22FF4EEE23DEE1E400B05C03 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -240,8 +213,8 @@
 				223A8954233F4A99008FFE1A /* TOFileSystemObserver */,
 				22C7FEA223B5E70E0017CABD /* TOFileSystemObserverTests */,
 				223A893A233F13CA008FFE1A /* TOFileSystemObserverExample */,
-				22FF4EF223DEE1E400B05C03 /* TOFileSystemObserver */,
 				223A8939233F13CA008FFE1A /* Products */,
+				22713F8E23E1B184005D12E2 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -250,7 +223,6 @@
 			children = (
 				223A8938233F13CA008FFE1A /* TOFileSystemObserverExample.app */,
 				22C7FEA123B5E70E0017CABD /* TOFileSystemObserverTests.xctest */,
-				22FF4EF123DEE1E400B05C03 /* TOFileSystemObserver.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -319,6 +291,13 @@
 			path = Categories;
 			sourceTree = "<group>";
 		};
+		22713F8E23E1B184005D12E2 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		22925B4623D36FFB00FC166C /* Categories */ = {
 			isa = PBXGroup;
 			children = (
@@ -362,47 +341,7 @@
 			path = Collections;
 			sourceTree = "<group>";
 		};
-		22FF4EF223DEE1E400B05C03 /* TOFileSystemObserver */ = {
-			isa = PBXGroup;
-			children = (
-				22FF4EF323DEE1E400B05C03 /* TOFileSystemObserver.h */,
-				22FF4EF423DEE1E400B05C03 /* Info.plist */,
-			);
-			path = TOFileSystemObserver;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
-
-/* Begin PBXHeadersBuildPhase section */
-		22FF4EEC23DEE1E400B05C03 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				22FF4EF523DEE1E400B05C03 /* TOFileSystemObserver.h in Headers */,
-				22FF4F1C23DEE26800B05C03 /* TOFileSystemItemListChanges.h in Headers */,
-				22FF4F1D23DEE26800B05C03 /* TOFileSystemChanges.h in Headers */,
-				22FF4F1E23DEE26800B05C03 /* TOFileSystemItemList.h in Headers */,
-				22FF4F1F23DEE26800B05C03 /* TOFileSystemItem.h in Headers */,
-				22FF4F2023DEE26800B05C03 /* TOFileSystemNotificationToken.h in Headers */,
-				22FF4F2123DEE26800B05C03 /* TOFileSystemObserver+UIKit.h in Headers */,
-				22FF4F2523DEE28600B05C03 /* TOFileSystemItemListChanges+Private.h in Headers */,
-				22FF4F2A23DEE28600B05C03 /* TOFileSystemItem+Private.h in Headers */,
-				22FF4F2623DEE28600B05C03 /* TOFileSystemChanges+Private.h in Headers */,
-				22FF4F2923DEE28600B05C03 /* TOFileSystemItemList+Private.h in Headers */,
-				22FF4F2223DEE28600B05C03 /* NSURL+TOFileSystemAttributes.h in Headers */,
-				22FF4F2323DEE28600B05C03 /* NSURL+TOFileSystemUUID.h in Headers */,
-				22FF4F2423DEE28600B05C03 /* NSFileManager+TOFileSystemDirectoryEnumerator.h in Headers */,
-				22FF4F2723DEE28600B05C03 /* TOFileSystemItemURLDictionary.h in Headers */,
-				22FF4F2823DEE28600B05C03 /* TOFileSystemItemMapTable.h in Headers */,
-				22FF4F2B23DEE28600B05C03 /* TOFileSystemPresenter.h in Headers */,
-				22FF4F2C23DEE28600B05C03 /* TOFileSystemPath.h in Headers */,
-				22FF4F2D23DEE28600B05C03 /* TOFileSystemNotificationToken+Private.h in Headers */,
-				22FF4F2E23DEE28600B05C03 /* TOFileSystemScanOperation.h in Headers */,
-				22FF4F2F23DEE28600B05C03 /* TOFileSystemObserverConstants.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		223A8937233F13C9008FFE1A /* TOFileSystemObserverExample */ = {
@@ -412,6 +351,7 @@
 				223A8934233F13C9008FFE1A /* Sources */,
 				223A8935233F13C9008FFE1A /* Frameworks */,
 				223A8936233F13C9008FFE1A /* Resources */,
+				22713F9423E1B193005D12E2 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -440,24 +380,6 @@
 			productReference = 22C7FEA123B5E70E0017CABD /* TOFileSystemObserverTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		22FF4EF023DEE1E400B05C03 /* TOFileSystemObserver */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 22FF4EF623DEE1E400B05C03 /* Build configuration list for PBXNativeTarget "TOFileSystemObserver" */;
-			buildPhases = (
-				22FF4EEC23DEE1E400B05C03 /* Headers */,
-				22FF4EED23DEE1E400B05C03 /* Sources */,
-				22FF4EEE23DEE1E400B05C03 /* Frameworks */,
-				22FF4EEF23DEE1E400B05C03 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = TOFileSystemObserver;
-			productName = TOFileSystemObserver;
-			productReference = 22FF4EF123DEE1E400B05C03 /* TOFileSystemObserver.framework */;
-			productType = "com.apple.product-type.framework";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -473,9 +395,6 @@
 					22C7FEA023B5E70E0017CABD = {
 						CreatedOnToolsVersion = 11.3;
 						TestTargetID = 223A8937233F13C9008FFE1A;
-					};
-					22FF4EF023DEE1E400B05C03 = {
-						CreatedOnToolsVersion = 11.3;
 					};
 				};
 			};
@@ -494,7 +413,6 @@
 			targets = (
 				223A8937233F13C9008FFE1A /* TOFileSystemObserverExample */,
 				22C7FEA023B5E70E0017CABD /* TOFileSystemObserverTests */,
-				22FF4EF023DEE1E400B05C03 /* TOFileSystemObserver */,
 			);
 		};
 /* End PBXProject section */
@@ -516,13 +434,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		22FF4EEF23DEE1E400B05C03 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -530,24 +441,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22ADAEC0237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */,
-				2254ED2E2340F04800331B47 /* TOFileSystemScanOperation.m in Sources */,
-				22838BA623CF65F700CBE2FE /* TOFileSystemChanges.m in Sources */,
-				22F4E42B23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m in Sources */,
-				22498E5923BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m in Sources */,
-				2254ED2A2340588F00331B47 /* TOFileSystemPath.m in Sources */,
-				2254ED3C2341060000331B47 /* NSURL+TOFileSystemUUID.m in Sources */,
-				229E0BA823C8503C0019937C /* TOFileSystemItemListChanges.m in Sources */,
+				22713FA623E1B4E7005D12E2 /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */,
 				22FF4EEB23DED9EE00B05C03 /* TOImages.m in Sources */,
-				2232B64C233F6C1800358B05 /* TOFileSystemNotificationToken.m in Sources */,
-				22D601C923657FA500275AD9 /* TOFileSystemPresenter.m in Sources */,
+				22713FB023E1B4E7005D12E2 /* TOFileSystemScanOperation.m in Sources */,
+				22713FAC23E1B4E7005D12E2 /* TOFileSystemNotificationToken.m in Sources */,
 				223A8943233F13CA008FFE1A /* TOViewController.m in Sources */,
-				223A8957233F4AB0008FFE1A /* TOFileSystemObserver.m in Sources */,
-				22ADAEBC237815DA0088D31E /* TOFileSystemItemList.m in Sources */,
-				22ADAEBD2378177F0088D31E /* TOFileSystemItem.m in Sources */,
+				22713FAE23E1B4E7005D12E2 /* TOFileSystemItem.m in Sources */,
+				22713FA723E1B4E7005D12E2 /* TOFileSystemItemListChanges.m in Sources */,
 				223A893D233F13CA008FFE1A /* TOAppDelegate.m in Sources */,
 				223A894E233F13CA008FFE1A /* main.m in Sources */,
-				22C7FE9C23B5BD120017CABD /* TOFileSystemItemURLDictionary.m in Sources */,
+				22713FA323E1B4E7005D12E2 /* TOFileSystemObserver.m in Sources */,
+				22713FA923E1B4E7005D12E2 /* TOFileSystemItemURLDictionary.m in Sources */,
+				22713FAD23E1B4E7005D12E2 /* TOFileSystemItemList.m in Sources */,
+				22713FA823E1B4E7005D12E2 /* TOFileSystemChanges.m in Sources */,
+				22713FA523E1B4E7005D12E2 /* NSURL+TOFileSystemUUID.m in Sources */,
+				22713FAB23E1B4E7005D12E2 /* TOFileSystemPath.m in Sources */,
+				22713FAF23E1B4E7005D12E2 /* TOFileSystemPresenter.m in Sources */,
+				22713FAA23E1B4E7005D12E2 /* TOFileSystemItemMapTable.m in Sources */,
+				22713FA423E1B4E7005D12E2 /* NSURL+TOFileSystemAttributes.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -555,44 +466,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22713F8D23E1B14E005D12E2 /* TOFileSystemScanOperation.m in Sources */,
+				22713F8B23E1B14E005D12E2 /* TOFileSystemItem.m in Sources */,
 				22925B4523D36D0D00FC166C /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */,
+				22713F8C23E1B14E005D12E2 /* TOFileSystemPresenter.m in Sources */,
 				2225239223DFFC9C00032C10 /* TOFileSystemItemURLDictionaryTests.m in Sources */,
+				22713F8723E1B14E005D12E2 /* TOFileSystemItemMapTable.m in Sources */,
+				22713F8623E1B14E005D12E2 /* TOFileSystemChanges.m in Sources */,
+				22713F8523E1B14E005D12E2 /* TOFileSystemItemListChanges.m in Sources */,
 				22C7FEAC23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m in Sources */,
 				22925B3F23D2991E00FC166C /* NSURL+TOFileSystemUUID.m in Sources */,
+				22713F8423E1B14E005D12E2 /* TOFileSystemObserver.m in Sources */,
 				2225238E23DFF2E400032C10 /* TOFileSystemChangesTests.m in Sources */,
 				22DA1C1123D1947900AA8444 /* TOFileSystemUUIDTests.m in Sources */,
+				22713F8A23E1B14E005D12E2 /* TOFileSystemItemList.m in Sources */,
+				22713F8923E1B14E005D12E2 /* TOFileSystemNotificationToken.m in Sources */,
 				2225239423E00A7000032C10 /* TOFileSystemItemMapTableTests.m in Sources */,
 				22BC8D5923D8575A008A310D /* TOFileSystemItemListChangesTests.m in Sources */,
 				22925B4423D36D0000FC166C /* TOFileSystemEnumeratorTests.m in Sources */,
 				22925B4123D35E4600FC166C /* TOFileSystemFileAttributesTests.m in Sources */,
+				22713F8823E1B14E005D12E2 /* TOFileSystemPath.m in Sources */,
 				22C7FEAD23B5E74E0017CABD /* TOFileSystemItemURLDictionary.m in Sources */,
 				22925B4223D3613100FC166C /* NSURL+TOFileSystemAttributes.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		22FF4EED23DEE1E400B05C03 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				22FF4EFA23DEE20000B05C03 /* TOFileSystemObserver.m in Sources */,
-				22FF4EFC23DEE20000B05C03 /* NSURL+TOFileSystemAttributes.m in Sources */,
-				22FF4EFE23DEE20000B05C03 /* NSURL+TOFileSystemUUID.m in Sources */,
-				22FF4F0023DEE20000B05C03 /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */,
-				22FF4F0223DEE20000B05C03 /* TOFileSystemItemListChanges+Private.h in Sources */,
-				22FF4F0323DEE20000B05C03 /* TOFileSystemItemListChanges.m in Sources */,
-				22FF4F0523DEE20000B05C03 /* TOFileSystemChanges+Private.h in Sources */,
-				22FF4F0623DEE20000B05C03 /* TOFileSystemChanges.m in Sources */,
-				22FF4F0823DEE20000B05C03 /* TOFileSystemItemURLDictionary.m in Sources */,
-				22FF4F0A23DEE20000B05C03 /* TOFileSystemItemMapTable.m in Sources */,
-				22FF4F0C23DEE20000B05C03 /* TOFileSystemItemList+Private.h in Sources */,
-				22FF4F0D23DEE20000B05C03 /* TOFileSystemItemList.m in Sources */,
-				22FF4F0F23DEE20000B05C03 /* TOFileSystemItem+Private.h in Sources */,
-				22FF4F1023DEE20000B05C03 /* TOFileSystemItem.m in Sources */,
-				22FF4F1223DEE20000B05C03 /* TOFileSystemPresenter.m in Sources */,
-				22FF4F1423DEE20000B05C03 /* TOFileSystemPath.m in Sources */,
-				22FF4F1623DEE20000B05C03 /* TOFileSystemNotificationToken+Private.h in Sources */,
-				22FF4F1723DEE20000B05C03 /* TOFileSystemNotificationToken.m in Sources */,
-				22FF4F1923DEE20000B05C03 /* TOFileSystemScanOperation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -808,62 +703,6 @@
 			};
 			name = Release;
 		};
-		22FF4EF723DEE1E400B05C03 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6LF3GMKZAB;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = TOFileSystemObserver/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACH_O_TYPE = staticlib;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.tim.TOFileSystemObserver;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		22FF4EF823DEE1E400B05C03 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 6LF3GMKZAB;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = TOFileSystemObserver/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MACH_O_TYPE = staticlib;
-				PRODUCT_BUNDLE_IDENTIFIER = dev.tim.TOFileSystemObserver;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -890,15 +729,6 @@
 			buildConfigurations = (
 				22C7FEA923B5E70E0017CABD /* Debug */,
 				22C7FEAA23B5E70E0017CABD /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		22FF4EF623DEE1E400B05C03 /* Build configuration list for PBXNativeTarget "TOFileSystemObserver" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				22FF4EF723DEE1E400B05C03 /* Debug */,
-				22FF4EF823DEE1E400B05C03 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
