@@ -21,10 +21,9 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
+#import "TOFileSystemNotificationToken.h"
 
 NS_ASSUME_NONNULL_BEGIN
-
-@class TOFileSystemNotificationToken;
 
 /** A protocol denoting that the object can serve notification tokens. */
 @protocol TOFileSystemNotifying <NSObject>
@@ -35,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface TOFileSystemNotificationToken ()
+@interface TOFileSystemNotificationToken (Private)
 
 /** The object for which this token was generated from. */
 @property (nonatomic, weak, readwrite) id<TOFileSystemNotifying> observingObject;
