@@ -29,7 +29,7 @@
 {
     // When files are still being copied, their
     // modification date is equal to the current device time.
-    return [self.to_modificationDate timeIntervalSinceDate:[NSDate date]] > (-1.0f - FLT_EPSILON);
+    return [self.to_modificationDate timeIntervalSinceDate:[NSDate date]] > (-0.05f - FLT_EPSILON);
 }
 
 - (BOOL)to_isDirectory

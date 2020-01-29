@@ -138,7 +138,7 @@
         }
         
         // Check to see if it is copying
-        _isCopying = [modificationDate timeIntervalSinceDate:[NSDate date]] > (-1.0f - FLT_EPSILON);
+        _isCopying = [modificationDate timeIntervalSinceDate:[NSDate date]] > (-0.05f - FLT_EPSILON);
     }
     else {
         // Else, it's a directory, count the number of items inside
