@@ -102,7 +102,7 @@ To that end, `TOFileSystemObserver` uses the [Extended File Attributes](https://
 
 `TOFileSystemObserver` was created by [Tim Oliver](http://twitter.com/TimOliverAU) as a component of [iComics](http://icomics.co).
 
-A huge thank you to Jeffrey Bergier whose [`JSBFileSystem`](https://github.com/jeffreybergier/JSBFilesystem) served as the base inspiration for this library, and for his help in letting me bounce ideas off him (such as eschewing having an on-disk store) during the start of this project.
+A huge thank you to [Jeffrey Bergier](https://twitter.com/jeffburg) whose [`JSBFileSystem`](https://github.com/jeffreybergier/JSBFilesystem) served as the base inspiration for this library, and for his help in letting me bounce ideas off him (such as eschewing having an on-disk store) during the start of this project.
 
 iOS device mockup art by [Pixeden](http://pixeden.com).
 
