@@ -84,17 +84,17 @@ I only need CocoaPods for my current plans with this library, so Carthage and SP
 
 Observing files on the file system consists of a variety of problems that each need to be solved to work.
 
-## Receiving System Events for File Changes
+### Receiving System Events for File Changes
 
 Historically, [Apple staff have recommended](https://forums.developer.apple.com/thread/90531) using `DispatchSource` for detecting file changes. However, since this doesn't support subdirectories, it wasn't suitable here. Instead, `TOFileSystemObserver` uses [`NSFilePresenter`](https://developer.apple.com/documentation/foundation/nsfilepresenter) a component of coordinated file access to detect when a file has changed.
 
-## Tracking Files Uniquely on Disk
+### Tracking Files Uniquely on Disk
 
 Since it's very easy for file names to change, and there's no guarantee they'll be unique (eg, multiple `Chapter1.zip`  files in different folders), it was necessary to assign each file an ID that the user cannot easily modify and would be unique.
 
 To that end, `TOFileSystemObserver` uses the [Extended File Attributes](https://nshipster.com/extended-file-attributes/) feature of APFS to attach a unique UUID string to each file it tracks. The observer then keeps an in-memory graph of every file's UUID and the URL of their last location, in order to determine when a file is moved or renamed.
 
-## Determining When a File is Copying
+### Determining When a File is Copying
 
 `NSFilePresenter` will trigger 2 times for a file being copied in: once at the start, and again at the end. Since most file imports need to happen only when the file has finished copying, a way to check that the file has finished copying was necessary. I sadly lost the original Stack Overflow post, but an extremely bright person discovered that when a file is still copying, its reported modification date will be equal to the current date. In this way, we can check if the file is still copying or not.
 
