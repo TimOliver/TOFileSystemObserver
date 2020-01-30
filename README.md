@@ -64,7 +64,7 @@ Please check the sample app for more examples on the features of this library.
 
 # Requirements
 
-`TOFileSystemObserver` will work with iOS 9 and above. While it's been written in Objective-C, it will also work with Swift (But the Swift interface may need some more work.)
+`TOFileSystemObserver` will work with iOS 8.0 and above. While it's been written in Objective-C, it will also work with Swift (But the Swift interface may need some more work.)
 
 ## Manual Installation
 
