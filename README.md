@@ -34,7 +34,7 @@ For document-based apps that display a list of available files from the Document
 TOFileSystemObserver *observer = [[TOFileSystemObserver alloc] init];
 
 // Start observing the target directory.
-[self.observer start];
+[observer start];
 
 // Register a notification token to receive events from the observer
 TOFileSystemNotificationToken *observerToken = [self.observer addNotificationBlock:
