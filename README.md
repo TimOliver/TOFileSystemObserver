@@ -37,15 +37,20 @@ TOFileSystemObserver *observer = [[TOFileSystemObserver alloc] init];
 [self.observer start];
 
 // Register a notification token to receive events from the observer
-TOFileSystemNotificationToken *observerToken = [self.observer addNotificationBlock:^(TOFileSystemObserver *observer, TOFileSystemObserverNotificationType type, TOFileSystemChanges *changes) {
-
-	// At the start of the session, the observer will perform a full system scan. This event will give observers a chance to set up before the scan.
+TOFileSystemNotificationToken *observerToken = [self.observer addNotificationBlock:
+				^(TOFileSystemObserver *observer, 
+					TOFileSystemObserverNotificationType type, 
+					TOFileSystemChanges *changes) 
+{
+	// At the start of the session, the observer will perform a full system scan. 
+	// This event will give observers a chance to set up before the scan.
 	if (type == TOFileSystemObserverNotificationTypeWillBeginFullScan) {
 		NSLog(@"Scan Will Start!");
 	  return;
 	}
 	        
-	// At the start of the session, the observer will perform a full system scan. This event will give observers a chance to clean up after the scan.
+	// At the start of the session, the observer will perform a full system scan. 
+	// This event will give observers a chance to clean up after the scan.
 	if (type == TOFileSystemObserverNotificationTypeDidCompleteFullScan) {
 		NSLog(@"Scan Complete!");
 		return;
@@ -100,3 +105,7 @@ To that end, `TOFileSystemObserver` uses the [Extended File Attributes](https://
 A huge thank you to Jeffrey Bergier whose [`JSBFileSystem`](https://github.com/jeffreybergier/JSBFilesystem) served as the base inspiration for this library, and for his help in letting me bounce ideas off him (such as eschewing having an on-disk store) during the start of this project.
 
 iOS device mockup art by [Pixeden](http://pixeden.com).
+
+# License
+
+`TOFileSystemObserver` is available under the MIT license. Please see the [LICENSE](LICENSE) file for more information. ![analytics](https://ga-beacon.appspot.com/UA-5643664-16/TOFileSystemObserver/README.md?pixel)
