@@ -270,7 +270,13 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     // the user deleted it via the Files app. Instead of moving the file, override
     // and treat it like it was deleted.
     BOOL movedToTrashes = ([url.path rangeOfString:kTOFileSystemTrashFolderName].location != NSNotFound);
-    if (movedToTrashes) {
+    
+    // Conversely, if it was moved to a level below what we had limited, also consider
+    // this as deleting the file
+    NSInteger numberOfSublevels = [self numberOfDirectoryLevelsToURL:url];
+    BOOL movedBeyondLevelLimit = (self.subDirectoryLevelLimit > 0 && numberOfSublevels > self.subDirectoryLevelLimit);
+    
+    if (movedToTrashes || movedBeyondLevelLimit) {
         [self.allItems removeItemURLForUUID:uuid];
         [self.delegate scanOperation:self didDeleteItemAtURL:savedURL withUUID:uuid];
         return NO;
