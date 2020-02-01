@@ -194,8 +194,6 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     
     // After all files are scanned, clean out any files
     [self cleanUpFilesPendingDeletion];
-    
-    NSLog(@"DID SCAN");
 }
 
 #pragma mark - Scanning Logic -
