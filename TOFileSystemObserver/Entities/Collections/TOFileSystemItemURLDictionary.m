@@ -81,14 +81,14 @@
     
     // Use dispatch barriers to block all reads when we mutate the dictionary
     dispatch_barrier_async(self.itemQueue, ^{
+        // Purge the previously saved entries as they may be stale
+        NSURL *savedURL = self.uuidItems[uuid];
+        NSString *savedUUID = self.urlItems[savedURL];
+        if (savedUUID) { [self.uuidItems removeObjectForKey:savedUUID]; }
+        if (savedURL) { [self.urlItems removeObjectForKey:savedURL]; }
+        
         // Remove the un-needed absolute path to save memory
         NSURL *url = [self relativeURLForURL:itemURL];
-        NSString *savedUUID = self.urlItems[url];
-        
-        // Clean out any stale data still in there
-        if (savedUUID) { [self.uuidItems removeObjectForKey:savedUUID]; }
-        if (url) { [self.urlItems removeObjectForKey:url]; }
-        
         self.uuidItems[uuid] = url;
         self.urlItems[url] = uuid;
     });
