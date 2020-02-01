@@ -79,10 +79,12 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 }
 
 - (instancetype)initForItemScanWithItemURLs:(NSArray<NSURL *> *)itemURLs
+                                    baseURL:(NSURL *)baseURL
               allItemsDictionary:(nonnull TOFileSystemItemURLDictionary *)allItems
                    filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
 {
     if (self = [super init]) {
+        _directoryURL = baseURL;
         _filePresenter = filePresenter;
         _itemURLs = itemURLs;
         _allItems = allItems;
@@ -192,6 +194,8 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     
     // After all files are scanned, clean out any files
     [self cleanUpFilesPendingDeletion];
+    
+    NSLog(@"DID SCAN");
 }
 
 #pragma mark - Scanning Logic -
@@ -377,13 +381,14 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 - (NSInteger)numberOfDirectoryLevelsToURL:(NSURL *)url
 {
     NSInteger levels = 0;
-
+    NSURL *directoryURL = self.directoryURL.URLByStandardizingPath;
+    
     // Loop up from the URL to the base
     // directory to see how many levels deep it is.
     while (1) {
-        url = [url URLByDeletingLastPathComponent];
+        url = [url URLByDeletingLastPathComponent].URLByStandardizingPath;
         if ([url.lastPathComponent isEqualToString:@".."]) { break; } // To prevent infinite loops
-        if ([url isEqual:self.directoryURL]) { break; }
+        if ([url isEqual:directoryURL]) { break; }
         levels++;
     }
 
@@ -392,7 +397,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 
 - (BOOL)isFullScan
 {
-    return (self.directoryURL != nil);
+    return (self.itemURLs == nil);
 }
 
 @end

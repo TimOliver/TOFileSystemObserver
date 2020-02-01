@@ -240,6 +240,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
     // Create a new scan operation to analyse what changed
     TOFileSystemScanOperation *scanOperation = nil;
     scanOperation = [[TOFileSystemScanOperation alloc] initForItemScanWithItemURLs:itemURLs
+                                                                           baseURL:self.directoryURL
                                                            allItemsDictionary:self.allItems
                                                                 filePresenter:self.fileSystemPresenter];
     scanOperation.subDirectoryLevelLimit = self.includedDirectoryLevels;
