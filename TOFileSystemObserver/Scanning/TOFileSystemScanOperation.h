@@ -73,12 +73,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** Create a new instance that will scan all of the child items of the provided directory */
 - (instancetype)initForFullScanWithDirectoryAtURL:(NSURL *)directoryURL
+                                    skippingItems:(NSArray *)skippedItems
                                allItemsDictionary:(nonnull TOFileSystemItemURLDictionary *)allItems
                                     filePresenter:(TOFileSystemPresenter *)filePresenter;
 
 /** Create a new instance that will scan all of the files/folders provided. */
 - (instancetype)initForItemScanWithItemURLs:(NSArray<NSURL *> *)itemURLs
                                     baseURL:(NSURL *)baseURL
+                              skippingItems:(NSArray *)skippedItems
                          allItemsDictionary:(nonnull TOFileSystemItemURLDictionary *)allItems
                               filePresenter:(TOFileSystemPresenter *)filePresenter;
 

@@ -48,6 +48,9 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 /** When iterating through all the files, this array stores pending directories that need scanning*/
 @property (nonatomic, strong) NSMutableArray *pendingDirectories;
 
+/** A list of items we've been instructed to skip. */
+@property (nonatomic, strong) NSArray *skippedItems;
+
 /** A reference to the master list of items maintained by this observer. */
 @property (nonatomic, strong) TOFileSystemItemURLDictionary *allItems;
 
@@ -64,12 +67,14 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 #pragma - Class Lifecycle -
 
 - (instancetype)initForFullScanWithDirectoryAtURL:(NSURL *)directoryURL
+                                    skippingItems:(NSArray *)skippedItems
                     allItemsDictionary:(nonnull TOFileSystemItemURLDictionary *)allItems
                          filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
 {
     if (self = [super init]) {
-        _directoryURL = directoryURL;
+        _directoryURL = directoryURL.URLByStandardizingPath;
         _filePresenter = filePresenter;
+        _skippedItems = skippedItems;
         _allItems = allItems;
         _pendingDirectories = [NSMutableArray array];
         [self commonInit];
@@ -80,12 +85,14 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 
 - (instancetype)initForItemScanWithItemURLs:(NSArray<NSURL *> *)itemURLs
                                     baseURL:(NSURL *)baseURL
+                              skippingItems:(NSArray *)skippedItems
               allItemsDictionary:(nonnull TOFileSystemItemURLDictionary *)allItems
                    filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
 {
     if (self = [super init]) {
-        _directoryURL = baseURL;
+        _directoryURL = baseURL.URLByStandardizingPath;
         _filePresenter = filePresenter;
+        _skippedItems = skippedItems;
         _itemURLs = itemURLs;
         _allItems = allItems;
         _pendingDirectories = [NSMutableArray array];
@@ -135,7 +142,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     
     // Scan all of the items in the base directory
     for (NSURL *url in childItemURLs) {
-        [self scanItemAtURL:url.URLByStandardizingPath
+        [self scanItemAtURL:url
          pendingDirectories:self.pendingDirectories];
     }
 
@@ -200,9 +207,20 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 
 - (void)scanItemAtURL:(NSURL *)url pendingDirectories:(NSMutableArray *)pendingDirectories
 {
+    // Sanitize the URL so we can use it in comparisons
+    url = url.URLByStandardizingPath;
+    
     // Make sure it's not a hidden file
     NSString *name = url.lastPathComponent;
     if ([name characterAtIndex:0] == '.') { return; }
+    
+    // Check if it's a skipped one
+    for (NSString *skippedFileName in self.skippedItems) {
+        NSURL *skippedURL = [self.directoryURL URLByAppendingPathComponent:skippedFileName];
+        if ([url isEqual:skippedURL]) {
+            return;
+        }
+    }
     
     // Double-check the file is still at that URL
     // (The file presenter will sometimes provide the old URL for moved files)

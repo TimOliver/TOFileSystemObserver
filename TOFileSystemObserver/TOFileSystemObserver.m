@@ -226,8 +226,9 @@ static TOFileSystemObserver *_sharedObserver = nil;
     // Create a new scan operation
     TOFileSystemScanOperation *scanOperation = nil;
     scanOperation = [[TOFileSystemScanOperation alloc] initForFullScanWithDirectoryAtURL:self.directoryURL
-                                                           allItemsDictionary:self.allItems
-                                                                filePresenter:self.fileSystemPresenter];
+                                                                           skippingItems:self.excludedItems
+                                                                      allItemsDictionary:self.allItems
+                                                                           filePresenter:self.fileSystemPresenter];
     scanOperation.subDirectoryLevelLimit = self.includedDirectoryLevels;
     scanOperation.delegate = self;
     
@@ -241,8 +242,9 @@ static TOFileSystemObserver *_sharedObserver = nil;
     TOFileSystemScanOperation *scanOperation = nil;
     scanOperation = [[TOFileSystemScanOperation alloc] initForItemScanWithItemURLs:itemURLs
                                                                            baseURL:self.directoryURL
-                                                           allItemsDictionary:self.allItems
-                                                                filePresenter:self.fileSystemPresenter];
+                                                                     skippingItems:self.excludedItems
+                                                                allItemsDictionary:self.allItems
+                                                                     filePresenter:self.fileSystemPresenter];
     scanOperation.subDirectoryLevelLimit = self.includedDirectoryLevels;
     scanOperation.delegate = self;
 
