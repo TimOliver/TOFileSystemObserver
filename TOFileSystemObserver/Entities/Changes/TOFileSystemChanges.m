@@ -29,7 +29,7 @@
 @property (nonatomic, strong, readwrite) NSMutableDictionary *modifiedItems;
 @property (nonatomic, strong, readwrite) NSMutableDictionary *deletedItems;
 @property (nonatomic, strong, readwrite) NSMutableDictionary *movedItems;
-
+@property (nonatomic, assign, readwrite) BOOL isFullScan;
 @end
 
 @implementation TOFileSystemChanges
@@ -74,6 +74,11 @@
         _movedItems = [NSMutableDictionary dictionary];
     }
     _movedItems[uuid] = @[oldFileURL, newFileURL];
+}
+
+- (void)setIsFullScan
+{
+    self.isFullScan = YES;
 }
 
 - (NSString *)description

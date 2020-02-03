@@ -39,6 +39,14 @@ NS_SWIFT_NAME(FileSystemChanges)
 @property (nonatomic, weak, readonly) TOFileSystemObserver *fileSystemObserver;
 
 /**
+ Whether the observer is performing the full scan at the start of the session or
+ an explict list of files mid-session.
+ If this is true, you might prefer to wait until the scan is complete before starting
+ any clean-up logic.
+ */
+@property (nonatomic, assign, readonly) BOOL isFullScan;
+
+/**
  A dictionary of items that were discovered by the file system observer.
  These are either files that were already on disk and were just discovered for the
  first time in this session, or they are brand new files that were just added by the user.

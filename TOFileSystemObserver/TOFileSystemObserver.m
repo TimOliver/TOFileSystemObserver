@@ -412,6 +412,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
     
     // Broadcast this event to all of the observers.
     TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
+    if (scanOperation.isFullScan) { [changes setIsFullScan]; }
     [changes addDiscoveredItemWithUUID:uuid fileURL:itemURL];
     [self postNotificationsWithChanges:changes];
     
@@ -434,6 +435,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
     
     // Broadcast this event to all of the observers.
     TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
+    if (scanOperation.isFullScan) { [changes setIsFullScan]; }
     [changes addModifiedItemWithUUID:uuid fileURL:itemURL];
     [self postNotificationsWithChanges:changes];
 }
@@ -462,6 +464,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
 
     // Broadcast this event to all of the observers.
     TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
+    if (scanOperation.isFullScan) { [changes setIsFullScan]; }
     [changes addMovedItemWithUUID:uuid oldFileURL:previousURL newFileURL:url];
     [self postNotificationsWithChanges:changes];
     
@@ -485,6 +488,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
     
     // Broadcast this event to all of the observers.
     TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
+    if (scanOperation.isFullScan) { [changes setIsFullScan]; }
     [changes addDeletedItemWithUUID:uuid fileURL:itemURL];
     [self postNotificationsWithChanges:changes];
     

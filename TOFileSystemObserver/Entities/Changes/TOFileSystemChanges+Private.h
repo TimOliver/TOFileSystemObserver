@@ -31,6 +31,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** Create a new instance. */
 - (instancetype)initWithFileSystemObserver:(TOFileSystemObserver *)fileSystemObserver;
 
+/** Sets that these changes came from the initial full system scan */
+- (void)setIsFullScan;
+
 /** Add a new discovered item to the list. */
 - (void)addDiscoveredItemWithUUID:(NSString *)uuid fileURL:(NSURL *)fileURL;
 
