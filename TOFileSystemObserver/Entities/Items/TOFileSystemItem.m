@@ -27,6 +27,7 @@
 #import "TOFileSystemPresenter.h"
 #import "NSURL+TOFileSystemAttributes.h"
 #import "NSURL+TOFileSystemUUID.h"
+#import "TOFileSystemObserverConstants.h"
 
 /** Private interface to expose the file presenter for coordinated writes. */
 @interface TOFileSystemObserver ()
@@ -138,7 +139,7 @@
         }
         
         // Check to see if it is copying
-        _isCopying = [modificationDate timeIntervalSinceDate:[NSDate date]] > (-0.05f - FLT_EPSILON);
+        _isCopying = [modificationDate timeIntervalSinceDate:[NSDate date]] > (-kTOFileSystemObserverCopyingTimeDelay - FLT_EPSILON);
     }
     else {
         // Else, it's a directory, count the number of items inside

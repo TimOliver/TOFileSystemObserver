@@ -96,4 +96,10 @@ extern NSString * const TOFileSystemObserverUserInfoKey
 extern NSString * const TOFileSystemObserverChangesUserInfoKey
                                 NS_SWIFT_NAME(FileSystemObserverChangesUserInfoKey);
 
+/**
+ When checking for if a file is still copying, a little bit of a delay is used when
+ comparing the file's modification date to the current date.
+ */
+NSTimeInterval const kTOFileSystemObserverCopyingTimeDelay = 1.5f;
+
 NS_ASSUME_NONNULL_END

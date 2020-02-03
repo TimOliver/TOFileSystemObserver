@@ -21,6 +21,7 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import "NSURL+TOFileSystemAttributes.h"
+#import "TOFileSystemObserverConstants.h"
 #include <dirent.h>
 
 @implementation NSURL (TOFileSystemAttributes)
@@ -29,7 +30,7 @@
 {
     // When files are still being copied, their
     // modification date is equal to the current device time.
-    return [self.to_modificationDate timeIntervalSinceDate:[NSDate date]] > (-0.05f - FLT_EPSILON);
+    return [self.to_modificationDate timeIntervalSinceDate:[NSDate date]] > (-kTOFileSystemObserverCopyingTimeDelay - FLT_EPSILON);
 }
 
 - (BOOL)to_isDirectory
