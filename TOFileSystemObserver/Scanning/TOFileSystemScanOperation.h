@@ -65,6 +65,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface TOFileSystemScanOperation : NSOperation
 
+/** Whether this a complete deep scan or not. */
+@property (nonatomic, readonly) BOOL isFullScan;
+
 /** A delegate object that will be called upon any detected change events. */
 @property (nonatomic, weak) id<TOFileSystemScanOperationDelegate> delegate;
 

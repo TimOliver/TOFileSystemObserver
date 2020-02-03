@@ -58,7 +58,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSURL *> *missingItems;
 
 /** A check to see if we are performing a full scan, or just focusing on one or two items. */
-@property (nonatomic, readonly) BOOL isFullScan;
+@property (nonatomic, assign, readwrite) BOOL isFullScan;
 
 @end
 
@@ -72,6 +72,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
                          filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
 {
     if (self = [super init]) {
+        _isFullScan = YES;
         _directoryURL = directoryURL.URLByStandardizingPath;
         _filePresenter = filePresenter;
         _skippedItems = skippedItems;
@@ -196,6 +197,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 {
     // Loop through each reported file URL and perform a scan to see what changed
     for (NSURL *itemURL in self.itemURLs) {
+        [self verifyEveryParentDirectoryForURL:itemURL];
         [self scanItemAtURL:itemURL pendingDirectories:self.pendingDirectories];
     }
     
@@ -246,6 +248,36 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     
     // Perform a verification of the item, and trigger the appropriate notifications
     [self verifyItemAtURL:url uuid:uuid];
+}
+
+- (void)verifyEveryParentDirectoryForURL:(NSURL *)url
+{
+    NSURL *directoryURL = self.directoryURL.URLByStandardizingPath;
+    
+    while (1) {
+        // Get the parent folder
+        url = [url URLByDeletingLastPathComponent].URLByStandardizingPath;
+        
+        // Ensure we exit when we come to the top level directory
+        if ([url.lastPathComponent isEqualToString:@".."]) { break; } // To prevent infinite loops
+        if ([url isEqual:directoryURL]) { break; }
+        
+        // Check if we have a UUID for this folder, and skip if we do
+        NSString *uuid = [self.allItems uuidForItemWithURL:url];
+        if (uuid) { continue; }
+        
+        // If we didn't have a UUID, try and get one from the folder
+        uuid = [url to_makeFileSystemUUIDIfNeeded];
+        
+        // Check if we had persisted this uuid, so it's been properly imported before
+        if (self.allItems[uuid] != nil) { continue; }
+        
+        // If not, we'll register it now
+        [self.allItems setItemURL:url forUUID:uuid];
+        
+        // Inform the delegate that we discovered a new folder
+        [self.delegate scanOperation:self didDiscoverItemAtURL:url withUUID:uuid];
+    }
 }
 
 - (BOOL)verifyItemIsNotMissingAtURL:(NSURL *)url
@@ -409,11 +441,6 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     }
 
     return MAX(levels, -1);
-}
-
-- (BOOL)isFullScan
-{
-    return (self.itemURLs == nil);
 }
 
 @end
