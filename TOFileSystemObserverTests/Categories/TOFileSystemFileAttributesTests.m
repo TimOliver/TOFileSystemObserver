@@ -69,13 +69,13 @@ const NSInteger kTOFileSystemTestFileSize = 3 * 1000000;
     
     // Wait a second, and it should transition to "completed'
     XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:@"Copying File Completed"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.5f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if ([self.fileURL to_isCopying] == NO) {
             [expectation fulfill];
         }
     });
 
-    [self waitForExpectations:@[expectation] timeout:3.0f];
+    [self waitForExpectations:@[expectation] timeout:4.0f];
 }
 
 - (void)testIsDirectory
