@@ -122,6 +122,34 @@
     return uuid;
 }
 
+- (nullable NSArray<NSString *> *)allUUIDs
+{
+    __block NSArray *uuids = nil;
+    dispatch_sync(self.itemQueue, ^{
+        uuids = self.uuidItems.allKeys;
+    });
+    return uuids;
+}
+
+- (nullable NSArray<NSURL *> *)allURLs
+{
+    // Loop through each item in the store, and restore its URL
+    __block NSMutableArray *array = [NSMutableArray array];
+    dispatch_sync(self.itemQueue, ^{
+        for (NSString *uuid in self.uuidItems) {
+            NSString *path = self.uuidItems[uuid].path;
+            NSURL *url = [self.baseURL URLByAppendingPathComponent:path];
+            [array addObject:url.URLByStandardizingPath];
+        }
+    });
+    
+    // If the array was empty, return nil
+    if (array.count == 0) { return nil; }
+    
+    // Return an immutable version
+    return [NSArray arrayWithArray:array];
+}
+
 - (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key
 {
     [self setItemURL:object forUUID:key];

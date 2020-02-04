@@ -139,7 +139,11 @@
         }
         
         // Check to see if it is copying
-        _isCopying = [modificationDate timeIntervalSinceDate:[NSDate date]] > (-kTOFileSystemObserverCopyingTimeDelay - FLT_EPSILON);
+        BOOL isCopying = _fileURL.to_isCopying;
+        if (isCopying != _isCopying) {
+            _isCopying = isCopying;
+            hasChanges = YES;
+        }
     }
     else {
         // Else, it's a directory, count the number of items inside

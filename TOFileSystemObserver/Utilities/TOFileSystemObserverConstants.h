@@ -98,8 +98,9 @@ extern NSString * const TOFileSystemObserverChangesUserInfoKey
 
 /**
  When checking for if a file is still copying, a little bit of a delay is used when
- comparing the file's modification date to the current date.
+ comparing the file's modification date to the current date since there will always be
+ around a second of drift.
  */
-NSTimeInterval const kTOFileSystemObserverCopyingTimeDelay = 1.5f;
+static NSTimeInterval const kTOFileSystemObserverCopyingTimeDelay = 3.0f;
 
 NS_ASSUME_NONNULL_END

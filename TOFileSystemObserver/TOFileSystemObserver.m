@@ -35,6 +35,7 @@
 #import "TOFileSystemChanges+Private.h"
 
 #import "NSURL+TOFileSystemUUID.h"
+#import "NSURL+TOFileSystemAttributes.h"
 
 // Because the block is stored as a generic id, we must cast it back before we can call it.
 static inline void TOFileSystemObserverCallBlock(id block, id observer, NSInteger type, id changes) {
@@ -77,8 +78,14 @@ static TOFileSystemObserver *_sharedObserver = nil;
 /** The operation queue we will perform our scanning on. */
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
 
-/** A store for every item URL discovered on disk to ensure there are no duplicate UUIDs. */
+/** A thread-safe store for every item URL discovered on disk to ensure there are no duplicate UUIDs. */
 @property (nonatomic, strong) TOFileSystemItemURLDictionary *allItems;
+
+/** A thread-safe store for items that were observered to still being copied during the last update. */
+@property (nonatomic, strong) TOFileSystemItemURLDictionary *copyingItems;
+
+/** A timer that will fire after a few seconds to attempt to clean up any copying files. */
+@property (nonatomic, strong) NSTimer *copyingTimer;
 
 /** A map table that weakly holds item list objects */
 @property (nonatomic, strong) TOFileSystemItemMapTable *itemListTable;
@@ -159,6 +166,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
     
     // Set up the stores for tracking items
     _allItems = [[TOFileSystemItemURLDictionary alloc] initWithBaseURL:self.directoryURL];
+    _copyingItems = [[TOFileSystemItemURLDictionary alloc] initWithBaseURL:self.directoryURL];
     
     // Change the UUID key name to match our app (for better visibility)
     NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
@@ -397,6 +405,44 @@ static TOFileSystemObserver *_sharedObserver = nil;
     return hasChanges;
 }
 
+- (void)startTimerForCopyingItems
+{
+    id block = ^{
+        // The timer is already counting down
+        if (self.copyingTimer) { return; }
+        
+        // Create a new timer
+        self.copyingTimer = [NSTimer timerWithTimeInterval:kTOFileSystemObserverCopyingTimeDelay
+                                                    target:self
+                                                  selector:@selector(copyTimerCompleted)
+                                                  userInfo:nil
+                                                   repeats:NO];
+        
+        // Start the timer
+        [[NSRunLoop currentRunLoop] addTimer:self.copyingTimer forMode:NSDefaultRunLoopMode];
+    };
+    
+    // Run this on the main thread in order to attach it to the main run loop
+    [[NSOperationQueue mainQueue] addOperationWithBlock:block];
+}
+
+- (void)copyTimerCompleted
+{
+    // Remove the timer
+    self.copyingTimer = nil;
+    
+    id block =  ^{
+        // Get all of the URLs still pending in the dictionary
+        NSArray *urls = self.copyingItems.allURLs;
+        if (urls == nil) { return; }
+        
+        // Perform a scan to see if they've changed
+        [self updateObservingObjectsWithChangedItemURLs:urls];
+    };
+    
+    [self.operationQueue addOperationWithBlock:block];
+}
+
 #pragma mark - Scan Operation Delegate -
 
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
@@ -428,6 +474,14 @@ static TOFileSystemObserver *_sharedObserver = nil;
    itemDidChangeAtURL:(NSURL *)itemURL
              withUUID:(NSString *)uuid
 {
+    // If the item is still copying at this point (Potentially lag during the write?)
+    // add it to our copying list so we can poll it again in a few seconds
+    if (itemURL.to_isCopying) {
+        [self.copyingItems setItemURL:itemURL forUUID:uuid];
+        [self startTimerForCopyingItems];
+    }
+    else { [self.copyingItems removeItemURLForUUID:uuid]; }
+    
     // See if there is a list had been made for the parent, and add it
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];
     [self refreshItemAtURL:itemURL uuid:uuid];
