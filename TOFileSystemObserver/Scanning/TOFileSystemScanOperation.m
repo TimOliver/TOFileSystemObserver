@@ -180,7 +180,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
         // Exit out if we've gone deeper than the specified limit
         if (self.subDirectoryLevelLimit > 0) {
             NSInteger levels = [self numberOfDirectoryLevelsToURL:url];
-            if (levels > self.subDirectoryLevelLimit) { continue; }
+            if (levels >= self.subDirectoryLevelLimit) { continue; }
         }
 
         // Create a new enumerator for it
