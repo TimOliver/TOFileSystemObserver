@@ -306,7 +306,13 @@ static TOFileSystemObserver *_sharedObserver = nil;
         }
     };
     
-    getListBlock();
+    if (![NSThread isMainThread]) {
+        dispatch_queue_t mainQueue = dispatch_get_main_queue();
+        dispatch_sync(mainQueue, getListBlock);
+    }
+    else {
+        getListBlock();
+    }
 
     return itemList;
 }
@@ -323,7 +329,10 @@ static TOFileSystemObserver *_sharedObserver = nil;
     void (^getItemBlock)(void) = ^{
         @autoreleasepool {
             // Fetch the UUID for this item and see if we've cached it already
-            NSString *uuid = [fileURL to_fileSystemUUID];
+            __block NSString *uuid = nil;
+            [self.fileSystemPresenter performCoordinatedWrite:^{
+                uuid = [fileURL to_makeFileSystemUUIDIfNeeded];
+            }];
             uuid = [self verifiedUniqueUUIDForItemAtURL:fileURL uuid:uuid];
             item = self.itemTable[uuid];
             if (item) { return; }
