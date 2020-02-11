@@ -8,6 +8,8 @@ x.y.z Release Notes (yyyy-MM-dd)
 
 * Fixed a thread coordinating issue where file UUIDs might not have
     been set yet upon first access.
+* Fixed an issue where proper UUIDs were not being generated before 
+    adding items as children to list objects.
 
 0.0.2 Release Notes (2020-02-11)
 =============================================================
