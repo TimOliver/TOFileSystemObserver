@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name     = 'TOFileSystemObserver'
-  s.version  = '0.0.1'
+  s.version  = '0.0.2'
   s.license  =  { :type => 'MIT', :file => 'LICENSE' }
   s.summary  = 'A bullet-proof mechanism for detecting any changes made to the contents of a folder in iOS & iPadOS.'
   s.homepage = 'https://github.com/TimOliver/TOFileSystemObserver'
