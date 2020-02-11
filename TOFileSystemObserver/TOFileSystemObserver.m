@@ -290,7 +290,10 @@ static TOFileSystemObserver *_sharedObserver = nil;
     void (^getListBlock)(void) = ^{
         @autoreleasepool {
             // Fetch the UUID for this item and see if we've cached it already
-            NSString *uuid = [directoryURL to_fileSystemUUID];
+            __block NSString *uuid = nil;
+            [self.fileSystemPresenter performCoordinatedWrite:^{
+                uuid = [directoryURL to_makeFileSystemUUIDIfNeeded];
+            }];
             uuid = [self verifiedUniqueUUIDForItemAtURL:directoryURL uuid:uuid];
             itemList = self.itemListTable[uuid];
             if (itemList) { return; }
@@ -436,6 +439,11 @@ static TOFileSystemObserver *_sharedObserver = nil;
         NSArray *urls = self.copyingItems.allURLs;
         if (urls == nil) { return; }
         
+        // Remove all the items we're about to test from the list,
+        // as they'll be re-added on the subsequent callback if they're
+        // still copying
+        [self.copyingItems removeAllItems];
+        
         // Perform a scan to see if they've changed
         [self updateObservingObjectsWithChangedItemURLs:urls];
     };
@@ -480,7 +488,6 @@ static TOFileSystemObserver *_sharedObserver = nil;
         [self.copyingItems setItemURL:itemURL forUUID:uuid];
         [self startTimerForCopyingItems];
     }
-    else { [self.copyingItems removeItemURLForUUID:uuid]; }
     
     // See if there is a list had been made for the parent, and add it
     NSString *parentUUID = [itemURL to_uuidForParentDirectory];

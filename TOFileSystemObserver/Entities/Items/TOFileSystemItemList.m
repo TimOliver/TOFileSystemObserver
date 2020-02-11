@@ -69,7 +69,7 @@ static inline void TOFileSystemItemListCallBlock(id block, id observer, id chang
     if (self = [super init]) {
         _fileSystemObserver = observer;
         _directoryURL = directoryURL;
-        _uuid = [directoryURL to_makeFileSystemUUIDIfNeeded];
+        _uuid = [directoryURL to_fileSystemUUID];
         [self commonInit];
     }
     

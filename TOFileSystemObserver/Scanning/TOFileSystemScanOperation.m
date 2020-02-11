@@ -231,8 +231,11 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     }
     
     // Check if we've already assigned an on-disk UUID
-    NSString *uuid = [url to_makeFileSystemUUIDIfNeeded];
-
+    __block NSString *uuid = nil;
+    [self.filePresenter performCoordinatedWrite:^{
+        uuid = [url to_makeFileSystemUUIDIfNeeded];
+    }];
+     
     // If the item is a directory, add it to the pending list to scan later
     if (url.to_isDirectory) {
         [pendingDirectories addObject:url];
@@ -263,11 +266,13 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
         if ([url isEqual:directoryURL]) { break; }
         
         // Check if we have a UUID for this folder, and skip if we do
-        NSString *uuid = [self.allItems uuidForItemWithURL:url];
+        __block NSString *uuid = [self.allItems uuidForItemWithURL:url];
         if (uuid) { continue; }
         
         // If we didn't have a UUID, try and get one from the folder
-        uuid = [url to_makeFileSystemUUIDIfNeeded];
+        [self.filePresenter performCoordinatedWrite:^{
+            uuid = [url to_makeFileSystemUUIDIfNeeded];
+        }];
         
         // Check if we had persisted this uuid, so it's been properly imported before
         if (self.allItems[uuid] != nil) { continue; }
