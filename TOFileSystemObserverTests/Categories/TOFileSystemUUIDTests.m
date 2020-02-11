@@ -55,7 +55,7 @@
 - (void)testCreatingUUID
 {
     // Confirm it's nil at the start
-    XCTAssertNil([self.itemURL to_fileSystemUUID]);
+    XCTAssert([self.itemURL to_fileSystemUUID].length == 0);
     
     // Generate a UUID for the item
     NSString *uuid = [self.itemURL to_generateFileSystemUUID];
