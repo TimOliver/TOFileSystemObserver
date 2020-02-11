@@ -30,7 +30,8 @@
 {
     // When files are still being copied, their
     // modification date is equal to the current device time.
-    return [self.to_modificationDate timeIntervalSinceDate:[NSDate date]] > (-kTOFileSystemObserverCopyingTimeDelay - FLT_EPSILON);
+    return [self.to_modificationDate timeIntervalSinceDate:[NSDate date]]
+                        > (-kTOFileSystemObserverCopyingTimeDelay - FLT_EPSILON);
 }
 
 - (BOOL)to_isDirectory
@@ -56,6 +57,7 @@
 
 - (NSDate *)to_modificationDate
 {
+    [self removeCachedResourceValueForKey:NSURLContentModificationDateKey];
     NSDate *modificationDate;
     [self getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:nil];
     return modificationDate;
