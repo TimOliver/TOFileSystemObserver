@@ -1,6 +1,14 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+0.0.3 Release Notes (yyyy-MM-dd)
+=============================================================
+
+### Fixed
+
+* Fixed a thread coordinating issue where file UUIDs might not have
+    been set yet upon first access.
+
 0.0.2 Release Notes (2020-02-11)
 =============================================================
 
