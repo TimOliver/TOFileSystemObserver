@@ -70,29 +70,13 @@
     XCTAssertNil([self.itemURL to_fileSystemUUID]);
     
     // Set a non-uuid value to the file
-    NSString *dummyUUID = @"000000000000000000000000000000000000";
     [self.itemURL to_setFileSystemUUID:@"000000000000000000000000000000000000"];
     
     // Regenerate a new uuid
-    NSString *newUUID = [self.itemURL to_makeFileSystemUUIDIfNeeded];
+    NSString *newUUID = [self.itemURL to_fileSystemUUID];
     
     // Sanity check it's not matching the dummy
-    XCTAssert([newUUID isEqualToString:dummyUUID] == NO);
-    
-    // Confirm the value on disk is the one we were given
-    XCTAssert([[self.itemURL to_fileSystemUUID] isEqualToString:newUUID]);
-}
-
-- (void)testParentUUIDAccess
-{
-    // Confirm it's nil at the start
-    XCTAssertNil([self.itemURL to_fileSystemUUID]);
-    
-    // Generate a UUID for the parent
-    NSString *uuid = [self.itemURL to_makeFileSystemUUIDIfNeeded];
-    
-    // Confirm the child can see the parent UUID
-    XCTAssert([[self.childItemURL to_uuidForParentDirectory] isEqualToString:uuid]);
+    XCTAssertNil(newUUID);
 }
 
 @end
