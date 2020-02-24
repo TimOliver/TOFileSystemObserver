@@ -40,9 +40,9 @@ NS_SWIFT_NAME(FileSystemChanges)
 
 /**
  Whether the observer is performing the full scan at the start of the session or
- an explict list of files mid-session.
- If this is true, you might prefer to wait until the scan is complete before starting
- any clean-up logic.
+ an explict list of files mid-session. If this is true, you might prefer to
+ wait to defer any heavy work to the notification that will be sent along when
+ this particular scan is complete.
  */
 @property (nonatomic, assign, readonly) BOOL isFullScan;
 
