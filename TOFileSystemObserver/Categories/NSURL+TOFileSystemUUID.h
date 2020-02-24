@@ -46,9 +46,6 @@ NS_ASSUME_NONNULL_BEGIN
 /** Regardless if one exists, generate and save a new UUID. */
 - (NSString *)to_generateFileSystemUUID;
 
-/** Checks if a valid UUID exists and makes a new one if needed */
-- (NSString *)to_makeFileSystemUUIDIfNeeded;
-
 /** Get the UUID of the folder containing this item. */
 - (nullable NSString *)to_uuidForParentDirectory;
 

@@ -45,11 +45,23 @@ static NSString *kTOFileSystemAttributeKey = @"dev.tim.fileSystemObserver.UUID";
 
     // Convert to a string, and return if successful
     NSString *uuid = [[NSString alloc] initWithBytes:value length:36 encoding:NSUTF8StringEncoding];
-    if (uuid.length > 0) {
-        return uuid;
+    if (uuid.length == 0) {
+        return nil;
+    }
+    
+    // Verify to make sure the provided value is a valid UUID string
+    NSString *uuidPattern = @"\\A[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}\\Z";
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:uuidPattern
+                                                                           options:NSRegularExpressionCaseInsensitive
+                                                                             error:nil];
+    NSRange range = [regex rangeOfFirstMatchInString:uuid options:0 range:NSMakeRange(0, uuid.length)];
+    
+    // A valid regex was found.
+    if (range.location == NSNotFound) {
+        return nil;
     }
 
-    return nil;
+    return uuid;
 }
 
 - (void)to_setFileSystemUUID:(NSString *)uuid
@@ -76,32 +88,6 @@ static NSString *kTOFileSystemAttributeKey = @"dev.tim.fileSystemObserver.UUID";
     NSString *uuid = [NSUUID UUID].UUIDString;
     [self to_setFileSystemUUID:uuid];
     return uuid;
-}
-
-- (NSString *)to_makeFileSystemUUIDIfNeeded
-{
-    // Attempt to load any existing UUID that may be there
-    NSString *uuid = [self to_fileSystemUUID];
-    
-    // Create a brand new one if it doesn't exist
-    if (uuid == nil) {
-        return [self to_generateFileSystemUUID];
-    }
-    
-    // Check to see if the UUID matches the UUID format
-    NSString *uuidPattern = @"\\A[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}\\Z";
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:uuidPattern
-                                                                           options:NSRegularExpressionCaseInsensitive
-                                                                             error:nil];
-    NSRange range = [regex rangeOfFirstMatchInString:uuid options:0 range:NSMakeRange(0, uuid.length)];
-    
-    // A valid regex was found.
-    if (range.location != NSNotFound) {
-        return uuid;
-    }
-    
-    // If not, generate a new UUID and save it to the file
-    return [self to_generateFileSystemUUID];
 }
 
 - (nullable NSString *)to_uuidForParentDirectory
