@@ -1,15 +1,22 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
-0.0.3 Release Notes (yyyy-MM-dd)
+0.0.3 Release Notes (2020-02-24)
 =============================================================
+
+### Added
+
+* Public, thread-safe API access for accessing the UUID string of an observed item, 
+    and/or its parent directory.
 
 ### Fixed
 
-* Fixed a thread coordinating issue where file UUIDs might not have
+* A thread coordinating issue where file UUIDs might not have
     been set yet upon first access.
-* Fixed an issue where proper UUIDs were not being generated before 
+* An issue where proper UUIDs were not being generated before 
     adding items as children to list objects.
+* An issue where deleting an item in Files.app would make the 
+    `.Trash` folder become treated like an official item.
 
 0.0.2 Release Notes (2020-02-11)
 =============================================================
