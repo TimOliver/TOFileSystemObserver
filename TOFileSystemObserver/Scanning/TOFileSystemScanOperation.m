@@ -254,6 +254,13 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 {
     NSURL *directoryURL = self.directoryURL.URLByStandardizingPath;
     
+    // Make sure that this file isn't hidden, or inside a hidden folder file 
+    url = url.URLByStandardizingPath;
+    NSString *relativePath = [url.path stringByReplacingOccurrencesOfString:directoryURL.path withString:@""];
+    if ([relativePath rangeOfString:@"/."].location != NSNotFound) {
+        return;
+    }
+    
     while (1) {
         // Get the parent folder
         url = [url URLByDeletingLastPathComponent].URLByStandardizingPath;
