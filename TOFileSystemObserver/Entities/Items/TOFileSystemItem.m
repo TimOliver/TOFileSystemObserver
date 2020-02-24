@@ -86,9 +86,7 @@
 - (void)configureUUIDForceRefresh:(BOOL)forceRefresh
 {
     TOFileSystemPresenter *presenter = self.fileSystemObserver.fileSystemPresenter;
-    [presenter performCoordinatedWrite:^{
-        self->_uuid = [self->_fileURL to_makeFileSystemUUIDIfNeeded];
-    }];
+    _uuid = [presenter uuidForItemAtURL:_fileURL];
 }
 
 - (BOOL)refreshFromItemAtURL:(NSURL *)url
