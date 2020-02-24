@@ -484,7 +484,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
              withUUID:(NSString *)uuid
 {
     // Get the UUID of the parent so we can see if there is a list for it
-    NSString *parentUUID = [itemURL to_uuidForParentDirectory];
+    NSString *parentUUID = [self uuidForParentOfItemAtURL:itemURL];
     
     // Refresh all of the properties of this item and its parent
     [self refreshItemAtURL:itemURL uuid:uuid];
@@ -516,7 +516,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
     }
     
     // See if there is a list had been made for the parent, and add it
-    NSString *parentUUID = [itemURL to_uuidForParentDirectory];
+    NSString *parentUUID = [self uuidForParentOfItemAtURL:itemURL];
     [self refreshItemAtURL:itemURL uuid:uuid];
     [self refreshParentItemWithUUID:parentUUID];
     
@@ -571,7 +571,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
    didDeleteItemAtURL:(NSURL *)itemURL
              withUUID:(NSString *)uuid
 {
-    NSString *parentUUID = [itemURL to_uuidForParentDirectory];
+    NSString *parentUUID = [self uuidForParentOfItemAtURL:itemURL];
     
     // Broadcast this event to all of the observers.
     TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];

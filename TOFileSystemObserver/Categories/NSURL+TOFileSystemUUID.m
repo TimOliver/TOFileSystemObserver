@@ -90,9 +90,4 @@ static NSString *kTOFileSystemAttributeKey = @"dev.tim.fileSystemObserver.UUID";
     return uuid;
 }
 
-- (nullable NSString *)to_uuidForParentDirectory
-{
-    return [self.URLByDeletingLastPathComponent to_fileSystemUUID];
-}
-
 @end
