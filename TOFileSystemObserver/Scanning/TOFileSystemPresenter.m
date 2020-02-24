@@ -21,6 +21,7 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import "TOFileSystemPresenter.h"
+#import "NSURL+TOFileSystemUUID.h"
 
 @interface TOFileSystemPresenter ()
 
@@ -161,26 +162,6 @@
     self.isRunning = YES;
 }
 
-- (void)pauseWhileExecutingBlock:(void (^)(void))block
-{
-    // If not running, just execute the block and terminate
-    if (!self.isRunning) {
-        if (block) { block(); }
-        return;
-    }
-
-    // Pause and wait for the semaphore to complete
-    dispatch_semaphore_wait(self.pausingSemaphore, DISPATCH_TIME_FOREVER);
-
-    @autoreleasepool {
-        [NSFileCoordinator removeFilePresenter:self];
-        if (block) { block(); }
-        [NSFileCoordinator addFilePresenter:self];
-    }
-    // Resume the semaphore
-    dispatch_semaphore_signal(self.pausingSemaphore);
-}
-
 - (void)performCoordinatedRead:(void (^)(void))block
 {
     dispatch_sync(self.fileCoordinatorQueue, ^{
@@ -204,6 +185,29 @@
     if (!self.isRunning) { return; }
     [NSFileCoordinator removeFilePresenter:self];
     self.isRunning = NO;
+}
+
+- (nullable NSString *)uuidForItemAtURL:(NSURL *)itemURL
+{
+    __block NSString *uuid = nil;
+    
+    // If the file exists, but it's not in the store yet,
+    // attempt to access it from disk
+    [self performCoordinatedRead:^{
+        uuid = [itemURL to_fileSystemUUID];
+    }];
+    if (uuid.length) { return uuid; }
+    
+    // If even that failed, then it's necessary to generate a new one
+    [self performCoordinatedWrite:^{
+        // Try again in case a previous operation already generated one
+        uuid = [itemURL to_fileSystemUUID];
+        if (uuid.length == 0) {
+            uuid = [itemURL to_generateFileSystemUUID];
+        }
+    }];
+    
+    return uuid;
 }
 
 #pragma mark - NSFilePresenter Delegate Events -
