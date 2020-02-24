@@ -83,25 +83,21 @@ NS_SWIFT_NAME(FileSystemObserver)
 /** If desired, promotes a locally created and configured observer to the singleton. */
 + (void)setSharedObserver:(TOFileSystemObserver *)observer;
 
-/** Starts the file system observer monitoring the target directory for changes. */
+/**
+ Starts the file system observer monitoring the target directory for changes.
+ Upon starting, the observer will perform a full file system scan, and will post a 'did discover'
+ event for every item it finds. This can be used in order to ensure any caches, or previously
+ expected locations of files can be updated.
+ */
 - (void)start;
 
-/** Suspends the file system observer from monitoring any file system changes. */
+/** Completely stops the file observer from running and resets all of the internal state. When
+ calling 'start' from after this state, another full file system scan will be performed. */
 - (void)stop;
 
 /**
- Performs a full scan of the contents of the base directory on a background thread,
- and triggers all of the registered notification objects and blocks for
- every item discovered.
- 
- Setting `includedDirectoryLevels` will limit how many directory levels down the scan
- will be performed, but by default, all levels are scanned.
- */
-- (void)performFullDirectoryScan;
-
-/**
  Returns a list of directories and files inside the directory specified.
- When the file observer is running, this list is live, and will be automatically
+ While the file observer is running, this list is live, and will be automatically
  updated whenever any of the underlying files on disk are changed.
  
  @param directoryURL The URL to target. Use `nil` for the observer's base directory.
@@ -110,12 +106,29 @@ NS_SWIFT_NAME(FileSystemObserver)
 
 /**
  Returns an item object representing the file or directory at the URL specified.
- When the file observer is running, this object is live, and will be automatically
+ While the file observer is running, this object is live, and will be automatically
  updated whenever the system detects that the file has changed.
  
   @param fileURL The URL to target.
  */
 - (nullable TOFileSystemItem *)itemForFileAtURL:(NSURL *)fileURL;
+
+/**
+ Returns the unique UUID string that's been associated with the file at the provided URL from disk.
+ This will attempt to retrieve the UUID while avoiding performing a file read if it can help it.
+ If the file has not yet had a UUID string assigned, it will generate a new one in a thread-safe manner.
+ 
+ @param itemURL The url of the item whose UUID that will be accessed.
+ @return The UUID string associated with the file on disk. Returns nil if the URL is invalid.
+ */
+- (nullable NSString *)uuidForItemAtURL:(NSURL *)itemURL;
+
+/**
+ Returns the unique UUID for the parent directory of the item at the provided URL.
+ This will attempt to retrieve the UUID while avoiding performing a file read if it can help it.
+ If the item doesn't yet have a UUID, it will create one in a thread safe manner.
+ */
+- (nullable NSString *)uuidForParentOfItemAtURL:(NSURL *)itemURL;
 
  /**
  Registers a new notification block that will be triggered each time an update is detected.

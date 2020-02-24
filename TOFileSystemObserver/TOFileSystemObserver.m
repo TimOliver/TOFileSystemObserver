@@ -276,7 +276,30 @@ static TOFileSystemObserver *_sharedObserver = nil;
     [self.notificationTokens removeObject:token];
 }
 
-#pragma mark - Creating Observing Objects -
+#pragma mark - Creating and Observing Items -
+
+- (nullable NSString *)uuidForItemAtURL:(NSURL *)itemURL
+{
+    // See if we already have a UUID entry for this file in the global store
+    __block NSString *uuid = nil;
+    uuid = [self.allItems uuidForItemWithURL:itemURL];
+    if (uuid.length) { return uuid; }
+    
+    // If it's not in the store, perform a sanity check that the file exists
+    // before we start doing potentially long file
+    if (![[NSFileManager defaultManager] fileExistsAtPath:itemURL.path]) {
+        return nil;
+    }
+    
+    // Defer to the file presenter to perform a thread-safe access of the UUID
+    // string associated with the file
+    return [self.fileSystemPresenter uuidForItemAtURL:itemURL];
+}
+
+- (nullable NSString *)uuidForParentOfItemAtURL:(NSURL *)itemURL
+{
+    return [self uuidForItemAtURL:itemURL.URLByDeletingLastPathComponent];
+}
 
 - (TOFileSystemItemList *)itemListForDirectoryAtURL:(NSURL *)directoryURL
 {
@@ -290,10 +313,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
     void (^getListBlock)(void) = ^{
         @autoreleasepool {
             // Fetch the UUID for this item and see if we've cached it already
-            __block NSString *uuid = nil;
-            [self.fileSystemPresenter performCoordinatedWrite:^{
-                uuid = [directoryURL to_makeFileSystemUUIDIfNeeded];
-            }];
+            NSString *uuid = [self uuidForItemAtURL:directoryURL];
             uuid = [self verifiedUniqueUUIDForItemAtURL:directoryURL uuid:uuid];
             itemList = self.itemListTable[uuid];
             if (itemList) { return; }
@@ -329,10 +349,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
     void (^getItemBlock)(void) = ^{
         @autoreleasepool {
             // Fetch the UUID for this item and see if we've cached it already
-            __block NSString *uuid = nil;
-            [self.fileSystemPresenter performCoordinatedWrite:^{
-                uuid = [fileURL to_makeFileSystemUUIDIfNeeded];
-            }];
+            NSString *uuid = [self uuidForItemAtURL:fileURL];
             uuid = [self verifiedUniqueUUIDForItemAtURL:fileURL uuid:uuid];
             item = self.itemTable[uuid];
             if (item) { return; }
