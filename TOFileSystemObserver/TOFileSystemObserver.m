@@ -447,6 +447,9 @@ static TOFileSystemObserver *_sharedObserver = nil;
                                                   userInfo:nil
                                                    repeats:NO];
         
+        // Add leeway of up to a second to allow the CPU to schedule this more efficiently.
+        self.copyingTimer.tolerance = 1.0f;
+        
         // Start the timer
         [[NSRunLoop currentRunLoop] addTimer:self.copyingTimer forMode:NSDefaultRunLoopMode];
     };
