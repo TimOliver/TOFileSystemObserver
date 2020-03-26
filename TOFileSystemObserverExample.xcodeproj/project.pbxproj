@@ -49,37 +49,21 @@
 		22C7FEAD23B5E74E0017CABD /* TOFileSystemItemURLDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FE9B23B5BD120017CABD /* TOFileSystemItemURLDictionary.m */; };
 		22DA1C1123D1947900AA8444 /* TOFileSystemUUIDTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DA1C1023D1947900AA8444 /* TOFileSystemUUIDTests.m */; };
 		22FF4EEB23DED9EE00B05C03 /* TOImages.m in Sources */ = {isa = PBXBuildFile; fileRef = 22FF4EEA23DED9EE00B05C03 /* TOImages.m */; };
-		AB9A440B242C96C600B4457C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AB9A440A242C96C600B4457C /* main.m */; };
 		AB9A4426242C9BCD00B4457C /* TOFileSystemObserverMacTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AB9A4425242C9BCD00B4457C /* TOFileSystemObserverMacTests.m */; };
 		AB9A442B242C9BE100B4457C /* TOFileSystemObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */; };
-		AB9A442C242C9BE500B4457C /* TOFileSystemObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */; };
-		AB9A442D242C9BEC00B4457C /* NSURL+TOFileSystemAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 22498E5823BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m */; };
 		AB9A442E242C9BEC00B4457C /* NSURL+TOFileSystemAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 22498E5823BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m */; };
-		AB9A442F242C9BEF00B4457C /* NSURL+TOFileSystemUUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */; };
 		AB9A4430242C9BF000B4457C /* NSURL+TOFileSystemUUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */; };
-		AB9A4431242C9BF300B4457C /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */; };
 		AB9A4432242C9BF400B4457C /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */; };
-		AB9A4433242C9BFB00B4457C /* NSIndexPath+UIKitAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = AB9A4402242C948000B4457C /* NSIndexPath+UIKitAdditions.m */; };
 		AB9A4434242C9BFB00B4457C /* NSIndexPath+UIKitAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = AB9A4402242C948000B4457C /* NSIndexPath+UIKitAdditions.m */; };
-		AB9A4435242C9C0300B4457C /* TOFileSystemItemListChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 229E0BA723C8503C0019937C /* TOFileSystemItemListChanges.m */; };
 		AB9A4436242C9C0300B4457C /* TOFileSystemItemListChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 229E0BA723C8503C0019937C /* TOFileSystemItemListChanges.m */; };
-		AB9A4437242C9C0500B4457C /* TOFileSystemChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 22838BA523CF65F700CBE2FE /* TOFileSystemChanges.m */; };
 		AB9A4438242C9C0600B4457C /* TOFileSystemChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 22838BA523CF65F700CBE2FE /* TOFileSystemChanges.m */; };
-		AB9A4439242C9C0900B4457C /* TOFileSystemItemURLDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FE9B23B5BD120017CABD /* TOFileSystemItemURLDictionary.m */; };
 		AB9A443A242C9C0900B4457C /* TOFileSystemItemURLDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FE9B23B5BD120017CABD /* TOFileSystemItemURLDictionary.m */; };
 		AB9A443B242C9C0D00B4457C /* TOFileSystemItemMapTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F4E42A23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m */; };
-		AB9A443C242C9C0D00B4457C /* TOFileSystemItemMapTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F4E42A23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m */; };
-		AB9A443D242C9C1000B4457C /* TOFileSystemPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED292340588F00331B47 /* TOFileSystemPath.m */; };
 		AB9A443E242C9C1100B4457C /* TOFileSystemPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED292340588F00331B47 /* TOFileSystemPath.m */; };
-		AB9A443F242C9C1300B4457C /* TOFileSystemNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232B64B233F6C1800358B05 /* TOFileSystemNotificationToken.m */; };
 		AB9A4440242C9C1400B4457C /* TOFileSystemNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232B64B233F6C1800358B05 /* TOFileSystemNotificationToken.m */; };
 		AB9A4441242C9C1700B4457C /* TOFileSystemItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */; };
-		AB9A4442242C9C1700B4457C /* TOFileSystemItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */; };
-		AB9A4443242C9C1A00B4457C /* TOFileSystemItemList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBB237815DA0088D31E /* TOFileSystemItemList.m */; };
 		AB9A4444242C9C1B00B4457C /* TOFileSystemItemList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBB237815DA0088D31E /* TOFileSystemItemList.m */; };
-		AB9A4445242C9C2100B4457C /* TOFileSystemPresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */; };
 		AB9A4446242C9C2100B4457C /* TOFileSystemPresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */; };
-		AB9A4447242C9C2500B4457C /* TOFileSystemScanOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */; };
 		AB9A4448242C9C2600B4457C /* TOFileSystemScanOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */; };
 		AB9A4449242C9C3200B4457C /* TOFileSystemFileAttributesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22925B4023D35E4600FC166C /* TOFileSystemFileAttributesTests.m */; };
 		AB9A444A242C9C3500B4457C /* TOFileSystemUUIDTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DA1C1023D1947900AA8444 /* TOFileSystemUUIDTests.m */; };
@@ -89,6 +73,27 @@
 		AB9A444E242C9C4000B4457C /* TOFileSystemItemDictionaryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FEAB23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m */; };
 		AB9A444F242C9C4200B4457C /* TOFileSystemItemURLDictionaryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2225239123DFFC9C00032C10 /* TOFileSystemItemURLDictionaryTests.m */; };
 		AB9A4450242C9C4500B4457C /* TOFileSystemItemMapTableTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2225239323E00A7000032C10 /* TOFileSystemItemMapTableTests.m */; };
+		AB9A4471242CA8F100B4457C /* ARAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AB9A4470242CA8F100B4457C /* ARAppDelegate.m */; };
+		AB9A4474242CA8F100B4457C /* ARViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AB9A4473242CA8F100B4457C /* ARViewController.m */; };
+		AB9A4476242CA8F200B4457C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AB9A4475242CA8F200B4457C /* Assets.xcassets */; };
+		AB9A4479242CA8F200B4457C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB9A4477242CA8F200B4457C /* Main.storyboard */; };
+		AB9A447C242CA8F200B4457C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AB9A447B242CA8F200B4457C /* main.m */; };
+		AB9A4481242CA95500B4457C /* TOFileSystemObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */; };
+		AB9A4482242CA95500B4457C /* NSURL+TOFileSystemAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 22498E5823BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m */; };
+		AB9A4483242CA95500B4457C /* NSURL+TOFileSystemUUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */; };
+		AB9A4484242CA95500B4457C /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */; };
+		AB9A4485242CA95500B4457C /* NSIndexPath+UIKitAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = AB9A4402242C948000B4457C /* NSIndexPath+UIKitAdditions.m */; };
+		AB9A4486242CA95500B4457C /* TOFileSystemItemListChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 229E0BA723C8503C0019937C /* TOFileSystemItemListChanges.m */; };
+		AB9A4487242CA95500B4457C /* TOFileSystemChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 22838BA523CF65F700CBE2FE /* TOFileSystemChanges.m */; };
+		AB9A4488242CA95500B4457C /* TOFileSystemItemURLDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FE9B23B5BD120017CABD /* TOFileSystemItemURLDictionary.m */; };
+		AB9A4489242CA95500B4457C /* TOFileSystemItemMapTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F4E42A23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m */; };
+		AB9A448A242CA95500B4457C /* TOFileSystemPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED292340588F00331B47 /* TOFileSystemPath.m */; };
+		AB9A448B242CA95500B4457C /* TOFileSystemNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232B64B233F6C1800358B05 /* TOFileSystemNotificationToken.m */; };
+		AB9A448C242CA95500B4457C /* TOFileSystemItemList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBB237815DA0088D31E /* TOFileSystemItemList.m */; };
+		AB9A448D242CA95500B4457C /* TOFileSystemItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */; };
+		AB9A448E242CA95500B4457C /* TOFileSystemPresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */; };
+		AB9A448F242CA95500B4457C /* TOFileSystemScanOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */; };
+		AB9A4496242CD33F00B4457C /* ARImages.m in Sources */ = {isa = PBXBuildFile; fileRef = AB9A4495242CD33F00B4457C /* ARImages.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -111,15 +116,6 @@
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
-		};
-		AB9A4406242C96C600B4457C /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -182,11 +178,22 @@
 		22FF4EEA23DED9EE00B05C03 /* TOImages.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOImages.m; sourceTree = "<group>"; };
 		AB9A4400242C917500B4457C /* NSIndexPath+UIKitAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSIndexPath+UIKitAdditions.h"; sourceTree = "<group>"; };
 		AB9A4402242C948000B4457C /* NSIndexPath+UIKitAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSIndexPath+UIKitAdditions.m"; sourceTree = "<group>"; };
-		AB9A4408242C96C600B4457C /* TOFileSystemObserverMacExample */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TOFileSystemObserverMacExample; sourceTree = BUILT_PRODUCTS_DIR; };
-		AB9A440A242C96C600B4457C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		AB9A4423242C9BCD00B4457C /* TOFileSystemObserverMacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TOFileSystemObserverMacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB9A4425242C9BCD00B4457C /* TOFileSystemObserverMacTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemObserverMacTests.m; sourceTree = "<group>"; };
 		AB9A4427242C9BCD00B4457C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AB9A446D242CA8F100B4457C /* TOFileSystemObserverMacExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TOFileSystemObserverMacExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB9A446F242CA8F100B4457C /* ARAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARAppDelegate.h; sourceTree = "<group>"; };
+		AB9A4470242CA8F100B4457C /* ARAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARAppDelegate.m; sourceTree = "<group>"; };
+		AB9A4472242CA8F100B4457C /* ARViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARViewController.h; sourceTree = "<group>"; };
+		AB9A4473242CA8F100B4457C /* ARViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARViewController.m; sourceTree = "<group>"; };
+		AB9A4475242CA8F200B4457C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AB9A4478242CA8F200B4457C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		AB9A447A242CA8F200B4457C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AB9A447B242CA8F200B4457C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		AB9A447D242CA8F200B4457C /* TOFileSystemObserverMacExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TOFileSystemObserverMacExample.entitlements; sourceTree = "<group>"; };
+		AB9A4490242CAD2D00B4457C /* TOFileSystemObserver+AppKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "TOFileSystemObserver+AppKit.h"; path = "../../TOFileSystemObserverMacExample/TOFileSystemObserver+AppKit.h"; sourceTree = "<group>"; };
+		AB9A4494242CD2A900B4457C /* ARImages.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARImages.h; sourceTree = "<group>"; };
+		AB9A4495242CD33F00B4457C /* ARImages.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARImages.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -204,14 +211,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AB9A4405242C96C600B4457C /* Frameworks */ = {
+		AB9A4420242C9BCD00B4457C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AB9A4420242C9BCD00B4457C /* Frameworks */ = {
+		AB9A446A242CA8F100B4457C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -225,6 +232,7 @@
 			isa = PBXGroup;
 			children = (
 				2206C80723C9BECA009FD5DD /* TOFileSystemObserver+UIKit.h */,
+				AB9A4490242CAD2D00B4457C /* TOFileSystemObserver+AppKit.h */,
 				22FF4EE823DEADBC00B05C03 /* TOFileSystemObserverConstants.h */,
 			);
 			path = Utilities;
@@ -283,8 +291,8 @@
 				223A8954233F4A99008FFE1A /* TOFileSystemObserver */,
 				22C7FEA223B5E70E0017CABD /* TOFileSystemObserverTests */,
 				223A893A233F13CA008FFE1A /* TOFileSystemObserverExample */,
-				AB9A4409242C96C600B4457C /* TOFileSystemObserverMacExample */,
 				AB9A4424242C9BCD00B4457C /* TOFileSystemObserverMacTests */,
+				AB9A446E242CA8F100B4457C /* TOFileSystemObserverMacExample */,
 				223A8939233F13CA008FFE1A /* Products */,
 				22713F8E23E1B184005D12E2 /* Frameworks */,
 			);
@@ -295,8 +303,8 @@
 			children = (
 				223A8938233F13CA008FFE1A /* TOFileSystemObserverExample.app */,
 				22C7FEA123B5E70E0017CABD /* TOFileSystemObserverTests.xctest */,
-				AB9A4408242C96C600B4457C /* TOFileSystemObserverMacExample */,
 				AB9A4423242C9BCD00B4457C /* TOFileSystemObserverMacTests.xctest */,
+				AB9A446D242CA8F100B4457C /* TOFileSystemObserverMacExample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -417,14 +425,6 @@
 			path = Collections;
 			sourceTree = "<group>";
 		};
-		AB9A4409242C96C600B4457C /* TOFileSystemObserverMacExample */ = {
-			isa = PBXGroup;
-			children = (
-				AB9A440A242C96C600B4457C /* main.m */,
-			);
-			path = TOFileSystemObserverMacExample;
-			sourceTree = "<group>";
-		};
 		AB9A4424242C9BCD00B4457C /* TOFileSystemObserverMacTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -432,6 +432,24 @@
 				AB9A4427242C9BCD00B4457C /* Info.plist */,
 			);
 			path = TOFileSystemObserverMacTests;
+			sourceTree = "<group>";
+		};
+		AB9A446E242CA8F100B4457C /* TOFileSystemObserverMacExample */ = {
+			isa = PBXGroup;
+			children = (
+				AB9A446F242CA8F100B4457C /* ARAppDelegate.h */,
+				AB9A4470242CA8F100B4457C /* ARAppDelegate.m */,
+				AB9A4472242CA8F100B4457C /* ARViewController.h */,
+				AB9A4473242CA8F100B4457C /* ARViewController.m */,
+				AB9A4494242CD2A900B4457C /* ARImages.h */,
+				AB9A4495242CD33F00B4457C /* ARImages.m */,
+				AB9A4475242CA8F200B4457C /* Assets.xcassets */,
+				AB9A4477242CA8F200B4457C /* Main.storyboard */,
+				AB9A447A242CA8F200B4457C /* Info.plist */,
+				AB9A447B242CA8F200B4457C /* main.m */,
+				AB9A447D242CA8F200B4457C /* TOFileSystemObserverMacExample.entitlements */,
+			);
+			path = TOFileSystemObserverMacExample;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -473,23 +491,6 @@
 			productReference = 22C7FEA123B5E70E0017CABD /* TOFileSystemObserverTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		AB9A4407242C96C600B4457C /* TOFileSystemObserverMacExample */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = AB9A440C242C96C600B4457C /* Build configuration list for PBXNativeTarget "TOFileSystemObserverMacExample" */;
-			buildPhases = (
-				AB9A4404242C96C600B4457C /* Sources */,
-				AB9A4405242C96C600B4457C /* Frameworks */,
-				AB9A4406242C96C600B4457C /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = TOFileSystemObserverMacExample;
-			productName = TOFileSystemObserverMacExample;
-			productReference = AB9A4408242C96C600B4457C /* TOFileSystemObserverMacExample */;
-			productType = "com.apple.product-type.tool";
-		};
 		AB9A4422242C9BCD00B4457C /* TOFileSystemObserverMacTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = AB9A442A242C9BCD00B4457C /* Build configuration list for PBXNativeTarget "TOFileSystemObserverMacTests" */;
@@ -506,6 +507,23 @@
 			productName = TOFileSystemObserverMacTests;
 			productReference = AB9A4423242C9BCD00B4457C /* TOFileSystemObserverMacTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		AB9A446C242CA8F100B4457C /* TOFileSystemObserverMacExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AB9A447E242CA8F200B4457C /* Build configuration list for PBXNativeTarget "TOFileSystemObserverMacExample" */;
+			buildPhases = (
+				AB9A4469242CA8F100B4457C /* Sources */,
+				AB9A446A242CA8F100B4457C /* Frameworks */,
+				AB9A446B242CA8F100B4457C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TOFileSystemObserverMacExample;
+			productName = TOFileSystemObserverMacExample;
+			productReference = AB9A446D242CA8F100B4457C /* TOFileSystemObserverMacExample.app */;
+			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
@@ -524,10 +542,10 @@
 						CreatedOnToolsVersion = 11.3;
 						TestTargetID = 223A8937233F13C9008FFE1A;
 					};
-					AB9A4407242C96C600B4457C = {
+					AB9A4422242C9BCD00B4457C = {
 						CreatedOnToolsVersion = 11.4;
 					};
-					AB9A4422242C9BCD00B4457C = {
+					AB9A446C242CA8F100B4457C = {
 						CreatedOnToolsVersion = 11.4;
 					};
 				};
@@ -547,7 +565,7 @@
 			targets = (
 				223A8937233F13C9008FFE1A /* TOFileSystemObserverExample */,
 				22C7FEA023B5E70E0017CABD /* TOFileSystemObserverTests */,
-				AB9A4407242C96C600B4457C /* TOFileSystemObserverMacExample */,
+				AB9A446C242CA8F100B4457C /* TOFileSystemObserverMacExample */,
 				AB9A4422242C9BCD00B4457C /* TOFileSystemObserverMacTests */,
 			);
 		};
@@ -574,6 +592,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB9A446B242CA8F100B4457C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AB9A4476242CA8F200B4457C /* Assets.xcassets in Resources */,
+				AB9A4479242CA8F200B4457C /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -634,29 +661,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AB9A4404242C96C600B4457C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				AB9A440B242C96C600B4457C /* main.m in Sources */,
-				AB9A4437242C9C0500B4457C /* TOFileSystemChanges.m in Sources */,
-				AB9A443C242C9C0D00B4457C /* TOFileSystemItemMapTable.m in Sources */,
-				AB9A442F242C9BEF00B4457C /* NSURL+TOFileSystemUUID.m in Sources */,
-				AB9A4447242C9C2500B4457C /* TOFileSystemScanOperation.m in Sources */,
-				AB9A4435242C9C0300B4457C /* TOFileSystemItemListChanges.m in Sources */,
-				AB9A442C242C9BE500B4457C /* TOFileSystemObserver.m in Sources */,
-				AB9A4443242C9C1A00B4457C /* TOFileSystemItemList.m in Sources */,
-				AB9A4433242C9BFB00B4457C /* NSIndexPath+UIKitAdditions.m in Sources */,
-				AB9A4445242C9C2100B4457C /* TOFileSystemPresenter.m in Sources */,
-				AB9A4431242C9BF300B4457C /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */,
-				AB9A442D242C9BEC00B4457C /* NSURL+TOFileSystemAttributes.m in Sources */,
-				AB9A4439242C9C0900B4457C /* TOFileSystemItemURLDictionary.m in Sources */,
-				AB9A4442242C9C1700B4457C /* TOFileSystemItem.m in Sources */,
-				AB9A443F242C9C1300B4457C /* TOFileSystemNotificationToken.m in Sources */,
-				AB9A443D242C9C1000B4457C /* TOFileSystemPath.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		AB9A441F242C9BCD00B4457C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -688,6 +692,32 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AB9A4469242CA8F100B4457C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AB9A4474242CA8F100B4457C /* ARViewController.m in Sources */,
+				AB9A4496242CD33F00B4457C /* ARImages.m in Sources */,
+				AB9A4481242CA95500B4457C /* TOFileSystemObserver.m in Sources */,
+				AB9A448F242CA95500B4457C /* TOFileSystemScanOperation.m in Sources */,
+				AB9A448B242CA95500B4457C /* TOFileSystemNotificationToken.m in Sources */,
+				AB9A447C242CA8F200B4457C /* main.m in Sources */,
+				AB9A448D242CA95500B4457C /* TOFileSystemItem.m in Sources */,
+				AB9A4486242CA95500B4457C /* TOFileSystemItemListChanges.m in Sources */,
+				AB9A4482242CA95500B4457C /* NSURL+TOFileSystemAttributes.m in Sources */,
+				AB9A4471242CA8F100B4457C /* ARAppDelegate.m in Sources */,
+				AB9A4485242CA95500B4457C /* NSIndexPath+UIKitAdditions.m in Sources */,
+				AB9A4488242CA95500B4457C /* TOFileSystemItemURLDictionary.m in Sources */,
+				AB9A448C242CA95500B4457C /* TOFileSystemItemList.m in Sources */,
+				AB9A4487242CA95500B4457C /* TOFileSystemChanges.m in Sources */,
+				AB9A4484242CA95500B4457C /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */,
+				AB9A448A242CA95500B4457C /* TOFileSystemPath.m in Sources */,
+				AB9A448E242CA95500B4457C /* TOFileSystemPresenter.m in Sources */,
+				AB9A4489242CA95500B4457C /* TOFileSystemItemMapTable.m in Sources */,
+				AB9A4483242CA95500B4457C /* NSURL+TOFileSystemUUID.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -705,6 +735,14 @@
 				223A894A233F13CA008FFE1A /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		AB9A4477242CA8F200B4457C /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				AB9A4478242CA8F200B4457C /* Base */,
+			);
+			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -900,30 +938,6 @@
 			};
 			name = Release;
 		};
-		AB9A440D242C96C600B4457C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 3D89A9XEEV;
-				ENABLE_HARDENED_RUNTIME = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-			};
-			name = Debug;
-		};
-		AB9A440E242C96C600B4457C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 3D89A9XEEV;
-				ENABLE_HARDENED_RUNTIME = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-			};
-			name = Release;
-		};
 		AB9A4428242C9BCD00B4457C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -962,6 +976,48 @@
 			};
 			name = Release;
 		};
+		AB9A447F242CA8F200B4457C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TOFileSystemObserverMacExample/TOFileSystemObserverMacExample.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 3D89A9XEEV;
+				ENABLE_HARDENED_RUNTIME = NO;
+				INFOPLIST_FILE = TOFileSystemObserverMacExample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.tim.TOFileSystemObserverMacExample.TOFileSystemObserverMacExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		AB9A4480242CA8F200B4457C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TOFileSystemObserverMacExample/TOFileSystemObserverMacExample.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 3D89A9XEEV;
+				ENABLE_HARDENED_RUNTIME = NO;
+				INFOPLIST_FILE = TOFileSystemObserverMacExample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.tim.TOFileSystemObserverMacExample.TOFileSystemObserverMacExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -992,20 +1048,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AB9A440C242C96C600B4457C /* Build configuration list for PBXNativeTarget "TOFileSystemObserverMacExample" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				AB9A440D242C96C600B4457C /* Debug */,
-				AB9A440E242C96C600B4457C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		AB9A442A242C9BCD00B4457C /* Build configuration list for PBXNativeTarget "TOFileSystemObserverMacTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AB9A4428242C9BCD00B4457C /* Debug */,
 				AB9A4429242C9BCD00B4457C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AB9A447E242CA8F200B4457C /* Build configuration list for PBXNativeTarget "TOFileSystemObserverMacExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB9A447F242CA8F200B4457C /* Debug */,
+				AB9A4480242CA8F200B4457C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

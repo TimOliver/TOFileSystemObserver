@@ -14,8 +14,8 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AB9A4407242C96C600B4457C"
-               BuildableName = "TOFileSystemObserverMacExample"
+               BlueprintIdentifier = "AB9A4454242CA59500B4457C"
+               BuildableName = "TOFileSystemObserverMacExample.app"
                BlueprintName = "TOFileSystemObserverMacExample"
                ReferencedContainer = "container:TOFileSystemObserverExample.xcodeproj">
             </BuildableReference>
@@ -44,8 +44,8 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AB9A4407242C96C600B4457C"
-            BuildableName = "TOFileSystemObserverMacExample"
+            BlueprintIdentifier = "AB9A4454242CA59500B4457C"
+            BuildableName = "TOFileSystemObserverMacExample.app"
             BlueprintName = "TOFileSystemObserverMacExample"
             ReferencedContainer = "container:TOFileSystemObserverExample.xcodeproj">
          </BuildableReference>
@@ -61,8 +61,8 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AB9A4407242C96C600B4457C"
-            BuildableName = "TOFileSystemObserverMacExample"
+            BlueprintIdentifier = "AB9A4454242CA59500B4457C"
+            BuildableName = "TOFileSystemObserverMacExample.app"
             BlueprintName = "TOFileSystemObserverMacExample"
             ReferencedContainer = "container:TOFileSystemObserverExample.xcodeproj">
          </BuildableReference>
