@@ -50,6 +50,45 @@
 		22DA1C1123D1947900AA8444 /* TOFileSystemUUIDTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DA1C1023D1947900AA8444 /* TOFileSystemUUIDTests.m */; };
 		22FF4EEB23DED9EE00B05C03 /* TOImages.m in Sources */ = {isa = PBXBuildFile; fileRef = 22FF4EEA23DED9EE00B05C03 /* TOImages.m */; };
 		AB9A440B242C96C600B4457C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AB9A440A242C96C600B4457C /* main.m */; };
+		AB9A4426242C9BCD00B4457C /* TOFileSystemObserverMacTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AB9A4425242C9BCD00B4457C /* TOFileSystemObserverMacTests.m */; };
+		AB9A442B242C9BE100B4457C /* TOFileSystemObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */; };
+		AB9A442C242C9BE500B4457C /* TOFileSystemObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A8956233F4AB0008FFE1A /* TOFileSystemObserver.m */; };
+		AB9A442D242C9BEC00B4457C /* NSURL+TOFileSystemAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 22498E5823BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m */; };
+		AB9A442E242C9BEC00B4457C /* NSURL+TOFileSystemAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 22498E5823BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m */; };
+		AB9A442F242C9BEF00B4457C /* NSURL+TOFileSystemUUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */; };
+		AB9A4430242C9BF000B4457C /* NSURL+TOFileSystemUUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */; };
+		AB9A4431242C9BF300B4457C /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */; };
+		AB9A4432242C9BF400B4457C /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */; };
+		AB9A4433242C9BFB00B4457C /* NSIndexPath+UIKitAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = AB9A4402242C948000B4457C /* NSIndexPath+UIKitAdditions.m */; };
+		AB9A4434242C9BFB00B4457C /* NSIndexPath+UIKitAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = AB9A4402242C948000B4457C /* NSIndexPath+UIKitAdditions.m */; };
+		AB9A4435242C9C0300B4457C /* TOFileSystemItemListChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 229E0BA723C8503C0019937C /* TOFileSystemItemListChanges.m */; };
+		AB9A4436242C9C0300B4457C /* TOFileSystemItemListChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 229E0BA723C8503C0019937C /* TOFileSystemItemListChanges.m */; };
+		AB9A4437242C9C0500B4457C /* TOFileSystemChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 22838BA523CF65F700CBE2FE /* TOFileSystemChanges.m */; };
+		AB9A4438242C9C0600B4457C /* TOFileSystemChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 22838BA523CF65F700CBE2FE /* TOFileSystemChanges.m */; };
+		AB9A4439242C9C0900B4457C /* TOFileSystemItemURLDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FE9B23B5BD120017CABD /* TOFileSystemItemURLDictionary.m */; };
+		AB9A443A242C9C0900B4457C /* TOFileSystemItemURLDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FE9B23B5BD120017CABD /* TOFileSystemItemURLDictionary.m */; };
+		AB9A443B242C9C0D00B4457C /* TOFileSystemItemMapTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F4E42A23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m */; };
+		AB9A443C242C9C0D00B4457C /* TOFileSystemItemMapTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F4E42A23CC8BE400F7EEC6 /* TOFileSystemItemMapTable.m */; };
+		AB9A443D242C9C1000B4457C /* TOFileSystemPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED292340588F00331B47 /* TOFileSystemPath.m */; };
+		AB9A443E242C9C1100B4457C /* TOFileSystemPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED292340588F00331B47 /* TOFileSystemPath.m */; };
+		AB9A443F242C9C1300B4457C /* TOFileSystemNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232B64B233F6C1800358B05 /* TOFileSystemNotificationToken.m */; };
+		AB9A4440242C9C1400B4457C /* TOFileSystemNotificationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232B64B233F6C1800358B05 /* TOFileSystemNotificationToken.m */; };
+		AB9A4441242C9C1700B4457C /* TOFileSystemItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */; };
+		AB9A4442242C9C1700B4457C /* TOFileSystemItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 223A895A233F4B3B008FFE1A /* TOFileSystemItem.m */; };
+		AB9A4443242C9C1A00B4457C /* TOFileSystemItemList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBB237815DA0088D31E /* TOFileSystemItemList.m */; };
+		AB9A4444242C9C1B00B4457C /* TOFileSystemItemList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBB237815DA0088D31E /* TOFileSystemItemList.m */; };
+		AB9A4445242C9C2100B4457C /* TOFileSystemPresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */; };
+		AB9A4446242C9C2100B4457C /* TOFileSystemPresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D601C823657FA500275AD9 /* TOFileSystemPresenter.m */; };
+		AB9A4447242C9C2500B4457C /* TOFileSystemScanOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */; };
+		AB9A4448242C9C2600B4457C /* TOFileSystemScanOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED2D2340F04800331B47 /* TOFileSystemScanOperation.m */; };
+		AB9A4449242C9C3200B4457C /* TOFileSystemFileAttributesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22925B4023D35E4600FC166C /* TOFileSystemFileAttributesTests.m */; };
+		AB9A444A242C9C3500B4457C /* TOFileSystemUUIDTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DA1C1023D1947900AA8444 /* TOFileSystemUUIDTests.m */; };
+		AB9A444B242C9C3700B4457C /* TOFileSystemEnumeratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22925B4323D36D0000FC166C /* TOFileSystemEnumeratorTests.m */; };
+		AB9A444C242C9C3A00B4457C /* TOFileSystemItemListChangesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BC8D5823D8575A008A310D /* TOFileSystemItemListChangesTests.m */; };
+		AB9A444D242C9C3D00B4457C /* TOFileSystemChangesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2225238D23DFF2E400032C10 /* TOFileSystemChangesTests.m */; };
+		AB9A444E242C9C4000B4457C /* TOFileSystemItemDictionaryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FEAB23B5E7450017CABD /* TOFileSystemItemDictionaryTests.m */; };
+		AB9A444F242C9C4200B4457C /* TOFileSystemItemURLDictionaryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2225239123DFFC9C00032C10 /* TOFileSystemItemURLDictionaryTests.m */; };
+		AB9A4450242C9C4500B4457C /* TOFileSystemItemMapTableTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2225239323E00A7000032C10 /* TOFileSystemItemMapTableTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -145,6 +184,9 @@
 		AB9A4402242C948000B4457C /* NSIndexPath+UIKitAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSIndexPath+UIKitAdditions.m"; sourceTree = "<group>"; };
 		AB9A4408242C96C600B4457C /* TOFileSystemObserverMacExample */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TOFileSystemObserverMacExample; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB9A440A242C96C600B4457C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		AB9A4423242C9BCD00B4457C /* TOFileSystemObserverMacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TOFileSystemObserverMacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB9A4425242C9BCD00B4457C /* TOFileSystemObserverMacTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemObserverMacTests.m; sourceTree = "<group>"; };
+		AB9A4427242C9BCD00B4457C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,6 +205,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		AB9A4405242C96C600B4457C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB9A4420242C9BCD00B4457C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -235,6 +284,7 @@
 				22C7FEA223B5E70E0017CABD /* TOFileSystemObserverTests */,
 				223A893A233F13CA008FFE1A /* TOFileSystemObserverExample */,
 				AB9A4409242C96C600B4457C /* TOFileSystemObserverMacExample */,
+				AB9A4424242C9BCD00B4457C /* TOFileSystemObserverMacTests */,
 				223A8939233F13CA008FFE1A /* Products */,
 				22713F8E23E1B184005D12E2 /* Frameworks */,
 			);
@@ -246,6 +296,7 @@
 				223A8938233F13CA008FFE1A /* TOFileSystemObserverExample.app */,
 				22C7FEA123B5E70E0017CABD /* TOFileSystemObserverTests.xctest */,
 				AB9A4408242C96C600B4457C /* TOFileSystemObserverMacExample */,
+				AB9A4423242C9BCD00B4457C /* TOFileSystemObserverMacTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -374,6 +425,15 @@
 			path = TOFileSystemObserverMacExample;
 			sourceTree = "<group>";
 		};
+		AB9A4424242C9BCD00B4457C /* TOFileSystemObserverMacTests */ = {
+			isa = PBXGroup;
+			children = (
+				AB9A4425242C9BCD00B4457C /* TOFileSystemObserverMacTests.m */,
+				AB9A4427242C9BCD00B4457C /* Info.plist */,
+			);
+			path = TOFileSystemObserverMacTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -430,6 +490,23 @@
 			productReference = AB9A4408242C96C600B4457C /* TOFileSystemObserverMacExample */;
 			productType = "com.apple.product-type.tool";
 		};
+		AB9A4422242C9BCD00B4457C /* TOFileSystemObserverMacTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AB9A442A242C9BCD00B4457C /* Build configuration list for PBXNativeTarget "TOFileSystemObserverMacTests" */;
+			buildPhases = (
+				AB9A441F242C9BCD00B4457C /* Sources */,
+				AB9A4420242C9BCD00B4457C /* Frameworks */,
+				AB9A4421242C9BCD00B4457C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TOFileSystemObserverMacTests;
+			productName = TOFileSystemObserverMacTests;
+			productReference = AB9A4423242C9BCD00B4457C /* TOFileSystemObserverMacTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -450,6 +527,9 @@
 					AB9A4407242C96C600B4457C = {
 						CreatedOnToolsVersion = 11.4;
 					};
+					AB9A4422242C9BCD00B4457C = {
+						CreatedOnToolsVersion = 11.4;
+					};
 				};
 			};
 			buildConfigurationList = 223A8933233F13C9008FFE1A /* Build configuration list for PBXProject "TOFileSystemObserverExample" */;
@@ -468,6 +548,7 @@
 				223A8937233F13C9008FFE1A /* TOFileSystemObserverExample */,
 				22C7FEA023B5E70E0017CABD /* TOFileSystemObserverTests */,
 				AB9A4407242C96C600B4457C /* TOFileSystemObserverMacExample */,
+				AB9A4422242C9BCD00B4457C /* TOFileSystemObserverMacTests */,
 			);
 		};
 /* End PBXProject section */
@@ -483,6 +564,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		22C7FE9F23B5E70E0017CABD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB9A4421242C9BCD00B4457C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -551,6 +639,52 @@
 			buildActionMask = 2147483647;
 			files = (
 				AB9A440B242C96C600B4457C /* main.m in Sources */,
+				AB9A4437242C9C0500B4457C /* TOFileSystemChanges.m in Sources */,
+				AB9A443C242C9C0D00B4457C /* TOFileSystemItemMapTable.m in Sources */,
+				AB9A442F242C9BEF00B4457C /* NSURL+TOFileSystemUUID.m in Sources */,
+				AB9A4447242C9C2500B4457C /* TOFileSystemScanOperation.m in Sources */,
+				AB9A4435242C9C0300B4457C /* TOFileSystemItemListChanges.m in Sources */,
+				AB9A442C242C9BE500B4457C /* TOFileSystemObserver.m in Sources */,
+				AB9A4443242C9C1A00B4457C /* TOFileSystemItemList.m in Sources */,
+				AB9A4433242C9BFB00B4457C /* NSIndexPath+UIKitAdditions.m in Sources */,
+				AB9A4445242C9C2100B4457C /* TOFileSystemPresenter.m in Sources */,
+				AB9A4431242C9BF300B4457C /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */,
+				AB9A442D242C9BEC00B4457C /* NSURL+TOFileSystemAttributes.m in Sources */,
+				AB9A4439242C9C0900B4457C /* TOFileSystemItemURLDictionary.m in Sources */,
+				AB9A4442242C9C1700B4457C /* TOFileSystemItem.m in Sources */,
+				AB9A443F242C9C1300B4457C /* TOFileSystemNotificationToken.m in Sources */,
+				AB9A443D242C9C1000B4457C /* TOFileSystemPath.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB9A441F242C9BCD00B4457C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AB9A4426242C9BCD00B4457C /* TOFileSystemObserverMacTests.m in Sources */,
+				AB9A4438242C9C0600B4457C /* TOFileSystemChanges.m in Sources */,
+				AB9A443B242C9C0D00B4457C /* TOFileSystemItemMapTable.m in Sources */,
+				AB9A4430242C9BF000B4457C /* NSURL+TOFileSystemUUID.m in Sources */,
+				AB9A444C242C9C3A00B4457C /* TOFileSystemItemListChangesTests.m in Sources */,
+				AB9A444B242C9C3700B4457C /* TOFileSystemEnumeratorTests.m in Sources */,
+				AB9A4448242C9C2600B4457C /* TOFileSystemScanOperation.m in Sources */,
+				AB9A4436242C9C0300B4457C /* TOFileSystemItemListChanges.m in Sources */,
+				AB9A442B242C9BE100B4457C /* TOFileSystemObserver.m in Sources */,
+				AB9A4444242C9C1B00B4457C /* TOFileSystemItemList.m in Sources */,
+				AB9A4434242C9BFB00B4457C /* NSIndexPath+UIKitAdditions.m in Sources */,
+				AB9A4446242C9C2100B4457C /* TOFileSystemPresenter.m in Sources */,
+				AB9A444A242C9C3500B4457C /* TOFileSystemUUIDTests.m in Sources */,
+				AB9A4432242C9BF400B4457C /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */,
+				AB9A444F242C9C4200B4457C /* TOFileSystemItemURLDictionaryTests.m in Sources */,
+				AB9A442E242C9BEC00B4457C /* NSURL+TOFileSystemAttributes.m in Sources */,
+				AB9A4449242C9C3200B4457C /* TOFileSystemFileAttributesTests.m in Sources */,
+				AB9A444E242C9C4000B4457C /* TOFileSystemItemDictionaryTests.m in Sources */,
+				AB9A4450242C9C4500B4457C /* TOFileSystemItemMapTableTests.m in Sources */,
+				AB9A443A242C9C0900B4457C /* TOFileSystemItemURLDictionary.m in Sources */,
+				AB9A4441242C9C1700B4457C /* TOFileSystemItem.m in Sources */,
+				AB9A4440242C9C1400B4457C /* TOFileSystemNotificationToken.m in Sources */,
+				AB9A444D242C9C3D00B4457C /* TOFileSystemChangesTests.m in Sources */,
+				AB9A443E242C9C1100B4457C /* TOFileSystemPath.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -790,6 +924,44 @@
 			};
 			name = Release;
 		};
+		AB9A4428242C9BCD00B4457C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 3D89A9XEEV;
+				INFOPLIST_FILE = TOFileSystemObserverMacTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.tim.TOFileSystemObserverMacExample.TOFileSystemObserverMacTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		AB9A4429242C9BCD00B4457C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 3D89A9XEEV;
+				INFOPLIST_FILE = TOFileSystemObserverMacTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.tim.TOFileSystemObserverMacExample.TOFileSystemObserverMacTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -825,6 +997,15 @@
 			buildConfigurations = (
 				AB9A440D242C96C600B4457C /* Debug */,
 				AB9A440E242C96C600B4457C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AB9A442A242C9BCD00B4457C /* Build configuration list for PBXNativeTarget "TOFileSystemObserverMacTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB9A4428242C9BCD00B4457C /* Debug */,
+				AB9A4429242C9BCD00B4457C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

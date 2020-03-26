@@ -22,6 +22,10 @@
 
 #import <XCTest/XCTest.h>
 
+#if TARGET_OS_OSX
+    #import "NSIndexPath+UIKitAdditions.h"
+#endif
+
 #import "TOFileSystemItemListChanges.h"
 #import "TOFileSystemItemListChanges+Private.h"
 
