@@ -6,7 +6,7 @@
 //  Copyright © 2020 Tim Oliver. All rights reserved.
 //
 
-#import "NSIndexPath+UIKitAdditions.h"
+#import "NSIndexPath+AppKitAdditions.h"
 
 @implementation NSIndexPath(UIKitAdditions)
     -(NSInteger)row {

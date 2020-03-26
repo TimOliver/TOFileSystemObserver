@@ -54,7 +54,7 @@
 		AB9A442E242C9BEC00B4457C /* NSURL+TOFileSystemAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 22498E5823BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m */; };
 		AB9A4430242C9BF000B4457C /* NSURL+TOFileSystemUUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */; };
 		AB9A4432242C9BF400B4457C /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */; };
-		AB9A4434242C9BFB00B4457C /* NSIndexPath+UIKitAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = AB9A4402242C948000B4457C /* NSIndexPath+UIKitAdditions.m */; };
+		AB9A4434242C9BFB00B4457C /* NSIndexPath+AppKitAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = AB9A4402242C948000B4457C /* NSIndexPath+AppKitAdditions.m */; };
 		AB9A4436242C9C0300B4457C /* TOFileSystemItemListChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 229E0BA723C8503C0019937C /* TOFileSystemItemListChanges.m */; };
 		AB9A4438242C9C0600B4457C /* TOFileSystemChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 22838BA523CF65F700CBE2FE /* TOFileSystemChanges.m */; };
 		AB9A443A242C9C0900B4457C /* TOFileSystemItemURLDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FE9B23B5BD120017CABD /* TOFileSystemItemURLDictionary.m */; };
@@ -82,7 +82,7 @@
 		AB9A4482242CA95500B4457C /* NSURL+TOFileSystemAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 22498E5823BF030C00D0C345 /* NSURL+TOFileSystemAttributes.m */; };
 		AB9A4483242CA95500B4457C /* NSURL+TOFileSystemUUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */; };
 		AB9A4484242CA95500B4457C /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */; };
-		AB9A4485242CA95500B4457C /* NSIndexPath+UIKitAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = AB9A4402242C948000B4457C /* NSIndexPath+UIKitAdditions.m */; };
+		AB9A4485242CA95500B4457C /* NSIndexPath+AppKitAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = AB9A4402242C948000B4457C /* NSIndexPath+AppKitAdditions.m */; };
 		AB9A4486242CA95500B4457C /* TOFileSystemItemListChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 229E0BA723C8503C0019937C /* TOFileSystemItemListChanges.m */; };
 		AB9A4487242CA95500B4457C /* TOFileSystemChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 22838BA523CF65F700CBE2FE /* TOFileSystemChanges.m */; };
 		AB9A4488242CA95500B4457C /* TOFileSystemItemURLDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C7FE9B23B5BD120017CABD /* TOFileSystemItemURLDictionary.m */; };
@@ -176,8 +176,8 @@
 		22FF4EE823DEADBC00B05C03 /* TOFileSystemObserverConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOFileSystemObserverConstants.h; sourceTree = "<group>"; };
 		22FF4EE923DED9EE00B05C03 /* TOImages.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOImages.h; sourceTree = "<group>"; };
 		22FF4EEA23DED9EE00B05C03 /* TOImages.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOImages.m; sourceTree = "<group>"; };
-		AB9A4400242C917500B4457C /* NSIndexPath+UIKitAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSIndexPath+UIKitAdditions.h"; sourceTree = "<group>"; };
-		AB9A4402242C948000B4457C /* NSIndexPath+UIKitAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSIndexPath+UIKitAdditions.m"; sourceTree = "<group>"; };
+		AB9A4400242C917500B4457C /* NSIndexPath+AppKitAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSIndexPath+AppKitAdditions.h"; sourceTree = "<group>"; };
+		AB9A4402242C948000B4457C /* NSIndexPath+AppKitAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSIndexPath+AppKitAdditions.m"; sourceTree = "<group>"; };
 		AB9A4423242C9BCD00B4457C /* TOFileSystemObserverMacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TOFileSystemObserverMacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB9A4425242C9BCD00B4457C /* TOFileSystemObserverMacTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TOFileSystemObserverMacTests.m; sourceTree = "<group>"; };
 		AB9A4427242C9BCD00B4457C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -369,8 +369,8 @@
 				2254ED3A2341060000331B47 /* NSURL+TOFileSystemUUID.m */,
 				22ADAEBE237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.h */,
 				22ADAEBF237AC95F0088D31E /* NSFileManager+TOFileSystemDirectoryEnumerator.m */,
-				AB9A4400242C917500B4457C /* NSIndexPath+UIKitAdditions.h */,
-				AB9A4402242C948000B4457C /* NSIndexPath+UIKitAdditions.m */,
+				AB9A4400242C917500B4457C /* NSIndexPath+AppKitAdditions.h */,
+				AB9A4402242C948000B4457C /* NSIndexPath+AppKitAdditions.m */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -675,7 +675,7 @@
 				AB9A4436242C9C0300B4457C /* TOFileSystemItemListChanges.m in Sources */,
 				AB9A442B242C9BE100B4457C /* TOFileSystemObserver.m in Sources */,
 				AB9A4444242C9C1B00B4457C /* TOFileSystemItemList.m in Sources */,
-				AB9A4434242C9BFB00B4457C /* NSIndexPath+UIKitAdditions.m in Sources */,
+				AB9A4434242C9BFB00B4457C /* NSIndexPath+AppKitAdditions.m in Sources */,
 				AB9A4446242C9C2100B4457C /* TOFileSystemPresenter.m in Sources */,
 				AB9A444A242C9C3500B4457C /* TOFileSystemUUIDTests.m in Sources */,
 				AB9A4432242C9BF400B4457C /* NSFileManager+TOFileSystemDirectoryEnumerator.m in Sources */,
@@ -706,7 +706,7 @@
 				AB9A4486242CA95500B4457C /* TOFileSystemItemListChanges.m in Sources */,
 				AB9A4482242CA95500B4457C /* NSURL+TOFileSystemAttributes.m in Sources */,
 				AB9A4471242CA8F100B4457C /* ARAppDelegate.m in Sources */,
-				AB9A4485242CA95500B4457C /* NSIndexPath+UIKitAdditions.m in Sources */,
+				AB9A4485242CA95500B4457C /* NSIndexPath+AppKitAdditions.m in Sources */,
 				AB9A4488242CA95500B4457C /* TOFileSystemItemURLDictionary.m in Sources */,
 				AB9A448C242CA95500B4457C /* TOFileSystemItemList.m in Sources */,
 				AB9A4487242CA95500B4457C /* TOFileSystemChanges.m in Sources */,

@@ -23,7 +23,7 @@
 #import "TOFileSystemItemListChanges.h"
 
 #if TARGET_OS_OSX
-    #import "NSIndexPath+UIKitAdditions.h"
+    #import "NSIndexPath+AppKitAdditions.h"
 #else
     #import <UIKit/NSIndexPath+UIKitAdditions.h>
 #endif

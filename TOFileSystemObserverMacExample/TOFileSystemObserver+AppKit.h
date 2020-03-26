@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
 #import "TOFileSystemItemListChanges.h"
 
 static inline void TOFileSystemItemListUpdateTableView(NSTableView * _Nonnull tableView,
