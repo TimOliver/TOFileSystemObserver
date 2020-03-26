@@ -21,7 +21,13 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import "TOFileSystemItemListChanges.h"
-#import <UIKit/NSIndexPath+UIKitAdditions.h>
+
+#if TARGET_OS_OSX
+    #import "NSIndexPath+AppKitAdditions.h"
+#else
+    #import <UIKit/NSIndexPath+UIKitAdditions.h>
+#endif
+
 
 @interface TOFileSystemItemListChanges ()
 

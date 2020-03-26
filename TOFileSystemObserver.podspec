@@ -6,7 +6,9 @@ Pod::Spec.new do |s|
   s.homepage = 'https://github.com/TimOliver/TOFileSystemObserver'
   s.author   = 'Tim Oliver'
   s.source   = { :git => 'https://github.com/TimOliver/TOFileSystemObserver.git', :tag => s.version }
-  s.platform = :ios, '8.0'
+  s.platforms = { :ios => "8.0", :osx => "10.12" }
   s.source_files = 'TOFileSystemObserver/**/*.{h,m}'
+  s.osx.exclude_files = 'TOFileSystemObserver/Utilities/TOFileSystemObserver+UIKit.h'
+  s.ios.exclude_files = ['TOFileSystemObserver/Utilities/TOFileSystemObserver+AppKit.h','TOFileSystemObserver/Categories/NSIndexPath+AppKitAdditions.{h,m}']
   s.requires_arc = true
 end
