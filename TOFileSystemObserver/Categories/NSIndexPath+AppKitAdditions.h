@@ -6,6 +6,8 @@
 //  Copyright © 2020 Tim Oliver. All rights reserved.
 //
 
+#if TARGET_OS_OSX
+
 #import <Foundation/Foundation.h>
 #import <AppKit/NSCollectionView.h>
 
@@ -13,3 +15,5 @@
     -(NSInteger)row;
     +(NSIndexPath*)indexPathForRow:(NSInteger)row inSection:(NSInteger)section;
 @end
+
+#endif

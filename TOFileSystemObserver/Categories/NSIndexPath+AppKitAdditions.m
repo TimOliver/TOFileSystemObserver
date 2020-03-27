@@ -6,6 +6,8 @@
 //  Copyright © 2020 Tim Oliver. All rights reserved.
 //
 
+#if TARGET_OS_OSX
+
 #import "NSIndexPath+AppKitAdditions.h"
 
 @implementation NSIndexPath(UIKitAdditions)
@@ -17,3 +19,5 @@
         return [self indexPathForItem:row inSection:section];
     }
 @end
+
+#endif
