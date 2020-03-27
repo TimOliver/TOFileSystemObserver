@@ -191,7 +191,7 @@
 		AB9A447A242CA8F200B4457C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB9A447B242CA8F200B4457C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		AB9A447D242CA8F200B4457C /* TOFileSystemObserverMacExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TOFileSystemObserverMacExample.entitlements; sourceTree = "<group>"; };
-		AB9A4490242CAD2D00B4457C /* TOFileSystemObserver+AppKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "TOFileSystemObserver+AppKit.h"; path = "../../TOFileSystemObserverMacExample/TOFileSystemObserver+AppKit.h"; sourceTree = "<group>"; };
+		AB9A4490242CAD2D00B4457C /* TOFileSystemObserver+AppKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TOFileSystemObserver+AppKit.h"; sourceTree = "<group>"; };
 		AB9A4494242CD2A900B4457C /* ARImages.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ARImages.h; sourceTree = "<group>"; };
 		AB9A4495242CD33F00B4457C /* ARImages.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ARImages.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
