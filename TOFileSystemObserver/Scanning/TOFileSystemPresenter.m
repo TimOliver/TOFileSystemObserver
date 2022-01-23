@@ -1,7 +1,7 @@
 //
 //  TOFileSystemPresenter.m
 //
-//  Copyright 2019-2020 Timothy Oliver. All rights reserved.
+//  Copyright 2019-2022 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -39,9 +39,6 @@
 
 /** Whether a timer has been set yet or not */
 @property (nonatomic, assign) BOOL isTiming;
-
-/** A dispatch semaphore used to serialize execution when paused, but maintain the same thread. */
-@property (nonatomic, strong) dispatch_semaphore_t pausingSemaphore;
 
 /** A concurrent queue used to coordinate writing UUIDs to files. */
 @property (nonatomic, readonly) dispatch_queue_t fileCoordinatorQueue;
@@ -96,9 +93,6 @@
 
     // Create the dispatch queue for the items
     _itemListAccessQueue = dispatch_queue_create("TOFileSystemObserver.itemListAccessQueue", DISPATCH_QUEUE_SERIAL);
-
-    // Create the dispatch semaphore when serializing paused work
-    _pausingSemaphore = dispatch_semaphore_create(1);
 
     // Default time interval
     _timerInterval = 0.1f;

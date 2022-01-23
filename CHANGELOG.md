@@ -1,6 +1,20 @@
 x.y.z Release Notes (yyyy-MM-dd)
 =============================================================
 
+0.0.4 Release Notes (2022-01-23)
+=============================================================
+
+### Enhancements
+
+* Replaced dispatch barriers in `TOFileSystemItem` with threading locks to minimize GCD queue creation.
+* General internal code/commenting cleanup and refinement.
+
+### Fixed
+
+* An incorrect casting breaking the visible number of items inside of a directory.
+* A crash that can occur if querying for the number of files in a deleted folder.
+* A linking issue when importing the library via SPM on macOS.
+
 0.0.3 Release Notes (2020-02-24)
 =============================================================
 

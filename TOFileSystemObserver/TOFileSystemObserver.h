@@ -1,7 +1,7 @@
 //
 //  TOFileSystemObserver.h
 //
-//  Copyright 2019-2020 Timothy Oliver. All rights reserved.
+//  Copyright 2019-2022 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -53,7 +53,7 @@ NS_SWIFT_NAME(FileSystemObserver)
 @property (nonatomic, strong, nullable) NSArray<NSString *> *excludedItems;
 
 /**
- Optionally, the number of directoy levels down that the observer will recursively traverse from the base target.
+ Optionally, the number of directory levels down that the observer will recursively traverse from the base target.
  This is useful to avoid performance overhead in instances such as if your app only has one level of directories. (Default is 0).
  */
 @property (nonatomic, assign) NSInteger includedDirectoryLevels;
@@ -63,8 +63,8 @@ NS_SWIFT_NAME(FileSystemObserver)
  by this file system observer.
 
  (This item will be refetched from the database each time it is called,
- so it is completely thread-safe. Like all Realm items, please ensure it
- is kept in an auto-release pool in dispatch queues.)
+ so it is completely thread-safe. Like most multi-threading cases, please ensure it
+ is kept in an autorelease pool in dispatch queues.)
  */
 @property (nonatomic, readonly) TOFileSystemItem *directoryItem;
 

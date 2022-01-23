@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1140"
+   LastUpgradeVersion = "1320"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AB9A4454242CA59500B4457C"
+               BlueprintIdentifier = "AB9A446C242CA8F100B4457C"
                BuildableName = "TOFileSystemObserverMacExample.app"
                BlueprintName = "TOFileSystemObserverMacExample"
                ReferencedContainer = "container:TOFileSystemObserverExample.xcodeproj">
@@ -44,7 +44,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AB9A4454242CA59500B4457C"
+            BlueprintIdentifier = "AB9A446C242CA8F100B4457C"
             BuildableName = "TOFileSystemObserverMacExample.app"
             BlueprintName = "TOFileSystemObserverMacExample"
             ReferencedContainer = "container:TOFileSystemObserverExample.xcodeproj">
@@ -61,7 +61,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AB9A4454242CA59500B4457C"
+            BlueprintIdentifier = "AB9A446C242CA8F100B4457C"
             BuildableName = "TOFileSystemObserverMacExample.app"
             BlueprintName = "TOFileSystemObserverMacExample"
             ReferencedContainer = "container:TOFileSystemObserverExample.xcodeproj">

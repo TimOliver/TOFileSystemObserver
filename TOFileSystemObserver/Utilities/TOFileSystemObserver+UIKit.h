@@ -1,7 +1,7 @@
 //
 //  TOFileSystemObserver+UIKit.h
 //
-//  Copyright 2019-2020 Timothy Oliver. All rights reserved.
+//  Copyright 2019-2022 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -26,10 +26,11 @@
 #import <UIKit/UIKit.h>
 #import "TOFileSystemItemListChanges.h"
 
-/**
- These convenience functions will perform the default
- update behaviour whenever an item on the file system changes.
- */
+/// A convenience function to update a standard `UITableView` with a new set
+/// of changes reported by a file system observer.
+/// @param tableView The `UITableView` to update
+/// @param changes The changes that were returned from the file system obserrver.
+/// @param section The section in the table view that the changes should be applied to.
 static inline void TOFileSystemItemListUpdateTableView(UITableView * _Nonnull tableView,
                                                 TOFileSystemItemListChanges * _Nonnull changes,
                                                 NSInteger section)
@@ -62,6 +63,11 @@ static inline void TOFileSystemItemListUpdateTableView(UITableView * _Nonnull ta
     }
 }
 
+/// A convenience function to update a standard `UICollectionView` with a new set
+/// of changes reported by a file system observer.
+/// @param collectionView The `UICollectionView` to update
+/// @param changes The changes that were returned from the file system obserrver.
+/// @param section The section in the table view that the changes should be applied to.
 static inline void TOFileSystemItemListUpdateCollectionView(UICollectionView * _Nonnull collectionView,
                                                      TOFileSystemItemListChanges * _Nonnull changes,
                                                      NSInteger section)

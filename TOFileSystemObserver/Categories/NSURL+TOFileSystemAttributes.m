@@ -1,7 +1,7 @@
 //
 //  NSURL+TOFileSystemAttributes.m
 //
-//  Copyright 2019-2020 Timothy Oliver. All rights reserved.
+//  Copyright 2019-2022 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -72,6 +72,7 @@
     // Do it using POSIX APIs to avoid needing to load in all of the file names
     const char *path = [self.path cStringUsingEncoding:NSUTF8StringEncoding];
     directory = opendir(path);
+    if (directory == NULL) { return 0; }
     while ((entry = readdir(directory)) != NULL) {
         if (entry->d_name[0] == '.') { continue; }
         if (entry->d_type == DT_REG || entry->d_type == DT_DIR) {
