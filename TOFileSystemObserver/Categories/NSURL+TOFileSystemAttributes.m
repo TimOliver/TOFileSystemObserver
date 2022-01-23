@@ -72,6 +72,7 @@
     // Do it using POSIX APIs to avoid needing to load in all of the file names
     const char *path = [self.path cStringUsingEncoding:NSUTF8StringEncoding];
     directory = opendir(path);
+    if (directory == NULL) { return 0; }
     while ((entry = readdir(directory)) != NULL) {
         if (entry->d_name[0] == '.') { continue; }
         if (entry->d_type == DT_REG || entry->d_type == DT_DIR) {
