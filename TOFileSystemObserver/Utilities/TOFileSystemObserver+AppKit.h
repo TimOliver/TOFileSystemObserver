@@ -12,6 +12,11 @@
 #import <AppKit/AppKit.h>
 #import "TOFileSystemItemListChanges.h"
 
+/// A convenience function to update a standard `NSTableView` with a new set
+/// of changes reported by a file system observer.
+/// @param tableView The `NSTableView` to update
+/// @param changes The changes that were returned from the file system obserrver.
+/// @param section The section in the table view that the changes should be applied to.
 static inline void TOFileSystemItemListUpdateTableView(NSTableView * _Nonnull tableView,
                                                 TOFileSystemItemListChanges * _Nonnull changes,
                                                 NSInteger section)
