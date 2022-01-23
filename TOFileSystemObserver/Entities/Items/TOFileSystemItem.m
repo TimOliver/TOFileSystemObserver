@@ -29,6 +29,9 @@
 #import "NSURL+TOFileSystemUUID.h"
 #import "TOFileSystemObserverConstants.h"
 
+#import <os/lock.h>
+#import <pthread/pthread.h>
+
 /** Private interface to expose the file presenter for coordinated writes. */
 @interface TOFileSystemObserver ()
 @property (nonatomic, readonly) TOFileSystemPresenter *fileSystemPresenter;
@@ -50,8 +53,12 @@
 @property (nonatomic, assign, readwrite) BOOL isCopying;
 @property (nonatomic, assign, readwrite) NSInteger numberOfSubItems;
 
-/** A queue used to ensure the object properties are thread-safe. */
-@property (nonatomic, strong) dispatch_queue_t barrierQueue;
+/** Thread safe locks */
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Weverything"
+@property (nonatomic, assign) os_unfair_lock unfairLock;
+@property (nonatomic, assign) pthread_mutex_t pthreadMutexLock;
+#pragma clang diagnostic pop
 
 @end
 
@@ -66,15 +73,19 @@
         _fileURL = fileURL;
         _fileSystemObserver = observer;
         
-        NSString *queueName = [NSString stringWithFormat:@"TOFileSystemObserver.Item.%lu", (unsigned long)_fileURL.hash];
-        _barrierQueue = dispatch_queue_create([queueName cStringUsingEncoding:NSUTF8StringEncoding], DISPATCH_QUEUE_CONCURRENT);
+        // Initialize the lock
+        if (@available(iOS 10.0, *)) {
+            self.unfairLock = OS_UNFAIR_LOCK_INIT;
+        } else {
+            pthread_mutex_init(&_pthreadMutexLock, NULL);
+        }
         
         // If this item represents a deleted file, skip gathering the data
         if (!self.isDeleted) {
-            dispatch_barrier_async(_barrierQueue, ^{
+            [self performWithLock:^{
                 [self configureUUIDForceRefresh:NO];
                 [self refreshFromItemAtURL:fileURL];
-            });
+            }];
         }
     }
 
@@ -162,9 +173,9 @@
 
 - (void)regenerateUUID
 {
-    dispatch_barrier_async(_barrierQueue, ^{
+    [self performWithLock:^{
         [self configureUUIDForceRefresh:YES];
-    });
+    }];
 }
 
 #pragma mark - Lists -
@@ -177,9 +188,9 @@
     // A lock needs to be used as this operation will ideally be done
     // in the background due to how heavy it could potentially be
     __block BOOL hasChanges = NO;
-    dispatch_barrier_sync(self.barrierQueue, ^{
+    [self performWithLock:^{
         hasChanges = [self refreshFromItemAtURL:itemURL];
-    });
+    }];
     
     // If it was detected one or more of the properties were
     // different, if the item is a member of a list, inform
@@ -227,9 +238,9 @@
 - (id)fetchValueForObject:(NSString *)objectName
 {
     __block id objectValue = nil;
-    dispatch_sync(self.barrierQueue, ^{
+    [self performWithLock:^{
         objectValue = [self valueForKey:objectName];
-    });
+    }];
     
     return objectValue;
 }
@@ -237,9 +248,9 @@
 - (long long)fetchValueForInteger:(NSString *)integerName
 {
     __block long long intValue = 0;
-    dispatch_sync(self.barrierQueue, ^{
+    [self performWithLock:^{
         intValue = [[self valueForKey:integerName] longLongValue];
-    });
+    }];
     
     return intValue;
 }
@@ -252,6 +263,27 @@
 - (NSDate *)modificationDate { return (NSDate *)[self fetchValueForObject:@"_modificationDate"]; }
 - (BOOL)isCopying { return (BOOL)[self fetchValueForInteger:@"_isCopying"]; }
 - (NSInteger)numberOfSubItems { return (BOOL)[self fetchValueForInteger:@"_numberOfSubItems"]; }
+
+#pragma mark - Thread Safe Access -
+
+- (void)performWithLock:(void (^)(void))block;
+{
+    // Lock the current thread
+    if (@available(iOS 10.0, *)) {
+        os_unfair_lock_lock(&_unfairLock);
+    } else {
+        pthread_mutex_lock(&_pthreadMutexLock);
+    }
+
+    block();
+
+    // Unlock the thread
+    if (@available(iOS 10.0, *)) {
+        os_unfair_lock_unlock(&_unfairLock);
+    } else {
+        pthread_mutex_unlock(&_pthreadMutexLock);
+    }
+}
 
 #pragma mark - Debugging -
 
