@@ -262,7 +262,7 @@
 - (NSDate *)creationDate { return (NSDate *)[self fetchValueForObject:@"_creationDate"]; }
 - (NSDate *)modificationDate { return (NSDate *)[self fetchValueForObject:@"_modificationDate"]; }
 - (BOOL)isCopying { return (BOOL)[self fetchValueForInteger:@"_isCopying"]; }
-- (NSInteger)numberOfSubItems { return (BOOL)[self fetchValueForInteger:@"_numberOfSubItems"]; }
+- (NSInteger)numberOfSubItems { return (NSInteger)[self fetchValueForInteger:@"_numberOfSubItems"]; }
 
 #pragma mark - Thread Safe Access -
 
