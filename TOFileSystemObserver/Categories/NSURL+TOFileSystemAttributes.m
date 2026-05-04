@@ -30,7 +30,9 @@
 {
     // When files are still being copied, their
     // modification date is equal to the current device time.
-    return [self.to_modificationDate timeIntervalSinceDate:[NSDate date]]
+    NSDate *modificationDate = self.to_modificationDate;
+    if (modificationDate == nil) { return NO; }
+    return [modificationDate timeIntervalSinceDate:[NSDate date]]
                         > (-kTOFileSystemObserverCopyingTimeDelay - FLT_EPSILON);
 }
 

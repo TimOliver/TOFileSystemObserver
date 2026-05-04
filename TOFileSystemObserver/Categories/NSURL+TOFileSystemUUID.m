@@ -40,11 +40,14 @@ static NSString *kTOFileSystemAttributeKey = @"dev.tim.fileSystemObserver.UUID";
     // Allocate a buffer for the value (UUID values are always 36 characters)
     char value[36];
 
-    // Fetch the value from disk
-    getxattr(filePath, keyName, value, 36, 0, 0);
+    // Fetch the value from disk. A short read means there's no valid UUID stored.
+    ssize_t bytesRead = getxattr(filePath, keyName, value, sizeof(value), 0, 0);
+    if (bytesRead != (ssize_t)sizeof(value)) {
+        return nil;
+    }
 
     // Convert to a string, and return if successful
-    NSString *uuid = [[NSString alloc] initWithBytes:value length:36 encoding:NSUTF8StringEncoding];
+    NSString *uuid = [[NSString alloc] initWithBytes:value length:bytesRead encoding:NSUTF8StringEncoding];
     if (uuid.length == 0) {
         return nil;
     }
@@ -64,9 +67,10 @@ static NSString *kTOFileSystemAttributeKey = @"dev.tim.fileSystemObserver.UUID";
     return uuid;
 }
 
-- (void)to_setFileSystemUUID:(NSString *)uuid
+- (BOOL)to_setFileSystemUUID:(NSString *)uuid
 {
-    if (uuid.length > 0 && uuid.length != 36) {
+    if (uuid.length == 0) { return NO; }
+    if (uuid.length != 36) {
         @throw [NSException exceptionWithName:NSInternalInconsistencyException
                                        reason:@"UUID must be 36 characters long!"
                                      userInfo:nil];
@@ -78,15 +82,16 @@ static NSString *kTOFileSystemAttributeKey = @"dev.tim.fileSystemObserver.UUID";
 
     // Convert the string to a C byte string
     const char *uuidString = [uuid cStringUsingEncoding:NSUTF8StringEncoding];
+    if (uuidString == NULL) { return NO; }
 
-    // Save it to this file
-    setxattr(filePath, keyName, uuidString, strlen(uuidString), 0, 0);
+    // Save it to this file. UUID strings are always 36 ASCII bytes.
+    return setxattr(filePath, keyName, uuidString, 36, 0, 0) == 0;
 }
 
 - (NSString *)to_generateFileSystemUUID
 {
     NSString *uuid = [NSUUID UUID].UUIDString;
-    [self to_setFileSystemUUID:uuid];
+    if (![self to_setFileSystemUUID:uuid]) { return nil; }
     return uuid;
 }
 

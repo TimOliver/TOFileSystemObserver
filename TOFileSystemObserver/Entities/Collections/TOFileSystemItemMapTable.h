@@ -29,13 +29,16 @@ NS_ASSUME_NONNULL_BEGIN
  used to store re-usable instances of item and list
  objects.
  */
-@interface TOFileSystemItemMapTable : NSObject<NSFastEnumeration>
+@interface TOFileSystemItemMapTable : NSObject
 
 @property (nonatomic, readonly) NSInteger count;
 
 - (void)setItem:(id)object forUUID:(NSString *)uuid;
 - (id)itemForUUID:(NSString *)uuid;
 - (void)removeItemForUUID:(NSString *)uuid;
+
+/** A point-in-time snapshot of all current items. Safe to iterate while the table is being mutated. */
+- (NSArray *)allItems;
 
 /** Implementations for allowing dictionary style literal syntax. */
 - (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key;

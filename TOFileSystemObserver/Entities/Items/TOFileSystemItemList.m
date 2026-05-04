@@ -131,7 +131,7 @@ static inline void TOFileSystemItemListCallBlock(id block, id observer, id chang
     }
     
     // Trigger the notification blocks to update any UI with this new order
-    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+    for (TOFileSystemNotificationToken *token in self.notificationTokens.allObjects) {
         TOFileSystemItemListCallBlock(token.notificationBlock, self, changes);
     }
 }
@@ -242,7 +242,7 @@ static inline void TOFileSystemItemListCallBlock(id block, id observer, id chang
     // Perform the broadcast to any observing objects that this update ocurred
     TOFileSystemItemListChanges *changes = [[TOFileSystemItemListChanges alloc] init];
     [changes addInsertionIndex:sortedIndex];
-    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+    for (TOFileSystemNotificationToken *token in self.notificationTokens.allObjects) {
         TOFileSystemItemListCallBlock(token.notificationBlock, self, changes);
     }
 }
@@ -267,7 +267,7 @@ static inline void TOFileSystemItemListCallBlock(id block, id observer, id chang
     TOFileSystemItemListChanges *changes = [[TOFileSystemItemListChanges alloc] init];
     [changes addDeletionIndex:index];
     
-    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+    for (TOFileSystemNotificationToken *token in self.notificationTokens.allObjects) {
         TOFileSystemItemListCallBlock(token.notificationBlock, self, changes);
     }
 }
@@ -300,7 +300,7 @@ static inline void TOFileSystemItemListCallBlock(id block, id observer, id chang
     [changes addModificationIndex:newIndex];
     
     // Broadcast the changes
-    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+    for (TOFileSystemNotificationToken *token in self.notificationTokens.allObjects) {
         TOFileSystemItemListCallBlock(token.notificationBlock, self, changes);
     }
 }
@@ -322,8 +322,9 @@ static inline void TOFileSystemItemListCallBlock(id block, id observer, id chang
     // Skip if every file was accounted for
     if (changes.deletions.count == 0) { return; }
     
-    // Remove all of the deleted files from the list
-    for (NSNumber *deletedIndex in changes.deletions) {
+    // Remove all of the deleted files from the list. Iterate from highest index
+    // to lowest so each removal doesn't shift the indices we still need to use.
+    for (NSNumber *deletedIndex in [changes.deletions reverseObjectEnumerator]) {
         NSString *uuid = self.sortedItems[deletedIndex.intValue];
         [self.sortedItems removeObjectAtIndex:deletedIndex.intValue];
         [self.items removeObjectForKey:uuid];
@@ -331,7 +332,7 @@ static inline void TOFileSystemItemListCallBlock(id block, id observer, id chang
     
     // Broadcast the changes
     dispatch_async(dispatch_get_main_queue(), ^{
-        for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+        for (TOFileSystemNotificationToken *token in self.notificationTokens.allObjects) {
             TOFileSystemItemListCallBlock(token.notificationBlock, self, changes);
         }
     });

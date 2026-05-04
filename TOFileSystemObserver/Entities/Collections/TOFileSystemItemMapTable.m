@@ -81,6 +81,17 @@
     });
 }
 
+- (NSArray *)allItems
+{
+    __block NSArray *items = nil;
+    dispatch_sync(self.dispatchQueue, ^{
+        @autoreleasepool {
+            items = self.mapTable.objectEnumerator.allObjects;
+        }
+    });
+    return items ?: @[];
+}
+
 - (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key
 {
     [self setItem:object forUUID:key];
@@ -89,15 +100,6 @@
 - (nullable id)objectForKeyedSubscript:(NSString *)key
 {
     return [self itemForUUID:key];
-}
-
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
-                                  objects:(id __unsafe_unretained _Nullable [_Nonnull])buffer
-                                    count:(NSUInteger)len
-{
-    return [_mapTable countByEnumeratingWithState:state
-                                       objects:buffer
-                                         count:len];
 }
 
 @end
