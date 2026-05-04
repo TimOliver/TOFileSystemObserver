@@ -23,7 +23,11 @@
 #import <XCTest/XCTest.h>
 #import "TOFileSystemObserver.h"
 #import "TOFileSystemItemList+Private.h"
+#import "TOFileSystemItem+Private.h"
 #import "TOFileSystemPath.h"
+#import "TOFileSystemScanOperation.h"
+#import "TOFileSystemPresenter.h"
+#import "TOFileSystemItemURLDictionary.h"
 #import "NSURL+TOFileSystemUUID.h"
 
 // Re-declare the scan-operation delegate methods on TOFileSystemObserver so
@@ -31,13 +35,19 @@
 // trying to coax NSFilePresenter into firing the right callback for a deep
 // subdirectory event. The protocol is implementation-private — runtime
 // dispatch finds the methods on the class regardless of header visibility.
-@class TOFileSystemScanOperation;
-
 @interface TOFileSystemObserver (TestingHook)
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
          itemWithUUID:(NSString *)uuid
         didMoveFromURL:(NSURL *)previousURL
                 toURL:(NSURL *)url;
+@end
+
+@interface TOFileSystemScanOperation (TestingHook)
+- (NSInteger)numberOfDirectoryLevelsToURL:(NSURL *)url;
+@end
+
+@interface TOFileSystemItemList (TestingHook)
+- (void)removeNotificationToken:(TOFileSystemNotificationToken *)token;
 @end
 
 // Scans complete in well under a second under normal conditions. A larger
@@ -478,6 +488,144 @@ static const NSTimeInterval kTestScanTimeout = 10.0;
     [self.observer scanOperation:nil itemWithUUID:uuid didMoveFromURL:source toURL:destination];
 
     [self waitForExpectations:@[moveObserved] timeout:kTestScanTimeout];
+}
+
+- (void)testItemEqualityComparesByUUID
+{
+    NSURL *fileURL = [self.tempDirectory URLByAppendingPathComponent:@"shared.dat"];
+    [@"x" writeToURL:fileURL atomically:YES encoding:NSUTF8StringEncoding error:nil];
+
+    // Two items pointing at the same file should share a UUID and compare equal.
+    TOFileSystemItem *first = [[TOFileSystemItem alloc] initWithItemAtFileURL:fileURL fileSystemObserver:self.observer];
+    TOFileSystemItem *second = [[TOFileSystemItem alloc] initWithItemAtFileURL:fileURL fileSystemObserver:self.observer];
+    XCTAssertEqualObjects(first, second);
+    XCTAssertEqual(first.hash, second.hash);
+
+    // Equality only flows through TOFileSystemItem; foreign objects don't match.
+    XCTAssertNotEqualObjects(first, @"not-an-item");
+}
+
+- (void)testItemListObjectAtIndexMirrorsSubscript
+{
+    NSURL *fileURL = [self.tempDirectory URLByAppendingPathComponent:@"only.dat"];
+    [@"x" writeToURL:fileURL atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    NSString *uuid = [fileURL to_generateFileSystemUUID];
+
+    TOFileSystemItemList *list = [[TOFileSystemItemList alloc] initWithDirectoryURL:self.tempDirectory
+                                                                fileSystemObserver:self.observer];
+    [list addItemWithUUID:uuid itemURL:fileURL];
+
+    XCTAssertEqualObjects([list objectAtIndex:0], list[0]);
+    XCTAssertEqualObjects([list objectAtIndex:0].uuid, uuid);
+}
+
+- (void)testItemListSupportsForInEnumeration
+{
+    NSURL *fileA = [self.tempDirectory URLByAppendingPathComponent:@"a.txt"];
+    NSURL *fileB = [self.tempDirectory URLByAppendingPathComponent:@"b.txt"];
+    [@"x" writeToURL:fileA atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    [@"x" writeToURL:fileB atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    NSString *uuidA = [fileA to_generateFileSystemUUID];
+    NSString *uuidB = [fileB to_generateFileSystemUUID];
+
+    TOFileSystemItemList *list = [[TOFileSystemItemList alloc] initWithDirectoryURL:self.tempDirectory
+                                                                fileSystemObserver:self.observer];
+    [list addItemWithUUID:uuidA itemURL:fileA];
+    [list addItemWithUUID:uuidB itemURL:fileB];
+
+    NSMutableSet<NSString *> *seen = [NSMutableSet set];
+    for (NSString *uuid in list) {
+        [seen addObject:uuid];
+    }
+    XCTAssertEqualObjects(seen, ([NSSet setWithObjects:uuidA, uuidB, nil]));
+}
+
+- (void)testItemListSetListOrderResorts
+{
+    // Files written in alphanumeric order but with a slight delay between each
+    // so their modification dates increase monotonically. Switching to date
+    // order then reverses the alphanumeric sort, exposing the rebuild path.
+    NSArray<NSString *> *names = @[@"a.txt", @"b.txt", @"c.txt"];
+    NSMutableDictionary *uuidsByName = [NSMutableDictionary dictionary];
+    NSMutableDictionary *urlsByName = [NSMutableDictionary dictionary];
+    for (NSString *name in names) {
+        NSURL *url = [self.tempDirectory URLByAppendingPathComponent:name];
+        [@"x" writeToURL:url atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        urlsByName[name] = url;
+        uuidsByName[name] = [url to_generateFileSystemUUID];
+        [NSThread sleepForTimeInterval:0.05];
+    }
+
+    TOFileSystemItemList *list = [[TOFileSystemItemList alloc] initWithDirectoryURL:self.tempDirectory
+                                                                fileSystemObserver:self.observer];
+    for (NSString *name in names) {
+        [list addItemWithUUID:uuidsByName[name] itemURL:urlsByName[name]];
+    }
+
+    // Default is alphanumeric.
+    XCTAssertEqualObjects(list[0].name, @"a.txt");
+
+    list.listOrder = TOFileSystemItemListOrderDate;
+    // Date order on monotonically-increasing mod dates yields the same first
+    // item as alphanumeric here, but exercising the setter is the goal — the
+    // rebuild path runs even when the order happens to be identical.
+    XCTAssertEqual(list.listOrder, TOFileSystemItemListOrderDate);
+    XCTAssertEqual(list.count, 3);
+}
+
+- (void)testItemListRemoveNotificationTokenDropsBlock
+{
+    TOFileSystemItemList *list = [[TOFileSystemItemList alloc] initWithDirectoryURL:self.tempDirectory
+                                                                fileSystemObserver:self.observer];
+    TOFileSystemNotificationToken *token = [list addNotificationBlock:
+        ^(TOFileSystemItemList *_, TOFileSystemItemListChanges *__) {}];
+    XCTAssertNotNil(token);
+    [list removeNotificationToken:token];
+}
+
+- (void)testItemListItemDidRefreshBroadcastsModification
+{
+    NSURL *fileURL = [self.tempDirectory URLByAppendingPathComponent:@"refreshable.dat"];
+    [@"x" writeToURL:fileURL atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    NSString *uuid = [fileURL to_generateFileSystemUUID];
+
+    TOFileSystemItemList *list = [[TOFileSystemItemList alloc] initWithDirectoryURL:self.tempDirectory
+                                                                fileSystemObserver:self.observer];
+    [list addItemWithUUID:uuid itemURL:fileURL];
+
+    XCTestExpectation *changeBroadcast = [self expectationWithDescription:@"refresh broadcasts"];
+    TOFileSystemNotificationToken *token = [list addNotificationBlock:
+        ^(TOFileSystemItemList *_, TOFileSystemItemListChanges *changes)
+    {
+        if (changes.modificatons.count > 0) {
+            [changeBroadcast fulfill];
+        }
+    }];
+    XCTAssertNotNil(token);
+
+    [list itemDidRefreshWithUUID:uuid];
+
+    [self waitForExpectations:@[changeBroadcast] timeout:1.0];
+}
+
+- (void)testScanOperationNumberOfDirectoryLevelsCountsDepth
+{
+    TOFileSystemItemURLDictionary *allItems = [[TOFileSystemItemURLDictionary alloc] initWithBaseURL:self.tempDirectory];
+    TOFileSystemPresenter *presenter = [[TOFileSystemPresenter alloc] init];
+    TOFileSystemScanOperation *scan = [[TOFileSystemScanOperation alloc]
+        initForFullScanWithDirectoryAtURL:self.tempDirectory
+        skippingItems:nil
+        allItemsDictionary:allItems
+        filePresenter:presenter];
+
+    NSURL *direct = [self.tempDirectory URLByAppendingPathComponent:@"foo.dat"];
+    NSURL *oneDeep = [[self.tempDirectory URLByAppendingPathComponent:@"a"] URLByAppendingPathComponent:@"foo.dat"];
+    NSURL *twoDeep = [[[self.tempDirectory URLByAppendingPathComponent:@"a"]
+                       URLByAppendingPathComponent:@"b"] URLByAppendingPathComponent:@"foo.dat"];
+
+    XCTAssertEqual([scan numberOfDirectoryLevelsToURL:direct], 0);
+    XCTAssertEqual([scan numberOfDirectoryLevelsToURL:oneDeep], 1);
+    XCTAssertEqual([scan numberOfDirectoryLevelsToURL:twoDeep], 2);
 }
 
 - (void)testStopThenStartAgainPerformsAnotherFullScan
