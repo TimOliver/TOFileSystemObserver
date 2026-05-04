@@ -23,11 +23,10 @@
 #import <XCTest/XCTest.h>
 #import "TOFileSystemObserver.h"
 
-// Generous timeout for integration tests. The test host app runs its own
-// TOFileSystemObserver against its Documents directory, and that observer
-// shares a process-wide file-coordinator queue with ours, so our scans can
-// be serialised behind the host app's writes.
-static const NSTimeInterval kTestScanTimeout = 30.0;
+// Scans complete in well under a second under normal conditions. A larger
+// budget than that gives slow CI hardware some headroom while still failing
+// fast if a regression brings back cross-instance serialisation.
+static const NSTimeInterval kTestScanTimeout = 10.0;
 
 @interface TOFileSystemObserverIntegrationTests : XCTestCase
 

@@ -109,4 +109,23 @@
     XCTAssertNil([missingURL to_generateFileSystemUUID]);
 }
 
+- (void)testSetUUIDIfAbsentSucceedsOnFirstCall
+{
+    NSString *uuid = [NSUUID UUID].UUIDString;
+    XCTAssertTrue([self.itemURL to_setFileSystemUUIDIfAbsent:uuid]);
+    XCTAssertEqualObjects([self.itemURL to_fileSystemUUID], uuid);
+}
+
+- (void)testSetUUIDIfAbsentReturnsNoWhenAttributeAlreadyExists
+{
+    NSString *first = [NSUUID UUID].UUIDString;
+    NSString *second = [NSUUID UUID].UUIDString;
+    XCTAssertTrue([self.itemURL to_setFileSystemUUIDIfAbsent:first]);
+
+    // The second call must not overwrite — that's the whole point of the
+    // race-safe variant. The on-disk UUID stays as the first one.
+    XCTAssertFalse([self.itemURL to_setFileSystemUUIDIfAbsent:second]);
+    XCTAssertEqualObjects([self.itemURL to_fileSystemUUID], first);
+}
+
 @end

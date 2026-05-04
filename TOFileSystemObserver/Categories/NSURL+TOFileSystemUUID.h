@@ -43,6 +43,15 @@ NS_ASSUME_NONNULL_BEGIN
 /** Sets a predetermined UUID to be the value of the file. Returns YES if the attribute was written. */
 - (BOOL)to_setFileSystemUUID:(NSString *)uuid;
 
+/**
+ Sets a UUID only if no UUID attribute is currently present on the file.
+ Returns YES if this call wrote the attribute. Returns NO if the attribute
+ already exists (another writer won the race) or the write failed for any
+ other reason. Callers should re-read with `to_fileSystemUUID` on NO to
+ see the canonical on-disk value.
+ */
+- (BOOL)to_setFileSystemUUIDIfAbsent:(NSString *)uuid;
+
 /** Regardless if one exists, generate and save a new UUID. Returns nil if the write failed. */
 - (nullable NSString *)to_generateFileSystemUUID;
 
