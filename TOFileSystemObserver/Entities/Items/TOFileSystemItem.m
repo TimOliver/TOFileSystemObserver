@@ -83,7 +83,7 @@
         // If this item represents a deleted file, skip gathering the data
         if (!self.isDeleted) {
             [self performWithLock:^{
-                [self configureUUIDForceRefresh:NO];
+                [self configureUUID];
                 [self refreshFromItemAtURL:fileURL];
             }];
         }
@@ -94,7 +94,7 @@
 
 #pragma mark - Update Properties -
 
-- (void)configureUUIDForceRefresh:(BOOL)forceRefresh
+- (void)configureUUID
 {
     TOFileSystemPresenter *presenter = self.fileSystemObserver.fileSystemPresenter;
     _uuid = [presenter uuidForItemAtURL:_fileURL];
@@ -169,13 +169,6 @@
 - (BOOL)isDeleted
 {
     return ![[NSFileManager defaultManager] fileExistsAtPath:self.fileURL.path];
-}
-
-- (void)regenerateUUID
-{
-    [self performWithLock:^{
-        [self configureUUIDForceRefresh:YES];
-    }];
 }
 
 #pragma mark - Lists -

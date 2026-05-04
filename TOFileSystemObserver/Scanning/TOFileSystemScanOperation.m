@@ -221,10 +221,16 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     
     // Check if we've already assigned an on-disk UUID
     NSString *uuid = [self.filePresenter uuidForItemAtURL:url];
-     
-    // If the item is a directory, add it to the pending list to scan later
+
+    // If the item is a directory, add it to the pending list to scan later.
+    // Skip symlinks — a circular symlink would otherwise loop the scan forever,
+    // and following symlinks out of the observed tree isn't behaviour we want.
     if (url.to_isDirectory) {
-        [pendingDirectories addObject:url];
+        NSNumber *isSymlink = nil;
+        [url getResourceValue:&isSymlink forKey:NSURLIsSymbolicLinkKey error:nil];
+        if (!isSymlink.boolValue) {
+            [pendingDirectories addObject:url];
+        }
     }
     
     // Check if the item had been moved
