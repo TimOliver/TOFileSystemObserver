@@ -23,6 +23,12 @@
 #import <XCTest/XCTest.h>
 #import "TOFileSystemObserver.h"
 
+// Generous timeout for integration tests. The test host app runs its own
+// TOFileSystemObserver against its Documents directory, and that observer
+// shares a process-wide file-coordinator queue with ours, so our scans can
+// be serialised behind the host app's writes.
+static const NSTimeInterval kTestScanTimeout = 30.0;
+
 @interface TOFileSystemObserverIntegrationTests : XCTestCase
 
 @property (nonatomic, strong) NSURL *tempDirectory;
@@ -43,12 +49,6 @@
                            withIntermediateDirectories:YES
                                             attributes:nil
                                                  error:nil];
-
-    // The scan operation early-returns on an empty directory and never fires its
-    // begin/complete delegate callbacks. Drop a sentinel file so the scan has at
-    // least one item to walk and the notification path actually executes.
-    NSURL *sentinel = [self.tempDirectory URLByAppendingPathComponent:@"sentinel.dat"];
-    [@"x" writeToURL:sentinel atomically:YES encoding:NSUTF8StringEncoding error:nil];
 
     self.observer = [[TOFileSystemObserver alloc] initWithDirectoryURL:self.tempDirectory];
     self.tokens = [NSMutableArray array];
@@ -105,7 +105,7 @@
     [self.tokens addObject:token];
 
     [self.observer start];
-    [self waitForExpectations:@[willBegin, didComplete] timeout:5.0];
+    [self waitForExpectations:@[willBegin, didComplete] timeout:kTestScanTimeout];
 }
 
 - (void)testTokenInvalidatedDuringDispatchStillReceivesCurrentNotification
@@ -140,7 +140,7 @@
     [self.tokens addObject:secondToken];
 
     [self.observer start];
-    [self waitForExpectations:@[firstFired, secondFired] timeout:5.0];
+    [self waitForExpectations:@[firstFired, secondFired] timeout:kTestScanTimeout];
 }
 
 - (void)testStopThenStartAgainPerformsAnotherFullScan
@@ -163,13 +163,13 @@
     [self.tokens addObject:token];
 
     [self.observer start];
-    [self waitForExpectations:@[firstScan] timeout:5.0];
+    [self waitForExpectations:@[firstScan] timeout:kTestScanTimeout];
 
     [self.observer stop];
     XCTAssertFalse(self.observer.isRunning);
 
     [self.observer start];
-    [self waitForExpectations:@[secondScan] timeout:5.0];
+    [self waitForExpectations:@[secondScan] timeout:kTestScanTimeout];
 }
 
 @end

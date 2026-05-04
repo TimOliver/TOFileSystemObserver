@@ -134,36 +134,25 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 
 - (void)scanAllSubdirectoriesFromBaseURL
 {
-    // Start scanning every item in our base directory
-    NSArray *childItemURLs = [self.fileManager to_fileSystemEnumeratorForDirectoryAtURL:self.directoryURL].allObjects;
-    if (childItemURLs.count == 0) { return; }
-
-    // Post the "will begin" notification
+    // Post the "will begin" notification before doing any work so consumers
+    // see paired begin/complete events even when the directory is empty.
     [self.delegate scanOperationWillBeginFullScan:self];
-    
-    // Scan all of the items in the base directory
+
+    // Scan all of the items in the base directory. An empty directory yields
+    // an empty enumeration, which is a valid (no-op) state.
+    NSArray *childItemURLs = [self.fileManager to_fileSystemEnumeratorForDirectoryAtURL:self.directoryURL].allObjects;
     for (NSURL *url in childItemURLs) {
         [self scanItemAtURL:url
          pendingDirectories:self.pendingDirectories];
     }
 
-    void (^didCompletedNotification)(void) = ^{
-        [self.delegate scanOperationDidCompleteFullScan:self];
-    };
-    
-    // If we were only scanning the immediate contents
-    // of the base directory, we can exit here
-    if (self.subDirectoryLevelLimit == 0) {
-        didCompletedNotification();
-        return;
+    // If we were only scanning the immediate contents of the base directory,
+    // skip the recursive pass.
+    if (self.subDirectoryLevelLimit != 0) {
+        [self scanPendingSubdirectories];
     }
 
-    // Otherwise, scan all of the directories discovered in the base
-    // directory (and then scan their directories).
-    [self scanPendingSubdirectories];
-    
-    // Send a notification so we can do some final clean up
-    didCompletedNotification();
+    [self.delegate scanOperationDidCompleteFullScan:self];
 }
 
 - (void)scanPendingSubdirectories
