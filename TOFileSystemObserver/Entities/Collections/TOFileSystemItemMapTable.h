@@ -37,6 +37,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)itemForUUID:(NSString *)uuid;
 - (void)removeItemForUUID:(NSString *)uuid;
 
+/** A point-in-time snapshot of all current items. Safe to iterate while the table is being mutated. */
+- (NSArray *)allItems;
+
 /** Implementations for allowing dictionary style literal syntax. */
 - (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key;
 - (nullable id)objectForKeyedSubscript:(NSString *)key;

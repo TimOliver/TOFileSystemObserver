@@ -322,8 +322,9 @@ static inline void TOFileSystemItemListCallBlock(id block, id observer, id chang
     // Skip if every file was accounted for
     if (changes.deletions.count == 0) { return; }
     
-    // Remove all of the deleted files from the list
-    for (NSNumber *deletedIndex in changes.deletions) {
+    // Remove all of the deleted files from the list. Iterate from highest index
+    // to lowest so each removal doesn't shift the indices we still need to use.
+    for (NSNumber *deletedIndex in [changes.deletions reverseObjectEnumerator]) {
         NSString *uuid = self.sortedItems[deletedIndex.intValue];
         [self.sortedItems removeObjectAtIndex:deletedIndex.intValue];
         [self.items removeObjectForKey:uuid];

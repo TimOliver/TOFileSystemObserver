@@ -618,8 +618,8 @@ static TOFileSystemObserver *_sharedObserver = nil;
 - (void)scanOperationDidCompleteFullScan:(TOFileSystemScanOperation *)scanOperation
 {
     // Loop through the list one more time to remove any headless entries
-    for (NSString *listUUID in self.itemListTable) {
-        [self.itemListTable[listUUID] synchronizeWithDisk];
+    for (TOFileSystemItemList *list in self.itemListTable.allItems) {
+        [list synchronizeWithDisk];
     }
     
     // Perform the Notification Center broadcast

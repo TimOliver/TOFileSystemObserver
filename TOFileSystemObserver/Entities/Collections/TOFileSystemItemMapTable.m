@@ -81,6 +81,17 @@
     });
 }
 
+- (NSArray *)allItems
+{
+    __block NSArray *items = nil;
+    dispatch_sync(self.dispatchQueue, ^{
+        @autoreleasepool {
+            items = self.mapTable.objectEnumerator.allObjects;
+        }
+    });
+    return items ?: @[];
+}
+
 - (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key
 {
     [self setItem:object forUUID:key];
