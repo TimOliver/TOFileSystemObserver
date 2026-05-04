@@ -26,6 +26,20 @@
 #import "TOFileSystemPath.h"
 #import "NSURL+TOFileSystemUUID.h"
 
+// Re-declare the scan-operation delegate methods on TOFileSystemObserver so
+// tests can drive them directly. Saves us from the inherent flakiness of
+// trying to coax NSFilePresenter into firing the right callback for a deep
+// subdirectory event. The protocol is implementation-private — runtime
+// dispatch finds the methods on the class regardless of header visibility.
+@class TOFileSystemScanOperation;
+
+@interface TOFileSystemObserver (TestingHook)
+- (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
+         itemWithUUID:(NSString *)uuid
+        didMoveFromURL:(NSURL *)previousURL
+                toURL:(NSURL *)url;
+@end
+
 // Scans complete in well under a second under normal conditions. A larger
 // budget than that gives slow CI hardware some headroom while still failing
 // fast if a regression brings back cross-instance serialisation.
@@ -350,6 +364,120 @@ static const NSTimeInterval kTestScanTimeout = 10.0;
     [NSFileManager.defaultManager removeItemAtURL:target error:nil];
 
     [self waitForExpectations:@[deletionObserved] timeout:kTestScanTimeout];
+}
+
+- (void)testSharedObserverReturnsSameInstanceAndBroadcastsByDefault
+{
+    TOFileSystemObserver *first = [TOFileSystemObserver sharedObserver];
+    TOFileSystemObserver *second = [TOFileSystemObserver sharedObserver];
+    XCTAssertNotNil(first);
+    XCTAssertEqual(first, second);
+    XCTAssertTrue(first.broadcastsNotifications);
+}
+
+- (void)testSetSharedObserverReplacesAndStopsExisting
+{
+    // Capture the lazy-init singleton (which targets Documents — never start
+    // it here, that triggers a scan on the test host's real Documents dir).
+    TOFileSystemObserver *previousShared = [TOFileSystemObserver sharedObserver];
+
+    // Use the test's own temp-dir observer as a stand-in "currently active
+    // singleton" so we can verify that setSharedObserver: stops a running
+    // predecessor without scanning a directory we don't control.
+    [TOFileSystemObserver setSharedObserver:self.observer];
+    [self.observer start];
+    XCTAssertTrue(self.observer.isRunning);
+
+    TOFileSystemObserver *replacement = [[TOFileSystemObserver alloc] initWithDirectoryURL:self.tempDirectory];
+    [TOFileSystemObserver setSharedObserver:replacement];
+
+    XCTAssertEqual([TOFileSystemObserver sharedObserver], replacement);
+    XCTAssertFalse(self.observer.isRunning);
+
+    // Restore so subsequent tests see the original lazy-init singleton.
+    [TOFileSystemObserver setSharedObserver:previousShared];
+}
+
+- (void)testFileModificationFiresItemDidChangeAndCopyTimer
+{
+    // Pre-create a file so the initial scan registers it as a known item.
+    // Subsequent modifications then take the itemDidChangeAtURL path (rather
+    // than didDiscoverItemAtURL) and trigger the copy timer because the
+    // modification date is "now" — which is what we want to exercise.
+    NSURL *target = [self.tempDirectory URLByAppendingPathComponent:@"to-modify.dat"];
+    [@"original" writeToURL:target atomically:YES encoding:NSUTF8StringEncoding error:nil];
+
+    XCTestExpectation *initialScanComplete = [self expectationWithDescription:@"initial scan complete"];
+    XCTestExpectation *modificationObserved = [self expectationWithDescription:@"modification observed"];
+    modificationObserved.assertForOverFulfill = NO;
+
+    TOFileSystemNotificationToken *token = [self.observer addNotificationBlock:
+        ^(TOFileSystemObserver *observer,
+          TOFileSystemObserverNotificationType type,
+          TOFileSystemChanges *changes)
+    {
+        if (type == TOFileSystemObserverNotificationTypeDidCompleteFullScan) {
+            [initialScanComplete fulfill];
+        } else if (type == TOFileSystemObserverNotificationTypeDidChange &&
+                   !changes.isFullScan &&
+                   changes.modifiedItems.count > 0) {
+            [modificationObserved fulfill];
+        }
+    }];
+    [self.tokens addObject:token];
+
+    [self.observer start];
+    [self waitForExpectations:@[initialScanComplete] timeout:kTestScanTimeout];
+
+    [@"modified" writeToURL:target atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    [self waitForExpectations:@[modificationObserved] timeout:kTestScanTimeout];
+
+    // Hold the run loop open long enough for the copy timer to fire so its
+    // completion path (copyTimerCompleted -> updateObservingObjects) runs.
+    XCTestExpectation *copyTimerWindow = [self expectationWithDescription:@"copy-timer window"];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5.0 * NSEC_PER_SEC)),
+                   dispatch_get_main_queue(), ^{ [copyTimerWindow fulfill]; });
+    [self waitForExpectations:@[copyTimerWindow] timeout:10.0];
+}
+
+- (void)testCrossDirectoryMoveHandlerProducesMovedChange
+{
+    // Synthetic test: drive the scan-op delegate method directly with realistic
+    // arguments and verify the broadcast carries a moved-item change. The
+    // NSFilePresenter-driven version of this is order-flaky in the full suite
+    // because subdirectory event timing varies; calling the handler ourselves
+    // exercises the same code path deterministically.
+    NSURL *folderA = [self.tempDirectory URLByAppendingPathComponent:@"A"];
+    NSURL *folderB = [self.tempDirectory URLByAppendingPathComponent:@"B"];
+    [NSFileManager.defaultManager createDirectoryAtURL:folderA withIntermediateDirectories:YES attributes:nil error:nil];
+    [NSFileManager.defaultManager createDirectoryAtURL:folderB withIntermediateDirectories:YES attributes:nil error:nil];
+    XCTAssertNotNil([folderA to_generateFileSystemUUID]);
+    XCTAssertNotNil([folderB to_generateFileSystemUUID]);
+
+    NSURL *source = [folderA URLByAppendingPathComponent:@"foo.dat"];
+    NSURL *destination = [folderB URLByAppendingPathComponent:@"foo.dat"];
+    [@"x" writeToURL:destination atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    NSString *uuid = [destination to_generateFileSystemUUID];
+    XCTAssertNotNil(uuid);
+
+    XCTestExpectation *moveObserved = [self expectationWithDescription:@"move observed"];
+    moveObserved.assertForOverFulfill = NO;
+
+    TOFileSystemNotificationToken *token = [self.observer addNotificationBlock:
+        ^(TOFileSystemObserver *observer,
+          TOFileSystemObserverNotificationType type,
+          TOFileSystemChanges *changes)
+    {
+        if (type == TOFileSystemObserverNotificationTypeDidChange &&
+            changes.movedItems.count > 0) {
+            [moveObserved fulfill];
+        }
+    }];
+    [self.tokens addObject:token];
+
+    [self.observer scanOperation:nil itemWithUUID:uuid didMoveFromURL:source toURL:destination];
+
+    [self waitForExpectations:@[moveObserved] timeout:kTestScanTimeout];
 }
 
 - (void)testStopThenStartAgainPerformsAnotherFullScan
