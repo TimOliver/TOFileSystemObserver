@@ -40,9 +40,6 @@
 /** Whether a timer has been set yet or not */
 @property (nonatomic, assign) BOOL isTiming;
 
-/** A concurrent queue used to serialise the duplicate-UUID resolution path. */
-@property (nonatomic, strong) dispatch_queue_t fileCoordinatorQueue;
-
 @end
 
 @implementation TOFileSystemPresenter
@@ -79,12 +76,6 @@
 
     // Create the dispatch queue for the items
     _itemListAccessQueue = dispatch_queue_create("TOFileSystemObserver.itemListAccessQueue", DISPATCH_QUEUE_SERIAL);
-
-    // Per-instance queue for serialising duplicate-UUID resolution. Initial UUID
-    // assignment is race-safe via XATTR_CREATE and does not pass through here, so
-    // a process-wide queue would over-serialise scans across observers.
-    _fileCoordinatorQueue = dispatch_queue_create("TOFileSystemObserver.fileCoordinatorQueue",
-                                                  DISPATCH_QUEUE_CONCURRENT);
 
     // Default time interval
     _timerInterval = 0.1f;
@@ -148,29 +139,19 @@
     self.isRunning = YES;
 }
 
-- (void)performCoordinatedRead:(void (^)(void))block
-{
-    dispatch_sync(self.fileCoordinatorQueue, ^{
-        @autoreleasepool {
-            if (block) { block(); }
-        }
-    });
-}
-
-- (void)performCoordinatedWrite:(void (^)(void))block
-{
-    dispatch_barrier_sync(self.fileCoordinatorQueue, ^{
-        @autoreleasepool {
-            if (block) { block(); }
-        }
-    });
-}
-
 - (void)stop
 {
     if (!self.isRunning) { return; }
     [NSFileCoordinator removeFilePresenter:self];
     self.isRunning = NO;
+
+    // Drain any buffered events and reset the timer flag so a subsequent start
+    // doesn't replay stale changes. Timer completion blocks bail on !isRunning,
+    // so we don't need to track and cancel them individually.
+    dispatch_async(self.itemListAccessQueue, ^{
+        [self.items removeAllObjects];
+        self.isTiming = NO;
+    });
 }
 
 - (nullable NSString *)uuidForItemAtURL:(NSURL *)itemURL
