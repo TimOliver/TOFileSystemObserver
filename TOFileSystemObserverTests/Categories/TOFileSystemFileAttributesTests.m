@@ -103,4 +103,14 @@ const NSInteger kTOFileSystemTestFileSize = 3 * 1000000;
     XCTAssertNotNil(self.fileURL.to_modificationDate);
 }
 
+- (void)testIsCopyingReturnsNoWhenModificationDateIsMissing
+{
+    // A URL pointing at nothing has no resource values, so to_modificationDate
+    // is nil. to_isCopying must treat that as "not copying" rather than reporting
+    // a file stuck in-flight forever.
+    NSURL *missingURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"does-not-exist.dat"]];
+    XCTAssertNil(missingURL.to_modificationDate);
+    XCTAssertFalse(missingURL.to_isCopying);
+}
+
 @end
