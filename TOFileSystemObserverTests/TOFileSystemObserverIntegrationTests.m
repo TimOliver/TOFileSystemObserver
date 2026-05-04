@@ -76,6 +76,15 @@ static const NSTimeInterval kTestScanTimeout = 10.0;
     XCTAssertFalse(self.observer.isRunning);
 }
 
+- (void)testDirectoryItemRepresentsObservedDirectory
+{
+    TOFileSystemItem *item = self.observer.directoryItem;
+    XCTAssertNotNil(item);
+    XCTAssertEqualObjects(item.fileURL.URLByStandardizingPath.path,
+                          self.tempDirectory.URLByStandardizingPath.path);
+    XCTAssertNotNil(item.uuid);
+}
+
 - (void)testStartAndStopUpdateIsRunning
 {
     XCTAssertFalse(self.observer.isRunning);
