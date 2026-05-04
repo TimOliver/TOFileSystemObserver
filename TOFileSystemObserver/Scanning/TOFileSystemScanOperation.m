@@ -409,16 +409,13 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     }
     
     // Otherwise, the user must have duplicated a file, so re-gen the UUID
-    // and assign it to this file
-    __block NSString *newUUID;
-    [self.filePresenter performCoordinatedWrite:^{
-        // Do a sanity check to verify the UUID didn't change while this queue was waiting
-        newUUID = [url to_fileSystemUUID];
-        if ([uuid isEqualToString:newUUID]) {
-            newUUID = [url to_generateFileSystemUUID];
-        }
-    }];
-        
+    // and assign it to this file. The scan is sequential on its operation queue,
+    // so a plain check-then-write here is safe.
+    NSString *newUUID = [url to_fileSystemUUID];
+    if ([uuid isEqualToString:newUUID]) {
+        newUUID = [url to_generateFileSystemUUID];
+    }
+
     return newUUID;
 }
 
