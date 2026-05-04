@@ -23,6 +23,7 @@
 #import <XCTest/XCTest.h>
 #import "TOFileSystemObserver.h"
 #import "TOFileSystemItemList+Private.h"
+#import "TOFileSystemPath.h"
 #import "NSURL+TOFileSystemUUID.h"
 
 // Scans complete in well under a second under normal conditions. A larger
@@ -269,6 +270,86 @@ static const NSTimeInterval kTestScanTimeout = 10.0;
     [@"new" writeToURL:newFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
 
     [self waitForExpectations:@[changeReceived] timeout:kTestScanTimeout];
+}
+
+- (void)testApplicationSandboxURLReturnsAReadableHomeDirectory
+{
+    NSURL *sandbox = [TOFileSystemPath applicationSandboxURL];
+    XCTAssertNotNil(sandbox);
+    XCTAssertTrue(sandbox.isFileURL);
+    XCTAssertTrue([NSFileManager.defaultManager fileExistsAtPath:sandbox.path]);
+}
+
+- (void)testItemListDescriptionIncludesURLAndUUID
+{
+    NSURL *fileURL = [self.tempDirectory URLByAppendingPathComponent:@"described.dat"];
+    [@"x" writeToURL:fileURL atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    NSString *uuid = [fileURL to_generateFileSystemUUID];
+
+    TOFileSystemItemList *list = [[TOFileSystemItemList alloc] initWithDirectoryURL:self.tempDirectory
+                                                                fileSystemObserver:self.observer];
+    [list addItemWithUUID:uuid itemURL:fileURL];
+
+    NSString *description = list.description;
+    XCTAssertNotNil(description);
+    XCTAssertTrue([description containsString:self.tempDirectory.lastPathComponent]);
+}
+
+- (void)testItemListRemoveItemWithUUIDDropsItemFromList
+{
+    // Add two files so the list has something left after the remove. (`count`
+    // re-scans from disk if `sortedItems` is empty, which would re-add the
+    // single file we just removed.)
+    NSURL *firstURL = [self.tempDirectory URLByAppendingPathComponent:@"keep.dat"];
+    NSURL *secondURL = [self.tempDirectory URLByAppendingPathComponent:@"to-remove.dat"];
+    [@"x" writeToURL:firstURL atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    [@"x" writeToURL:secondURL atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    NSString *firstUUID = [firstURL to_generateFileSystemUUID];
+    NSString *secondUUID = [secondURL to_generateFileSystemUUID];
+
+    TOFileSystemItemList *list = [[TOFileSystemItemList alloc] initWithDirectoryURL:self.tempDirectory
+                                                                fileSystemObserver:self.observer];
+    [list addItemWithUUID:firstUUID itemURL:firstURL];
+    [list addItemWithUUID:secondUUID itemURL:secondURL];
+    XCTAssertEqual(list.count, 2);
+
+    [list removeItemWithUUID:secondUUID fileURL:secondURL];
+    XCTAssertEqual(list.count, 1);
+    XCTAssertEqualObjects(list[0].uuid, firstUUID);
+}
+
+- (void)testFileDeletionAfterStartFiresChangeNotification
+{
+    // Pre-create a file so the initial scan picks it up; deletion then triggers
+    // the item-scan + cleanUpFilesPendingDeletion + didDeleteItemAtURL path.
+    NSURL *target = [self.tempDirectory URLByAppendingPathComponent:@"to-delete.dat"];
+    [@"x" writeToURL:target atomically:YES encoding:NSUTF8StringEncoding error:nil];
+
+    XCTestExpectation *initialScanComplete = [self expectationWithDescription:@"initial scan complete"];
+    XCTestExpectation *deletionObserved = [self expectationWithDescription:@"deletion observed"];
+    deletionObserved.assertForOverFulfill = NO;
+
+    TOFileSystemNotificationToken *token = [self.observer addNotificationBlock:
+        ^(TOFileSystemObserver *observer,
+          TOFileSystemObserverNotificationType type,
+          TOFileSystemChanges *changes)
+    {
+        if (type == TOFileSystemObserverNotificationTypeDidCompleteFullScan) {
+            [initialScanComplete fulfill];
+        } else if (type == TOFileSystemObserverNotificationTypeDidChange &&
+                   !changes.isFullScan &&
+                   changes.deletedItems.count > 0) {
+            [deletionObserved fulfill];
+        }
+    }];
+    [self.tokens addObject:token];
+
+    [self.observer start];
+    [self waitForExpectations:@[initialScanComplete] timeout:kTestScanTimeout];
+
+    [NSFileManager.defaultManager removeItemAtURL:target error:nil];
+
+    [self waitForExpectations:@[deletionObserved] timeout:kTestScanTimeout];
 }
 
 - (void)testStopThenStartAgainPerformsAnotherFullScan
