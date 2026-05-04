@@ -131,7 +131,7 @@ static inline void TOFileSystemItemListCallBlock(id block, id observer, id chang
     }
     
     // Trigger the notification blocks to update any UI with this new order
-    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+    for (TOFileSystemNotificationToken *token in self.notificationTokens.allObjects) {
         TOFileSystemItemListCallBlock(token.notificationBlock, self, changes);
     }
 }
@@ -242,7 +242,7 @@ static inline void TOFileSystemItemListCallBlock(id block, id observer, id chang
     // Perform the broadcast to any observing objects that this update ocurred
     TOFileSystemItemListChanges *changes = [[TOFileSystemItemListChanges alloc] init];
     [changes addInsertionIndex:sortedIndex];
-    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+    for (TOFileSystemNotificationToken *token in self.notificationTokens.allObjects) {
         TOFileSystemItemListCallBlock(token.notificationBlock, self, changes);
     }
 }
@@ -267,7 +267,7 @@ static inline void TOFileSystemItemListCallBlock(id block, id observer, id chang
     TOFileSystemItemListChanges *changes = [[TOFileSystemItemListChanges alloc] init];
     [changes addDeletionIndex:index];
     
-    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+    for (TOFileSystemNotificationToken *token in self.notificationTokens.allObjects) {
         TOFileSystemItemListCallBlock(token.notificationBlock, self, changes);
     }
 }
@@ -300,7 +300,7 @@ static inline void TOFileSystemItemListCallBlock(id block, id observer, id chang
     [changes addModificationIndex:newIndex];
     
     // Broadcast the changes
-    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+    for (TOFileSystemNotificationToken *token in self.notificationTokens.allObjects) {
         TOFileSystemItemListCallBlock(token.notificationBlock, self, changes);
     }
 }
@@ -331,7 +331,7 @@ static inline void TOFileSystemItemListCallBlock(id block, id observer, id chang
     
     // Broadcast the changes
     dispatch_async(dispatch_get_main_queue(), ^{
-        for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+        for (TOFileSystemNotificationToken *token in self.notificationTokens.allObjects) {
             TOFileSystemItemListCallBlock(token.notificationBlock, self, changes);
         }
     });

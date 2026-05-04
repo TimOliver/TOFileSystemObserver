@@ -607,7 +607,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
     }
     
     // Inform all notification tokens registered
-    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+    for (TOFileSystemNotificationToken *token in self.notificationTokens.allObjects) {
         TOFileSystemObserverCallBlock(token.notificationBlock,
                                       self,
                                       TOFileSystemObserverNotificationTypeWillBeginFullScan,
@@ -631,7 +631,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
     }
     
     // Inform all notification tokens registered
-    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+    for (TOFileSystemNotificationToken *token in self.notificationTokens.allObjects) {
         TOFileSystemObserverCallBlock(token.notificationBlock,
                                       self,
                                       TOFileSystemObserverNotificationTypeDidCompleteFullScan,
@@ -667,7 +667,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
     }
     
     // Inform all notification tokens registered
-    for (TOFileSystemNotificationToken *token in self.notificationTokens) {
+    for (TOFileSystemNotificationToken *token in self.notificationTokens.allObjects) {
         TOFileSystemObserverCallBlock(token.notificationBlock,
                                       self,
                                       TOFileSystemObserverNotificationTypeDidChange,
