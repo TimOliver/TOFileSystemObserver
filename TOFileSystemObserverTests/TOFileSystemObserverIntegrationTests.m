@@ -22,6 +22,8 @@
 
 #import <XCTest/XCTest.h>
 #import "TOFileSystemObserver.h"
+#import "TOFileSystemItemList+Private.h"
+#import "NSURL+TOFileSystemUUID.h"
 
 // Scans complete in well under a second under normal conditions. A larger
 // budget than that gives slow CI hardware some headroom while still failing
@@ -149,6 +151,60 @@ static const NSTimeInterval kTestScanTimeout = 10.0;
 
     [self.observer start];
     [self waitForExpectations:@[firstFired, secondFired] timeout:kTestScanTimeout];
+}
+
+- (void)testItemListSynchronizeWithDiskRemovesNonContiguousDeletedItems
+{
+    // Regression: deletions used to be applied by ascending stale index, so
+    // non-contiguous deletions mis-targeted the second-and-later removals
+    // because earlier removals shifted the array.
+    NSMutableArray<NSURL *> *fileURLs = [NSMutableArray array];
+    NSMutableArray<NSString *> *uuids = [NSMutableArray array];
+    for (NSInteger i = 0; i < 5; i++) {
+        NSURL *fileURL = [self.tempDirectory URLByAppendingPathComponent:[NSString stringWithFormat:@"file-%ld.dat", (long)i]];
+        [@"x" writeToURL:fileURL atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        NSString *uuid = [fileURL to_generateFileSystemUUID];
+        XCTAssertNotNil(uuid);
+        [fileURLs addObject:fileURL];
+        [uuids addObject:uuid];
+    }
+
+    TOFileSystemItemList *list = [[TOFileSystemItemList alloc] initWithDirectoryURL:self.tempDirectory
+                                                                fileSystemObserver:self.observer];
+    for (NSInteger i = 0; i < 5; i++) {
+        [list addItemWithUUID:uuids[i] itemURL:fileURLs[i]];
+    }
+    XCTAssertEqual(list.count, 5);
+
+    // Delete the files at indices 1 and 3 — non-contiguous, so reverse-iteration
+    // order is what keeps the indices valid for both removals.
+    [NSFileManager.defaultManager removeItemAtURL:fileURLs[1] error:nil];
+    [NSFileManager.defaultManager removeItemAtURL:fileURLs[3] error:nil];
+
+    [list synchronizeWithDisk];
+
+    XCTAssertEqual(list.count, 3);
+    NSMutableSet<NSString *> *expected = [NSMutableSet setWithObjects:uuids[0], uuids[2], uuids[4], nil];
+    NSMutableSet<NSString *> *actual = [NSMutableSet set];
+    for (NSUInteger i = 0; i < list.count; i++) {
+        [actual addObject:list[i].uuid];
+    }
+    XCTAssertEqualObjects(expected, actual);
+}
+
+- (void)testBroadcastsNotificationsPostsToNotificationCenter
+{
+    self.observer.broadcastsNotifications = YES;
+
+    XCTestExpectation *willBegin = [self expectationForNotification:TOFileSystemObserverWillBeginFullScanNotification
+                                                             object:nil
+                                                            handler:nil];
+    XCTestExpectation *didComplete = [self expectationForNotification:TOFileSystemObserverDidCompleteFullScanNotification
+                                                               object:nil
+                                                              handler:nil];
+
+    [self.observer start];
+    [self waitForExpectations:@[willBegin, didComplete] timeout:kTestScanTimeout];
 }
 
 - (void)testStopThenStartAgainPerformsAnotherFullScan
