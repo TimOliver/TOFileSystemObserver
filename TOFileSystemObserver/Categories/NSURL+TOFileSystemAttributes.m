@@ -23,6 +23,7 @@
 #import "NSURL+TOFileSystemAttributes.h"
 #import "TOFileSystemObserverConstants.h"
 #include <dirent.h>
+#include <sys/stat.h>
 
 @implementation NSURL (TOFileSystemAttributes)
 
@@ -78,11 +79,25 @@
     while ((entry = readdir(directory)) != NULL) {
         if (entry->d_name[0] == '.') { continue; }
         if (entry->d_type == DT_REG || entry->d_type == DT_DIR) {
-             numberOfItems++;
+            numberOfItems++;
+            continue;
+        }
+        // Some filesystems (NFS, FAT, others) report DT_UNKNOWN and require an
+        // actual stat to determine the type. APFS fills d_type reliably so this
+        // branch is rare in practice.
+        if (entry->d_type == DT_UNKNOWN) {
+            char fullPath[PATH_MAX];
+            int written = snprintf(fullPath, sizeof(fullPath), "%s/%s", path, entry->d_name);
+            if (written <= 0 || written >= (int)sizeof(fullPath)) { continue; }
+            struct stat st;
+            if (lstat(fullPath, &st) != 0) { continue; }
+            if (S_ISREG(st.st_mode) || S_ISDIR(st.st_mode)) {
+                numberOfItems++;
+            }
         }
     }
     closedir(directory);
-    
+
     return numberOfItems;
 }
 
