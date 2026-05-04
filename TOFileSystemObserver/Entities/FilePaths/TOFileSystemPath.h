@@ -36,14 +36,6 @@ NS_ASSUME_NONNULL_BEGIN
 /** The path to the application documents directory. */
 + (NSURL *)documentsDirectoryURL;
 
-/** Takes an absolute URL, and strips off the sandbox portion, making it relative. */
-+ (NSString *)relativePathWithPath:(NSURL *)fileURL;
-
-/** Takes a flat array of URLs, and organizes them into a
- dictionary where each key is the parent directory URL, and the value
- is an array of all items in that directory. */
-+ (NSDictionary<NSURL *, NSArray *> *)directoryDictionaryWithItemURLs:(NSArray<NSURL *> *)itemURLs;
-
 @end
 
 NS_ASSUME_NONNULL_END

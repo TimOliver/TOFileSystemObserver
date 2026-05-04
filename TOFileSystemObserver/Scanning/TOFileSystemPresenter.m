@@ -55,16 +55,6 @@
     return self;
 }
 
-- (instancetype)initWithDirectoryURL:(NSURL *)directoryURL
-{
-    if (self = [super init]) {
-        _directoryURL = directoryURL;
-        [self commonInit];
-    }
-
-    return self;
-}
-
 - (void)commonInit
 {
     // Create the queue to receive events

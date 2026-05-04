@@ -207,6 +207,70 @@ static const NSTimeInterval kTestScanTimeout = 10.0;
     [self waitForExpectations:@[willBegin, didComplete] timeout:kTestScanTimeout];
 }
 
+- (void)testItemListIsDescendingTriggersResort
+{
+    // Exercises setIsDescending, rebuildItemListForListingOrder, and the
+    // sort-comparator block that drives them.
+    NSArray<NSString *> *names = @[@"a.txt", @"b.txt", @"c.txt"];
+    NSMutableDictionary<NSString *, NSString *> *uuidsByName = [NSMutableDictionary dictionary];
+    NSMutableDictionary<NSString *, NSURL *> *urlsByName = [NSMutableDictionary dictionary];
+    for (NSString *name in names) {
+        NSURL *url = [self.tempDirectory URLByAppendingPathComponent:name];
+        [@"x" writeToURL:url atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        urlsByName[name] = url;
+        uuidsByName[name] = [url to_generateFileSystemUUID];
+        XCTAssertNotNil(uuidsByName[name]);
+    }
+
+    TOFileSystemItemList *list = [[TOFileSystemItemList alloc] initWithDirectoryURL:self.tempDirectory
+                                                                fileSystemObserver:self.observer];
+    for (NSString *name in names) {
+        [list addItemWithUUID:uuidsByName[name] itemURL:urlsByName[name]];
+    }
+
+    // Default order is alphanumeric ascending.
+    XCTAssertEqualObjects(list[0].name, @"a.txt");
+    XCTAssertEqualObjects(list[2].name, @"c.txt");
+
+    list.isDescending = YES;
+    XCTAssertEqualObjects(list[0].name, @"c.txt");
+    XCTAssertEqualObjects(list[2].name, @"a.txt");
+
+    list.isDescending = NO;
+    XCTAssertEqualObjects(list[0].name, @"a.txt");
+}
+
+- (void)testFileCreationAfterStartFiresChangeNotification
+{
+    // Wait for the initial scan to settle, then create a file and confirm a
+    // non-full-scan DidChange notification fires. Exercises the entire
+    // NSFilePresenter -> beginTimer -> item-scan path.
+    XCTestExpectation *initialScanComplete = [self expectationWithDescription:@"initial scan complete"];
+    XCTestExpectation *changeReceived = [self expectationWithDescription:@"file creation observed"];
+    changeReceived.assertForOverFulfill = NO;
+
+    TOFileSystemNotificationToken *token = [self.observer addNotificationBlock:
+        ^(TOFileSystemObserver *observer,
+          TOFileSystemObserverNotificationType type,
+          TOFileSystemChanges *changes)
+    {
+        if (type == TOFileSystemObserverNotificationTypeDidCompleteFullScan) {
+            [initialScanComplete fulfill];
+        } else if (type == TOFileSystemObserverNotificationTypeDidChange && !changes.isFullScan) {
+            [changeReceived fulfill];
+        }
+    }];
+    [self.tokens addObject:token];
+
+    [self.observer start];
+    [self waitForExpectations:@[initialScanComplete] timeout:kTestScanTimeout];
+
+    NSURL *newFile = [self.tempDirectory URLByAppendingPathComponent:@"new-file.dat"];
+    [@"new" writeToURL:newFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
+
+    [self waitForExpectations:@[changeReceived] timeout:kTestScanTimeout];
+}
+
 - (void)testStopThenStartAgainPerformsAnotherFullScan
 {
     XCTestExpectation *firstScan = [self expectationWithDescription:@"first scan completes"];
