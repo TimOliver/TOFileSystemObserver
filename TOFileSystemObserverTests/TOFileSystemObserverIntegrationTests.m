@@ -43,7 +43,7 @@
 @end
 
 @interface TOFileSystemScanOperation (TestingHook)
-- (NSInteger)numberOfDirectoryLevelsToURL:(NSURL *)url;
+- (NSInteger)_numberOfDirectoryLevelsToURL:(NSURL *)url;
 @end
 
 @interface TOFileSystemItemList (TestingHook)
@@ -623,9 +623,9 @@ static const NSTimeInterval kTestScanTimeout = 10.0;
     NSURL *twoDeep = [[[self.tempDirectory URLByAppendingPathComponent:@"a"]
                        URLByAppendingPathComponent:@"b"] URLByAppendingPathComponent:@"foo.dat"];
 
-    XCTAssertEqual([scan numberOfDirectoryLevelsToURL:direct], 0);
-    XCTAssertEqual([scan numberOfDirectoryLevelsToURL:oneDeep], 1);
-    XCTAssertEqual([scan numberOfDirectoryLevelsToURL:twoDeep], 2);
+    XCTAssertEqual([scan _numberOfDirectoryLevelsToURL:direct], 0);
+    XCTAssertEqual([scan _numberOfDirectoryLevelsToURL:oneDeep], 1);
+    XCTAssertEqual([scan _numberOfDirectoryLevelsToURL:twoDeep], 2);
 }
 
 - (void)testStopThenStartAgainPerformsAnotherFullScan

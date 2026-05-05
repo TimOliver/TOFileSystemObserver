@@ -24,14 +24,12 @@
 
 @implementation TOFileSystemPath
 
-+ (NSURL *)applicationSandboxURL
-{
++ (NSURL *)applicationSandboxURL {
     return [NSURL fileURLWithPath:NSHomeDirectory()];
 }
 
-+ (NSURL *)documentsDirectoryURL
-{
-    NSFileManager *fileManager = [NSFileManager defaultManager];
++ (NSURL *)documentsDirectoryURL {
+    NSFileManager * const fileManager = [NSFileManager defaultManager];
     return [fileManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].lastObject;
 }
 

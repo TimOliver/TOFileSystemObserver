@@ -69,8 +69,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 - (instancetype)initForFullScanWithDirectoryAtURL:(NSURL *)directoryURL
                                     skippingItems:(NSArray *)skippedItems
                     allItemsDictionary:(nonnull TOFileSystemItemURLDictionary *)allItems
-                         filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
-{
+                         filePresenter:(nonnull TOFileSystemPresenter *)filePresenter {
     if (self = [super init]) {
         _isFullScan = YES;
         _directoryURL = directoryURL.URLByStandardizingPath;
@@ -78,7 +77,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
         _skippedItems = skippedItems;
         _allItems = allItems;
         _pendingDirectories = [NSMutableArray array];
-        [self commonInit];
+        [self _commonInit];
     }
 
     return self;
@@ -88,8 +87,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
                                     baseURL:(NSURL *)baseURL
                               skippingItems:(NSArray *)skippedItems
               allItemsDictionary:(nonnull TOFileSystemItemURLDictionary *)allItems
-                   filePresenter:(nonnull TOFileSystemPresenter *)filePresenter
-{
+                   filePresenter:(nonnull TOFileSystemPresenter *)filePresenter {
     if (self = [super init]) {
         _directoryURL = baseURL.URLByStandardizingPath;
         _filePresenter = filePresenter;
@@ -98,22 +96,20 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
         _allItems = allItems;
         _pendingDirectories = [NSMutableArray array];
         _missingItems = [NSMutableDictionary dictionary];
-        [self commonInit];
+        [self _commonInit];
     }
 
     return self;
 }
 
-- (void)commonInit
-{
+- (void)_commonInit {
     _subDirectoryLevelLimit = -1;
     _fileManager = [[NSFileManager alloc] init];
 }
 
 #pragma mark - Scanning Implementation -
 
-- (void)main
-{
+- (void)main {
     // Terminate out if this operation was cancelled before it started
     // Once it's started however, we need to see it through to completion
     // to prevent leaving things in an inconsistent state.
@@ -123,91 +119,87 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     // or a flat list of files was provided, perform
     // different scan patterns
     if (self.isFullScan) {
-        [self scanAllSubdirectoriesFromBaseURL];
+        [self _scanAllSubdirectoriesFromBaseURL];
     }
     else if (self.itemURLs) {
-        [self scanItemURLsList];
+        [self _scanItemURLsList];
     }
 }
 
 #pragma mark - Deep Hierarcy Directory Scan -
 
-- (void)scanAllSubdirectoriesFromBaseURL
-{
+- (void)_scanAllSubdirectoriesFromBaseURL {
     // Post the "will begin" notification before doing any work so consumers
     // see paired begin/complete events even when the directory is empty.
     [self.delegate scanOperationWillBeginFullScan:self];
 
     // Scan all of the items in the base directory. An empty directory yields
     // an empty enumeration, which is a valid (no-op) state.
-    NSArray *childItemURLs = [self.fileManager to_fileSystemEnumeratorForDirectoryAtURL:self.directoryURL].allObjects;
-    for (NSURL *url in childItemURLs) {
-        [self scanItemAtURL:url
+    NSArray * const childItemURLs = [self.fileManager to_fileSystemEnumeratorForDirectoryAtURL:self.directoryURL].allObjects;
+    for (NSURL * const url in childItemURLs) {
+        [self _scanItemAtURL:url
          pendingDirectories:self.pendingDirectories];
     }
 
     // If we were only scanning the immediate contents of the base directory,
     // skip the recursive pass.
     if (self.subDirectoryLevelLimit != 0) {
-        [self scanPendingSubdirectories];
+        [self _scanPendingSubdirectories];
     }
 
     [self.delegate scanOperationDidCompleteFullScan:self];
 }
 
-- (void)scanPendingSubdirectories
-{
-    NSMutableArray *pendingDirectories = self.pendingDirectories;
+- (void)_scanPendingSubdirectories {
+    NSMutableArray * const pendingDirectories = self.pendingDirectories;
 
     // If there were any directories in the base, start a flat loop to scan
     // all subdirectories too (Avoiding potential stack overflows!)
     while (pendingDirectories.count > 0) {
         // Extract the item, and then remove it from the pending list
-        NSURL *url = pendingDirectories.firstObject;
+        NSURL * const url = pendingDirectories.firstObject;
         [pendingDirectories removeObjectAtIndex:0];
 
         // Exit out if we've gone deeper than the specified limit
         if (self.subDirectoryLevelLimit > 0) {
-            NSInteger levels = [self numberOfDirectoryLevelsToURL:url];
+            const NSInteger levels = [self _numberOfDirectoryLevelsToURL:url];
             if (levels >= self.subDirectoryLevelLimit) { continue; }
         }
 
         // Create a new enumerator for it
-        NSDirectoryEnumerator *enumerator = [self.fileManager to_fileSystemEnumeratorForDirectoryAtURL:url];
-        for (NSURL *url in enumerator) {
-            [self scanItemAtURL:url pendingDirectories:pendingDirectories];
+        NSDirectoryEnumerator * const enumerator = [self.fileManager to_fileSystemEnumeratorForDirectoryAtURL:url];
+        for (NSURL * const url in enumerator) {
+            [self _scanItemAtURL:url pendingDirectories:pendingDirectories];
         }
     }
 }
 
 #pragma mark - Flat File List Scan -
 
-- (void)scanItemURLsList
-{
+- (void)_scanItemURLsList {
     // Loop through each reported file URL and perform a scan to see what changed
-    for (NSURL *itemURL in self.itemURLs) {
-        [self verifyEveryParentDirectoryForURL:itemURL];
-        [self scanItemAtURL:itemURL pendingDirectories:self.pendingDirectories];
+    for (NSURL * const itemURL in self.itemURLs) {
+        [self _verifyEveryParentDirectoryForURL:itemURL];
+        [self _scanItemAtURL:itemURL pendingDirectories:self.pendingDirectories];
     }
-    
+
     // After all files are scanned, clean out any files
-    [self cleanUpFilesPendingDeletion];
+    [self _cleanUpFilesPendingDeletion];
 }
 
 #pragma mark - Scanning Logic -
 
-- (void)scanItemAtURL:(NSURL *)url pendingDirectories:(NSMutableArray *)pendingDirectories
-{
+- (void)_scanItemAtURL:(NSURL *)url pendingDirectories:(NSMutableArray *)pendingDirectories {
     // Sanitize the URL so we can use it in comparisons
     url = url.URLByStandardizingPath;
-    
+
     // Make sure it's not a hidden file
-    NSString *name = url.lastPathComponent;
+    NSString * const name = url.lastPathComponent;
     if ([name characterAtIndex:0] == '.') { return; }
-    
+
     // Check if it's a skipped one
-    for (NSString *skippedFileName in self.skippedItems) {
-        NSURL *skippedURL = [self.directoryURL URLByAppendingPathComponent:skippedFileName];
+    for (NSString * const skippedFileName in self.skippedItems) {
+        NSURL * const skippedURL = [self.directoryURL URLByAppendingPathComponent:skippedFileName];
         if ([url isEqual:skippedURL]) {
             return;
         }
@@ -215,7 +207,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     
     // Double-check the file is still at that URL
     // (The file presenter will sometimes provide the old URL for moved files)
-    if (![self verifyItemIsNotMissingAtURL:url]) {
+    if (![self _verifyItemIsNotMissingAtURL:url]) {
         return;
     }
     
@@ -234,24 +226,23 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     }
     
     // Check if the item had been moved
-    if (![self verifyIfItemWasMovedOrDeletedWithURL:url uuid:uuid]) {
+    if (![self _verifyIfItemWasMovedOrDeletedWithURL:url uuid:uuid]) {
         return;
     }
     
     // Verify this file has a unique UUID.
-    uuid = [self uniqueUUIDForItemAtURL:url withUUID:uuid];
+    uuid = [self _uniqueUUIDForItemAtURL:url withUUID:uuid];
     
     // Perform a verification of the item, and trigger the appropriate notifications
-    [self verifyItemAtURL:url uuid:uuid];
+    [self _verifyItemAtURL:url uuid:uuid];
 }
 
-- (void)verifyEveryParentDirectoryForURL:(NSURL *)url
-{
-    NSURL *directoryURL = self.directoryURL.URLByStandardizingPath;
-    
-    // Make sure that this file isn't hidden, or inside a hidden folder file 
+- (void)_verifyEveryParentDirectoryForURL:(NSURL *)url {
+    NSURL * const directoryURL = self.directoryURL.URLByStandardizingPath;
+
+    // Make sure that this file isn't hidden, or inside a hidden folder file
     url = url.URLByStandardizingPath;
-    NSString *relativePath = [url.path stringByReplacingOccurrencesOfString:directoryURL.path withString:@""];
+    NSString * const relativePath = [url.path stringByReplacingOccurrencesOfString:directoryURL.path withString:@""];
     if ([relativePath rangeOfString:@"/."].location != NSNotFound) {
         return;
     }
@@ -282,8 +273,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     }
 }
 
-- (BOOL)verifyItemIsNotMissingAtURL:(NSURL *)url
-{
+- (BOOL)_verifyItemIsNotMissingAtURL:(NSURL *)url {
     // Exit out if we're not interested in tracking deleted files in this operation
     if (self.missingItems == nil) { return YES; }
     
@@ -293,42 +283,41 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     }
     
     // Look up in the all items store to see if we have a UUID
-    NSString *uuid = [self.allItems uuidForItemWithURL:url];
+    NSString * const uuid = [self.allItems uuidForItemWithURL:url];
     if (uuid == nil) { return NO; }
-    
+
     // Save a reference to this file in case it turns up later in this operation
     self.missingItems[uuid] = url;
-    
+
     return NO;
 }
 
-- (BOOL)verifyIfItemWasMovedOrDeletedWithURL:(NSURL *)url uuid:(NSString *)uuid
-{
-    NSURL *savedURL = self.allItems[uuid];
+- (BOOL)_verifyIfItemWasMovedOrDeletedWithURL:(NSURL *)url uuid:(NSString *)uuid {
+    NSURL * const savedURL = self.allItems[uuid];
     if (savedURL == nil) { return YES; }
-    
+
     // If the URLs match, the item hasn't been moved
     if ([savedURL isEqual:url]) {
         return YES;
     }
-    
+
     // Check that the saved URL still has a file there, and the UUID of that file matches this one,
     // (in case the user potentially deleted the file, and replaced it with one with the same name)
-    NSString *savedUUID = [savedURL to_fileSystemUUID];
-    BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:savedURL.path];
+    NSString * const savedUUID = [savedURL to_fileSystemUUID];
+    const BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:savedURL.path];
     if (fileExists && [savedUUID isEqualToString:uuid]) {
         return YES;
     }
-    
+
     // If the file still exists, but it was moved to the Trashes folder, this means
     // the user deleted it via the Files app. Instead of moving the file, override
     // and treat it like it was deleted.
-    BOOL movedToTrashes = ([url.path rangeOfString:kTOFileSystemTrashFolderName].location != NSNotFound);
-    
+    const BOOL movedToTrashes = ([url.path rangeOfString:kTOFileSystemTrashFolderName].location != NSNotFound);
+
     // Conversely, if it was moved to a level below what we had limited, also consider
     // this as deleting the file
-    NSInteger numberOfSublevels = [self numberOfDirectoryLevelsToURL:url];
-    BOOL movedBeyondLevelLimit = (self.subDirectoryLevelLimit > 0 && numberOfSublevels > self.subDirectoryLevelLimit);
+    const NSInteger numberOfSublevels = [self _numberOfDirectoryLevelsToURL:url];
+    const BOOL movedBeyondLevelLimit = (self.subDirectoryLevelLimit > 0 && numberOfSublevels > self.subDirectoryLevelLimit);
     
     if (movedToTrashes || movedBeyondLevelLimit) {
         [self.allItems removeItemURLForUUID:uuid];
@@ -349,20 +338,19 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     
     return YES;
 }
-- (void)verifyItemAtURL:(NSURL *)url uuid:(NSString *)uuid
-{
-    NSURL *savedURL = self.allItems[uuid];
-    
+- (void)_verifyItemAtURL:(NSURL *)url uuid:(NSString *)uuid {
+    NSURL * const savedURL = self.allItems[uuid];
+
     // There's an extremely specific edge case here.
     // If a user suspends the app, deletes an item, and then imports
     // a new item with the same name, we can import the new item easily,
     // but there's no easy way to work out which file entry was deleted
     // (Because the reference to the UUID of the first file is lost).
-    
+
     // To remedy this, use an inverse dictionary to access any previous UUID
     // values stored against this current URL, and if they don't match,
     // delete the previous entry
-    NSString *savedUUID = [self.allItems uuidForItemWithURL:url];
+    NSString * const savedUUID = [self.allItems uuidForItemWithURL:url];
     if (savedUUID && ![savedUUID isEqualToString:uuid]) {
         [self.allItems removeItemURLForUUID:savedUUID];
         [self.delegate scanOperation:self didDeleteItemAtURL:url withUUID:savedUUID];
@@ -382,8 +370,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     [self.delegate scanOperation:self itemDidChangeAtURL:url withUUID:uuid];
 }
 
-- (void)cleanUpFilesPendingDeletion
-{
+- (void)_cleanUpFilesPendingDeletion {
     if (self.missingItems.count == 0) { return; }
     
     // Loop through each missing item entry
@@ -398,10 +385,9 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 
 #pragma mark - State Tracking -
 
-- (NSString *)uniqueUUIDForItemAtURL:(NSURL *)url withUUID:(NSString *)uuid
-{
+- (NSString *)_uniqueUUIDForItemAtURL:(NSURL *)url withUUID:(NSString *)uuid {
     // Check if we already stored an item with that same UUID
-    NSURL *savedURL = self.allItems[uuid];
+    NSURL * const savedURL = self.allItems[uuid];
     if (savedURL == nil) { return uuid; }
     
     // Check if the URLs match
@@ -425,10 +411,9 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     return newUUID;
 }
 
-- (NSInteger)numberOfDirectoryLevelsToURL:(NSURL *)url
-{
+- (NSInteger)_numberOfDirectoryLevelsToURL:(NSURL *)url {
     NSInteger levels = 0;
-    NSURL *directoryURL = self.directoryURL.URLByStandardizingPath;
+    NSURL * const directoryURL = self.directoryURL.URLByStandardizingPath;
     
     // Loop up from the URL to the base
     // directory to see how many levels deep it is.

@@ -27,39 +27,34 @@
 
 @implementation NSURL (TOFileSystemAttributes)
 
-- (BOOL)to_isCopying
-{
+- (BOOL)to_isCopying {
     // When files are still being copied, their
     // modification date is equal to the current device time.
-    NSDate *modificationDate = self.to_modificationDate;
+    NSDate * const modificationDate = self.to_modificationDate;
     if (modificationDate == nil) { return NO; }
     return [modificationDate timeIntervalSinceDate:[NSDate date]]
                         > (-kTOFileSystemObserverCopyingTimeDelay - FLT_EPSILON);
 }
 
-- (BOOL)to_isDirectory
-{
+- (BOOL)to_isDirectory {
     NSNumber *isDirectory;
     [self getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
     return isDirectory.boolValue;
 }
 
-- (long long)to_size
-{
+- (long long)to_size {
     NSNumber *fileSize;
     [self getResourceValue:&fileSize forKey:NSURLFileSizeKey error:nil];
     return fileSize.longLongValue;
 }
 
-- (NSDate *)to_creationDate
-{
+- (NSDate *)to_creationDate {
     NSDate *creationDate;
     [self getResourceValue:&creationDate forKey:NSURLCreationDateKey error:nil];
     return creationDate;
 }
 
-- (NSDate *)to_modificationDate
-{
+- (NSDate *)to_modificationDate {
     [self removeCachedResourceValueForKey:NSURLContentModificationDateKey];
     NSDate *modificationDate;
     [self getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:nil];
@@ -72,14 +67,13 @@
 // that don't fill d_type, like NFS or FAT — falls back to lstat. Exposed (not
 // static) so the DT_UNKNOWN branch can be exercised by unit tests, since it's
 // not reachable on APFS where readdir always reports a concrete type.
-BOOL TOFileSystemDirEntryIsCountable(const char *parentPath, const struct dirent *entry)
-{
+BOOL TOFileSystemDirEntryIsCountable(const char *parentPath, const struct dirent *entry) {
     if (entry->d_name[0] == '.') { return NO; }
     if (entry->d_type == DT_REG || entry->d_type == DT_DIR) { return YES; }
     if (entry->d_type != DT_UNKNOWN) { return NO; }
 
     char fullPath[PATH_MAX];
-    int written = snprintf(fullPath, sizeof(fullPath), "%s/%s", parentPath, entry->d_name);
+    const int written = snprintf(fullPath, sizeof(fullPath), "%s/%s", parentPath, entry->d_name);
     if (written <= 0 || written >= (int)sizeof(fullPath)) { return NO; }
 
     struct stat st;
@@ -87,11 +81,10 @@ BOOL TOFileSystemDirEntryIsCountable(const char *parentPath, const struct dirent
     return S_ISREG(st.st_mode) || S_ISDIR(st.st_mode);
 }
 
-- (NSInteger)to_numberOfSubItems
-{
+- (NSInteger)to_numberOfSubItems {
     // Do it using POSIX APIs to avoid needing to load in all of the file names
-    const char *path = [self.path cStringUsingEncoding:NSUTF8StringEncoding];
-    DIR *directory = opendir(path);
+    const char * const path = [self.path cStringUsingEncoding:NSUTF8StringEncoding];
+    DIR * const directory = opendir(path);
     if (directory == NULL) { return 0; }
 
     NSInteger numberOfItems = 0;

@@ -49,8 +49,7 @@
 
 #pragma mark - Adding Index Values -
 
-- (void)addDeletionIndex:(NSInteger)index
-{
+- (void)addDeletionIndex:(NSInteger)index {
     if (self.deletions == nil) {
         self.deletions = [NSMutableArray array];
     }
@@ -58,8 +57,7 @@
     [(NSMutableArray *)self.deletions addObject:@(index)];
 }
 
-- (void)addInsertionIndex:(NSInteger)index
-{
+- (void)addInsertionIndex:(NSInteger)index {
     if (self.insertions == nil) {
         self.insertions = [NSMutableArray array];
     }
@@ -67,8 +65,7 @@
     [(NSMutableArray *)self.insertions addObject:@(index)];
 }
 
-- (void)addModificationIndex:(NSInteger)index
-{
+- (void)addModificationIndex:(NSInteger)index {
     if (self.modificatons == nil) {
         self.modificatons = [NSMutableArray array];
     }
@@ -77,73 +74,64 @@
 }
 
 - (void)addMovementWithSourceIndex:(NSInteger)sourceIndex
-                  destinationIndex:(NSInteger)destinationIndex
-{
+                  destinationIndex:(NSInteger)destinationIndex {
     if (self.movements == nil) {
         self.movements = [NSMutableDictionary dictionary];
     }
     
-    NSMutableDictionary *dict = (NSMutableDictionary *)self.movements;
+    NSMutableDictionary * const dict = (NSMutableDictionary *)self.movements;
     dict[@(sourceIndex)] = @(destinationIndex);
 }
 
 #pragma mark - Table/Collection View Converters -
 
-- (NSArray<NSIndexPath *> *)indexPathsForCollection:(nullable NSArray<NSNumber *> *)collection
-                                                   inSection:(NSInteger)section
-{
+- (NSArray<NSIndexPath *> *)_indexPathsForCollection:(nullable NSArray<NSNumber *> *)collection
+                                                   inSection:(NSInteger)section {
     if (!collection) { return [NSArray array]; }
-    
-    NSMutableArray *array = [NSMutableArray array];
-    for (NSNumber *number in collection) {
-        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:number.intValue inSection:section];
+
+    NSMutableArray * const array = [NSMutableArray array];
+    for (NSNumber * const number in collection) {
+        NSIndexPath * const indexPath = [NSIndexPath indexPathForRow:number.intValue inSection:section];
         [array addObject:indexPath];
     }
-    
+
     return [NSArray arrayWithArray:array];
 }
 
-- (NSArray<NSIndexPath *> *)indexPathsForDeletionsInSection:(NSInteger)section
-{
-    return [self indexPathsForCollection:self.deletions inSection:section];
+- (NSArray<NSIndexPath *> *)indexPathsForDeletionsInSection:(NSInteger)section {
+    return [self _indexPathsForCollection:self.deletions inSection:section];
 }
 
-- (NSArray<NSIndexPath *> *)indexPathsForInsertionsInSection:(NSInteger)section
-{
-    return [self indexPathsForCollection:self.insertions inSection:section];
+- (NSArray<NSIndexPath *> *)indexPathsForInsertionsInSection:(NSInteger)section {
+    return [self _indexPathsForCollection:self.insertions inSection:section];
 }
 
-- (NSArray<NSIndexPath *> *)indexPathsForModificationsInSection:(NSInteger)section
-{
-    return [self indexPathsForCollection:self.modificatons inSection:section];
+- (NSArray<NSIndexPath *> *)indexPathsForModificationsInSection:(NSInteger)section {
+    return [self _indexPathsForCollection:self.modificatons inSection:section];
 }
 
-- (NSArray<NSIndexPath *> *)indexPathsForMovementSourcesInSection:(NSInteger)section
-{
-    return [self indexPathsForCollection:self.movements.allKeys inSection:section];
+- (NSArray<NSIndexPath *> *)indexPathsForMovementSourcesInSection:(NSInteger)section {
+    return [self _indexPathsForCollection:self.movements.allKeys inSection:section];
 }
 
-- (NSArray<NSIndexPath *> *)indexPathsForMovementDestinationsWithSourceIndexPaths:(NSArray<NSIndexPath *> *)sourceIndexPaths
-{
+- (NSArray<NSIndexPath *> *)indexPathsForMovementDestinationsWithSourceIndexPaths:(NSArray<NSIndexPath *> *)sourceIndexPaths {
     if (self.movements == nil) { return [NSArray array]; }
-    
-    NSMutableArray *array = [NSMutableArray array];
-    for (NSIndexPath *sourceIndexPath in sourceIndexPaths) {
-        NSInteger row = self.movements[@(sourceIndexPath.row)].intValue;
-        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:sourceIndexPath.section];
+
+    NSMutableArray * const array = [NSMutableArray array];
+    for (NSIndexPath * const sourceIndexPath in sourceIndexPaths) {
+        const NSInteger row = self.movements[@(sourceIndexPath.row)].intValue;
+        NSIndexPath * const indexPath = [NSIndexPath indexPathForRow:row inSection:sourceIndexPath.section];
         [array addObject:indexPath];
     }
-    
+
     return [NSArray arrayWithArray:array];
 }
 
-- (BOOL)hasItemMovements
-{
+- (BOOL)hasItemMovements {
     return self.movements != nil;
 }
 
-- (BOOL)hasItemChanges
-{
+- (BOOL)hasItemChanges {
     return (self.deletions.count ||
             self.insertions.count ||
             self.modificatons.count);

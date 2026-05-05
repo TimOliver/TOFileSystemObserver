@@ -42,8 +42,7 @@
 
 #pragma mark - Class Creation -
 
-- (instancetype)initWithBaseURL:(NSURL *)baseURL
-{
+- (instancetype)initWithBaseURL:(NSURL *)baseURL {
     if (self = [super init]) {
         _baseURL    = baseURL.URLByDeletingLastPathComponent.URLByStandardizingPath;
         _uuidItems  = [NSMutableDictionary dictionary];
@@ -55,8 +54,7 @@
     return self;
 }
 
-- (NSUInteger)count
-{
+- (NSUInteger)count {
     __block NSInteger count = 0;
     dispatch_sync(self.itemQueue, ^{
         count = self.uuidItems.count;
@@ -65,37 +63,35 @@
     return count;
 }
 
-- (void)setItemURL:(nullable NSURL *)itemURL forUUID:(nullable NSString *)uuid
-{
+- (void)setItemURL:(nullable NSURL *)itemURL forUUID:(nullable NSString *)uuid {
     if (uuid.length == 0) { return; }
     
     // If the item is nil, remove it from the store
     if (itemURL == nil) {
         dispatch_barrier_async(self.itemQueue, ^{
-            NSURL *url = self.uuidItems[uuid];
+            NSURL * const url = self.uuidItems[uuid];
             [self.urlItems removeObjectForKey:url];
             [self.uuidItems removeObjectForKey:uuid];
         });
         return;
     }
-    
+
     // Use dispatch barriers to block all reads when we mutate the dictionary
     dispatch_barrier_async(self.itemQueue, ^{
         // Purge the previously saved entries as they may be stale
-        NSURL *savedURL = self.uuidItems[uuid];
-        NSString *savedUUID = self.urlItems[savedURL];
+        NSURL * const savedURL = self.uuidItems[uuid];
+        NSString * const savedUUID = self.urlItems[savedURL];
         if (savedUUID) { [self.uuidItems removeObjectForKey:savedUUID]; }
         if (savedURL) { [self.urlItems removeObjectForKey:savedURL]; }
-        
+
         // Remove the un-needed absolute path to save memory
-        NSURL *url = [self relativeURLForURL:itemURL];
+        NSURL * const url = [self _relativeURLForURL:itemURL];
         self.uuidItems[uuid] = url;
         self.urlItems[url] = uuid;
     });
 }
 
-- (nullable NSURL *)itemURLForUUID:(NSString *)uuid
-{
+- (nullable NSURL *)itemURLForUUID:(NSString *)uuid {
     if (uuid.length == 0) { return nil; }
     
     // Use dispatch barriers to allow asynchronouse reading
@@ -108,22 +104,20 @@
     return [self.baseURL URLByAppendingPathComponent:itemURL.path].URLByStandardizingPath;
 }
 
-- (nullable NSString *)uuidForItemWithURL:(NSURL *)itemURL
-{
+- (nullable NSString *)uuidForItemWithURL:(NSURL *)itemURL {
     // Convert the item URL to relative
-    NSURL *url = [self relativeURLForURL:itemURL];
-    
+    NSURL * const url = [self _relativeURLForURL:itemURL];
+
     // Look up the URL in the dictionary
     __block NSString *uuid = nil;
     dispatch_sync(self.itemQueue, ^{
         uuid = self.urlItems[url];
     });
-    
+
     return uuid;
 }
 
-- (nullable NSArray<NSString *> *)allUUIDs
-{
+- (nullable NSArray<NSString *> *)allUUIDs {
     __block NSArray *uuids = nil;
     dispatch_sync(self.itemQueue, ^{
         uuids = self.uuidItems.allKeys;
@@ -131,14 +125,13 @@
     return uuids;
 }
 
-- (nullable NSArray<NSURL *> *)allURLs
-{
+- (nullable NSArray<NSURL *> *)allURLs {
     // Loop through each item in the store, and restore its URL
-    __block NSMutableArray *array = [NSMutableArray array];
+    NSMutableArray * const array = [NSMutableArray array];
     dispatch_sync(self.itemQueue, ^{
-        for (NSString *uuid in self.uuidItems) {
-            NSString *path = self.uuidItems[uuid].path;
-            NSURL *url = [self.baseURL URLByAppendingPathComponent:path];
+        for (NSString * const uuid in self.uuidItems) {
+            NSString * const path = self.uuidItems[uuid].path;
+            NSURL * const url = [self.baseURL URLByAppendingPathComponent:path];
             [array addObject:url.URLByStandardizingPath];
         }
     });
@@ -150,55 +143,49 @@
     return [NSArray arrayWithArray:array];
 }
 
-- (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key
-{
+- (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key {
     [self setItemURL:object forUUID:key];
 }
 
-- (void)removeItemURLForUUID:(NSString *)uuid
-{
+- (void)removeItemURLForUUID:(NSString *)uuid {
     if (uuid == nil) { return; }
-    
+
     dispatch_barrier_async(self.itemQueue, ^{
-        NSURL *url = self.uuidItems[uuid];
+        NSURL * const url = self.uuidItems[uuid];
         if (url == nil) { return; }
         [self.urlItems removeObjectForKey:url];
         [self.uuidItems removeObjectForKey:uuid];
     });
 }
 
-- (void)removeAllItems
-{
+- (void)removeAllItems {
     dispatch_barrier_async(self.itemQueue, ^{
         [self.urlItems removeAllObjects];
         [self.uuidItems removeAllObjects];
     });
 }
 
-- (nullable id)objectForKeyedSubscript:(NSString *)key
-{
+- (nullable id)objectForKeyedSubscript:(NSString *)key {
     return [self itemURLForUUID:key];
 }
 
 #pragma mark - URL Conversion -
 
-- (NSURL *)relativeURLForURL:(NSURL *)url
-{
-    NSString *basePath = self.baseURL.path;
-    NSString *itemPath = url.URLByStandardizingPath.path;
-    NSString *relativePath = [itemPath stringByReplacingOccurrencesOfString:basePath withString:@""];
+- (NSURL *)_relativeURLForURL:(NSURL *)url {
+    NSString * const basePath = self.baseURL.path;
+    NSString * const itemPath = url.URLByStandardizingPath.path;
+    NSString * const relativePath = [itemPath stringByReplacingOccurrencesOfString:basePath withString:@""];
     return [NSURL fileURLWithPath:relativePath];
 }
 
 #pragma mark - Debugging -
 
-- (NSString *)description
-{
+- (NSString *)description {
     NSString *descriptionString = @"";
-    for (NSString *key in self.uuidItems.allKeys) {
+    for (NSString * const key in self.uuidItems.allKeys) {
         descriptionString = [descriptionString stringByAppendingFormat:@"%@ - %@\n", key, self.uuidItems[key]];
     }
-    
+
     return descriptionString;
 }
 
