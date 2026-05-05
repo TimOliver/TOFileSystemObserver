@@ -68,15 +68,64 @@
 {
     // Confirm it's nil at the start
     XCTAssertNil([self.itemURL to_fileSystemUUID]);
-    
+
     // Set a non-uuid value to the file
     [self.itemURL to_setFileSystemUUID:@"000000000000000000000000000000000000"];
-    
+
     // Regenerate a new uuid
     NSString *newUUID = [self.itemURL to_fileSystemUUID];
-    
+
     // Sanity check it's not matching the dummy
     XCTAssertNil(newUUID);
+}
+
+- (void)testSetUUIDReturnsYesOnSuccess
+{
+    NSString *uuid = [NSUUID UUID].UUIDString;
+    XCTAssertTrue([self.itemURL to_setFileSystemUUID:uuid]);
+    XCTAssertEqualObjects([self.itemURL to_fileSystemUUID], uuid);
+}
+
+- (void)testSetUUIDRejectsNilAndEmptyWithoutCrashing
+{
+    // Passing through a typed variable so the compiler doesn't reject the literal
+    // nil against the nonnull-annotated parameter.
+    NSString *nilUUID = nil;
+    XCTAssertFalse([self.itemURL to_setFileSystemUUID:nilUUID]);
+    XCTAssertFalse([self.itemURL to_setFileSystemUUID:@""]);
+    XCTAssertNil([self.itemURL to_fileSystemUUID]);
+}
+
+- (void)testSetUUIDThrowsForInvalidLength
+{
+    XCTAssertThrows([self.itemURL to_setFileSystemUUID:@"too-short"]);
+}
+
+- (void)testGenerateUUIDReturnsNilWhenWriteFails
+{
+    // Pointing at a path that doesn't exist makes setxattr fail (ENOENT), so
+    // the generator should propagate nil rather than report a phantom UUID.
+    NSURL *missingURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"missing-for-uuid-test"]];
+    XCTAssertNil([missingURL to_generateFileSystemUUID]);
+}
+
+- (void)testSetUUIDIfAbsentSucceedsOnFirstCall
+{
+    NSString *uuid = [NSUUID UUID].UUIDString;
+    XCTAssertTrue([self.itemURL to_setFileSystemUUIDIfAbsent:uuid]);
+    XCTAssertEqualObjects([self.itemURL to_fileSystemUUID], uuid);
+}
+
+- (void)testSetUUIDIfAbsentReturnsNoWhenAttributeAlreadyExists
+{
+    NSString *first = [NSUUID UUID].UUIDString;
+    NSString *second = [NSUUID UUID].UUIDString;
+    XCTAssertTrue([self.itemURL to_setFileSystemUUIDIfAbsent:first]);
+
+    // The second call must not overwrite — that's the whole point of the
+    // race-safe variant. The on-disk UUID stays as the first one.
+    XCTAssertFalse([self.itemURL to_setFileSystemUUIDIfAbsent:second]);
+    XCTAssertEqualObjects([self.itemURL to_fileSystemUUID], first);
 }
 
 @end

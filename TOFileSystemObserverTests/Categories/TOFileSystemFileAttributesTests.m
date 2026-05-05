@@ -21,7 +21,13 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <XCTest/XCTest.h>
+#import <dirent.h>
 #import "NSURL+TOFileSystemAttributes.h"
+
+// Internal helper exposed (non-static) by NSURL+TOFileSystemAttributes.m so we
+// can drive the DT_UNKNOWN fallback with a synthetic dirent. The branch isn't
+// reachable through readdir on APFS because APFS always fills d_type.
+extern BOOL TOFileSystemDirEntryIsCountable(const char *parentPath, const struct dirent *entry);
 
 const NSInteger kTOFileSystemTestFileSize = 3 * 1000000;
 
@@ -101,6 +107,75 @@ const NSInteger kTOFileSystemTestFileSize = 3 * 1000000;
 - (void)testModificationDate
 {
     XCTAssertNotNil(self.fileURL.to_modificationDate);
+}
+
+- (void)testDirEntryIsCountableHandlesAllTypes
+{
+    const char *parent = [self.directoryURL.path cStringUsingEncoding:NSUTF8StringEncoding];
+
+    NSURL *fileURL = [self.directoryURL URLByAppendingPathComponent:@"countable.txt"];
+    [@"x" writeToURL:fileURL atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    NSURL *subdirURL = [self.directoryURL URLByAppendingPathComponent:@"countable_subdir"];
+    [NSFileManager.defaultManager createDirectoryAtURL:subdirURL withIntermediateDirectories:YES attributes:nil error:nil];
+
+    struct dirent entry;
+
+    // d_type = DT_REG (fast path) — counted.
+    memset(&entry, 0, sizeof(entry));
+    entry.d_type = DT_REG;
+    strncpy(entry.d_name, "countable.txt", sizeof(entry.d_name) - 1);
+    XCTAssertTrue(TOFileSystemDirEntryIsCountable(parent, &entry));
+
+    // d_type = DT_DIR (fast path) — counted.
+    memset(&entry, 0, sizeof(entry));
+    entry.d_type = DT_DIR;
+    strncpy(entry.d_name, "countable_subdir", sizeof(entry.d_name) - 1);
+    XCTAssertTrue(TOFileSystemDirEntryIsCountable(parent, &entry));
+
+    // d_type = DT_UNKNOWN, file exists on disk — falls back to lstat, counted.
+    memset(&entry, 0, sizeof(entry));
+    entry.d_type = DT_UNKNOWN;
+    strncpy(entry.d_name, "countable.txt", sizeof(entry.d_name) - 1);
+    XCTAssertTrue(TOFileSystemDirEntryIsCountable(parent, &entry));
+
+    // d_type = DT_UNKNOWN, directory exists on disk — falls back to lstat, counted.
+    memset(&entry, 0, sizeof(entry));
+    entry.d_type = DT_UNKNOWN;
+    strncpy(entry.d_name, "countable_subdir", sizeof(entry.d_name) - 1);
+    XCTAssertTrue(TOFileSystemDirEntryIsCountable(parent, &entry));
+
+    // d_type = DT_UNKNOWN, target doesn't exist — lstat fails, not counted.
+    memset(&entry, 0, sizeof(entry));
+    entry.d_type = DT_UNKNOWN;
+    strncpy(entry.d_name, "does-not-exist", sizeof(entry.d_name) - 1);
+    XCTAssertFalse(TOFileSystemDirEntryIsCountable(parent, &entry));
+
+    // Hidden entries are always skipped, regardless of d_type.
+    memset(&entry, 0, sizeof(entry));
+    entry.d_type = DT_REG;
+    strncpy(entry.d_name, ".hidden", sizeof(entry.d_name) - 1);
+    XCTAssertFalse(TOFileSystemDirEntryIsCountable(parent, &entry));
+
+    // Non-regular, non-directory types (DT_LNK, DT_SOCK, etc.) are not counted.
+    memset(&entry, 0, sizeof(entry));
+    entry.d_type = DT_LNK;
+    strncpy(entry.d_name, "countable.txt", sizeof(entry.d_name) - 1);
+    XCTAssertFalse(TOFileSystemDirEntryIsCountable(parent, &entry));
+
+    // Clean both fixtures — tearDown only removes self.fileURL, so anything we
+    // added to self.directoryURL would leak into testSubItemCount.
+    [NSFileManager.defaultManager removeItemAtURL:fileURL error:nil];
+    [NSFileManager.defaultManager removeItemAtURL:subdirURL error:nil];
+}
+
+- (void)testIsCopyingReturnsNoWhenModificationDateIsMissing
+{
+    // A URL pointing at nothing has no resource values, so to_modificationDate
+    // is nil. to_isCopying must treat that as "not copying" rather than reporting
+    // a file stuck in-flight forever.
+    NSURL *missingURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"does-not-exist.dat"]];
+    XCTAssertNil(missingURL.to_modificationDate);
+    XCTAssertFalse(missingURL.to_isCopying);
 }
 
 @end

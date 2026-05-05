@@ -25,11 +25,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- This file presenter object handles coordinating state
- and events with the file system. It uses `NSFileCoordinator`
- to receive events from the system, when files change,
- and also performs coordinated reads and writes for retrieving
- UUIDs from the files it manages.
+ This file presenter object adopts `NSFilePresenter` to receive callbacks
+ when items in its target directory change, and exposes a UUID accessor
+ backed by extended file attributes.
  */
 @interface TOFileSystemPresenter : NSObject <NSFilePresenter>
 
@@ -56,16 +54,10 @@ NS_ASSUME_NONNULL_BEGIN
 /** Start listening for file events in the target directory. */
 - (void)start;
 
-/** Perform a synchronous coordinated read on a file. */
-- (void)performCoordinatedRead:(void (^)(void))block;
-
-/** Perform a synchronous write operation on a file */
-- (void)performCoordinatedWrite:(void (^)(void))block;
-
-/** Stop listening and cancel any pending timer events. */
+/** Stop listening, cancel any pending timer events, and discard buffered state. */
 - (void)stop;
 
-/** Coordinates reading (and writing if need be) a UUID string for the supplied item */
+/** Reads (creating if needed, atomically) a UUID string for the supplied item. */
 - (nullable NSString *)uuidForItemAtURL:(NSURL *)itemURL;
 
 @end

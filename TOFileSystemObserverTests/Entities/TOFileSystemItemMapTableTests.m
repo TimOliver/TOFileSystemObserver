@@ -55,4 +55,29 @@
     XCTAssertEqual(self.mapTable.count, 0);
 }
 
+- (void)testAllItemsSnapshotIsIndependentOfTable
+{
+    NSString *second = @"second";
+    [self.mapTable setItem:second forUUID:@"second-uuid"];
+
+    NSArray *snapshot = [self.mapTable allItems];
+    XCTAssertEqual(snapshot.count, 2);
+    XCTAssertTrue([snapshot containsObject:self.object]);
+    XCTAssertTrue([snapshot containsObject:second]);
+
+    // Mutating the table after taking a snapshot must not change the snapshot.
+    [self.mapTable removeItemForUUID:self.uuid];
+    [self.mapTable removeItemForUUID:@"second-uuid"];
+    XCTAssertEqual(self.mapTable.count, 0);
+    XCTAssertEqual(snapshot.count, 2);
+}
+
+- (void)testAllItemsOnEmptyTableReturnsEmptyArray
+{
+    [self.mapTable removeItemForUUID:self.uuid];
+    NSArray *snapshot = [self.mapTable allItems];
+    XCTAssertNotNil(snapshot);
+    XCTAssertEqual(snapshot.count, 0);
+}
+
 @end

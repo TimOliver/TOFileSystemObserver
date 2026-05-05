@@ -134,36 +134,25 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 
 - (void)scanAllSubdirectoriesFromBaseURL
 {
-    // Start scanning every item in our base directory
-    NSArray *childItemURLs = [self.fileManager to_fileSystemEnumeratorForDirectoryAtURL:self.directoryURL].allObjects;
-    if (childItemURLs.count == 0) { return; }
-
-    // Post the "will begin" notification
+    // Post the "will begin" notification before doing any work so consumers
+    // see paired begin/complete events even when the directory is empty.
     [self.delegate scanOperationWillBeginFullScan:self];
-    
-    // Scan all of the items in the base directory
+
+    // Scan all of the items in the base directory. An empty directory yields
+    // an empty enumeration, which is a valid (no-op) state.
+    NSArray *childItemURLs = [self.fileManager to_fileSystemEnumeratorForDirectoryAtURL:self.directoryURL].allObjects;
     for (NSURL *url in childItemURLs) {
         [self scanItemAtURL:url
          pendingDirectories:self.pendingDirectories];
     }
 
-    void (^didCompletedNotification)(void) = ^{
-        [self.delegate scanOperationDidCompleteFullScan:self];
-    };
-    
-    // If we were only scanning the immediate contents
-    // of the base directory, we can exit here
-    if (self.subDirectoryLevelLimit == 0) {
-        didCompletedNotification();
-        return;
+    // If we were only scanning the immediate contents of the base directory,
+    // skip the recursive pass.
+    if (self.subDirectoryLevelLimit != 0) {
+        [self scanPendingSubdirectories];
     }
 
-    // Otherwise, scan all of the directories discovered in the base
-    // directory (and then scan their directories).
-    [self scanPendingSubdirectories];
-    
-    // Send a notification so we can do some final clean up
-    didCompletedNotification();
+    [self.delegate scanOperationDidCompleteFullScan:self];
 }
 
 - (void)scanPendingSubdirectories
@@ -232,10 +221,16 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     
     // Check if we've already assigned an on-disk UUID
     NSString *uuid = [self.filePresenter uuidForItemAtURL:url];
-     
-    // If the item is a directory, add it to the pending list to scan later
+
+    // If the item is a directory, add it to the pending list to scan later.
+    // Skip symlinks — a circular symlink would otherwise loop the scan forever,
+    // and following symlinks out of the observed tree isn't behaviour we want.
     if (url.to_isDirectory) {
-        [pendingDirectories addObject:url];
+        NSNumber *isSymlink = nil;
+        [url getResourceValue:&isSymlink forKey:NSURLIsSymbolicLinkKey error:nil];
+        if (!isSymlink.boolValue) {
+            [pendingDirectories addObject:url];
+        }
     }
     
     // Check if the item had been moved
@@ -420,16 +415,13 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
     }
     
     // Otherwise, the user must have duplicated a file, so re-gen the UUID
-    // and assign it to this file
-    __block NSString *newUUID;
-    [self.filePresenter performCoordinatedWrite:^{
-        // Do a sanity check to verify the UUID didn't change while this queue was waiting
-        newUUID = [url to_fileSystemUUID];
-        if ([uuid isEqualToString:newUUID]) {
-            newUUID = [url to_generateFileSystemUUID];
-        }
-    }];
-        
+    // and assign it to this file. The scan is sequential on its operation queue,
+    // so a plain check-then-write here is safe.
+    NSString *newUUID = [url to_fileSystemUUID];
+    if ([uuid isEqualToString:newUUID]) {
+        newUUID = [url to_generateFileSystemUUID];
+    }
+
     return newUUID;
 }
 

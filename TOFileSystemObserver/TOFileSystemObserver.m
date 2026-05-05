@@ -337,6 +337,11 @@ static TOFileSystemObserver *_sharedObserver = nil;
     return itemList;
 }
 
+- (TOFileSystemItem *)directoryItem
+{
+    return [self itemForFileAtURL:self.directoryURL];
+}
+
 - (TOFileSystemItem *)itemForFileAtURL:(NSURL *)fileURL
 {
     // Exit out if the URL is invalid
@@ -395,16 +400,13 @@ static TOFileSystemObserver *_sharedObserver = nil;
     }
     
     // If another file with the same UUID exists alongside this one, they are clearly duplicated.
-    // Create a new UUID for this item
-    __block NSString *newUUID = nil;
-    [self.fileSystemPresenter performCoordinatedWrite:^{
-        // Do a sanity check to verify the UUID didn't change while this queue was waiting
-        newUUID = [itemURL to_fileSystemUUID];
-        if ([uuid isEqualToString:newUUID]) {
-            newUUID = [itemURL to_generateFileSystemUUID];
-        }
-    }];
-    
+    // Create a new UUID for this item. Scans on a single observer are serialised by the
+    // operation queue, so a check-then-write here cannot race with itself.
+    NSString *newUUID = [itemURL to_fileSystemUUID];
+    if ([uuid isEqualToString:newUUID]) {
+        newUUID = [itemURL to_generateFileSystemUUID];
+    }
+
     return newUUID;
 }
 

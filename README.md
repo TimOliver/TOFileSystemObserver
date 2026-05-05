@@ -9,7 +9,7 @@
 [![PayPal](https://img.shields.io/badge/paypal-donate-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=M4RKULAVKV7K8)
 [![Twitch](https://img.shields.io/badge/twitch-timXD-6441a5.svg)](http://twitch.tv/timXD)
 
-`TOFileSystemObserver` is a bullet-proof mechanism (hopefully) for detecting any user-initiated changes made to the contents of an iOS / iPadOS app's sandbox while the app is open.
+`TOFileSystemObserver` is a bullet-proof mechanism (hopefully) for detecting any user-initiated changes made to the contents of an iOS / iPadOS / macOS app's sandbox while the app is open.
 
 Since iOS 11, the Files app has given the option to allow apps to expose the contents of their Documents directories to the users, letting them manipulate the files, either while the app is closed, suspended, or even running side-by-side with iPad multitasking.
 
@@ -64,7 +64,9 @@ Please check the sample app for more examples on the features of this library.
 
 # Requirements
 
-`TOFileSystemObserver` will work with iOS 8.0 and above. While it's been written in Objective-C, it will also work with Swift (But the Swift interface may need some more work.)
+`TOFileSystemObserver` requires iOS 11+ / iPadOS 11+, and runs on macOS 10.13+ as well. The iOS 11 floor reflects the Files-app integration the library is built around, and the use of APFS extended file attributes for tracking item identity. While it's been written in Objective-C, it will also work with Swift (the Swift interface may need some more work).
+
+Notification blocks fire on a background queue. If you're updating UI in response to events, dispatch to the main queue yourself.
 
 ## Manual Installation
 

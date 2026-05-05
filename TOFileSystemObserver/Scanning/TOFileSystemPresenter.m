@@ -40,9 +40,6 @@
 /** Whether a timer has been set yet or not */
 @property (nonatomic, assign) BOOL isTiming;
 
-/** A concurrent queue used to coordinate writing UUIDs to files. */
-@property (nonatomic, readonly) dispatch_queue_t fileCoordinatorQueue;
-
 @end
 
 @implementation TOFileSystemPresenter
@@ -56,30 +53,6 @@
     }
 
     return self;
-}
-
-- (instancetype)initWithDirectoryURL:(NSURL *)directoryURL
-{
-    if (self = [super init]) {
-        _directoryURL = directoryURL;
-        [self commonInit];
-    }
-
-    return self;
-}
-
-- (dispatch_queue_t)fileCoordinatorQueue
-{
-    // In case we have multiple file observers, we must share this
-    // coordinator amongst all of them in case two separate instances
-    // try and write to the same file.
-    static dispatch_queue_t _fileCoordinatorQueue = NULL;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _fileCoordinatorQueue = dispatch_queue_create("TOFileSystemObserver.fileCoordinatorQueue",
-                                                      DISPATCH_QUEUE_CONCURRENT);
-    });
-    return _fileCoordinatorQueue;
 }
 
 - (void)commonInit
@@ -156,52 +129,37 @@
     self.isRunning = YES;
 }
 
-- (void)performCoordinatedRead:(void (^)(void))block
-{
-    dispatch_sync(self.fileCoordinatorQueue, ^{
-        @autoreleasepool {
-            if (block) { block(); }
-        }
-    });
-}
-
-- (void)performCoordinatedWrite:(void (^)(void))block
-{
-    dispatch_barrier_sync(self.fileCoordinatorQueue, ^{
-        @autoreleasepool {
-            if (block) { block(); }
-        }
-    });
-}
-
 - (void)stop
 {
     if (!self.isRunning) { return; }
     [NSFileCoordinator removeFilePresenter:self];
     self.isRunning = NO;
+
+    // Drain any buffered events and reset the timer flag so a subsequent start
+    // doesn't replay stale changes. Timer completion blocks bail on !isRunning,
+    // so we don't need to track and cancel them individually.
+    dispatch_async(self.itemListAccessQueue, ^{
+        [self.items removeAllObjects];
+        self.isTiming = NO;
+    });
 }
 
 - (nullable NSString *)uuidForItemAtURL:(NSURL *)itemURL
 {
-    __block NSString *uuid = nil;
-    
-    // If the file exists, but it's not in the store yet,
-    // attempt to access it from disk
-    [self performCoordinatedRead:^{
-        uuid = [itemURL to_fileSystemUUID];
-    }];
+    // Fast path: the file already has a UUID attribute.
+    NSString *uuid = [itemURL to_fileSystemUUID];
     if (uuid.length) { return uuid; }
-    
-    // If even that failed, then it's necessary to generate a new one
-    [self performCoordinatedWrite:^{
-        // Try again in case a previous operation already generated one
-        uuid = [itemURL to_fileSystemUUID];
-        if (uuid.length == 0) {
-            uuid = [itemURL to_generateFileSystemUUID];
-        }
-    }];
-    
-    return uuid;
+
+    // No UUID yet. Attempt an atomic create. If we win the race, the UUID we
+    // generated is canonical. If another writer (in this or any other process)
+    // wrote first, the create returns NO and we re-read disk to pick up the
+    // winner. Either way both threads converge on the same value without
+    // crossing a process-wide queue.
+    NSString *candidate = [NSUUID UUID].UUIDString;
+    if ([itemURL to_setFileSystemUUIDIfAbsent:candidate]) {
+        return candidate;
+    }
+    return [itemURL to_fileSystemUUID];
 }
 
 #pragma mark - NSFilePresenter Delegate Events -

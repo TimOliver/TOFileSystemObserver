@@ -88,6 +88,26 @@ static NSString *kTOFileSystemAttributeKey = @"dev.tim.fileSystemObserver.UUID";
     return setxattr(filePath, keyName, uuidString, 36, 0, 0) == 0;
 }
 
+- (BOOL)to_setFileSystemUUIDIfAbsent:(NSString *)uuid
+{
+    if (uuid.length == 0) { return NO; }
+    if (uuid.length != 36) {
+        @throw [NSException exceptionWithName:NSInternalInconsistencyException
+                                       reason:@"UUID must be 36 characters long!"
+                                     userInfo:nil];
+    }
+
+    const char *filePath = [self.path fileSystemRepresentation];
+    const char *keyName = kTOFileSystemAttributeKey.UTF8String;
+    const char *uuidString = [uuid cStringUsingEncoding:NSUTF8StringEncoding];
+    if (uuidString == NULL) { return NO; }
+
+    // XATTR_CREATE makes setxattr fail with EEXIST if the attribute is already
+    // present. That is the atomic "set if absent" we want — no read-then-write
+    // race between two writers for the initial UUID assignment.
+    return setxattr(filePath, keyName, uuidString, 36, 0, XATTR_CREATE) == 0;
+}
+
 - (NSString *)to_generateFileSystemUUID
 {
     NSString *uuid = [NSUUID UUID].UUIDString;

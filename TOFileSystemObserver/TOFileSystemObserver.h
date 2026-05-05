@@ -33,6 +33,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class TOFileSystemObserver;
 
+/**
+ Threading: notification blocks registered via `-addNotificationBlock:` are
+ invoked on a background queue. If you're updating UI in response to events,
+ dispatch to the main queue yourself.
+ */
 NS_SWIFT_NAME(FileSystemObserver)
 @interface TOFileSystemObserver : NSObject
 
@@ -134,6 +139,9 @@ NS_SWIFT_NAME(FileSystemObserver)
  Registers a new notification block that will be triggered each time an update is detected.
  It is your responsibility to strongly retain the token object, and release it only
  when you wish to stop receiving notifications.
+
+ The block is invoked on a background queue. Dispatch to the main queue yourself
+ if the block touches UI.
 
  @param block A block that will be called each time a file system event is detected.
 */

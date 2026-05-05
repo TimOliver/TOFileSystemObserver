@@ -40,9 +40,6 @@ NS_ASSUME_NONNULL_BEGIN
 /** Remove this item from a list. */
 - (void)removeFromList;
 
-/** Forces a refresh of the UUID (in cases where the file seems to have been duplicated) */
-- (void)regenerateUUID;
-
 /** Notify this object that it should re-fetch all its properties from disk.
     Returns true if there were changes. */
 - (BOOL)refreshWithURL:(nullable NSURL *)itemURL;
