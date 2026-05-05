@@ -29,6 +29,8 @@
 
 + (instancetype)tokenWithObservingObject:(id<TOFileSystemNotifying>)observingObject
                                    block:(id)block {
+    NSParameterAssert(observingObject != nil);
+    NSParameterAssert(block != nil);
     TOFileSystemNotificationToken * const token = [[TOFileSystemNotificationToken alloc] init];
     token.observingObject = observingObject;
     token.notificationBlock = block;

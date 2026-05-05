@@ -37,7 +37,7 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 @property (nonatomic, strong) NSURL *directoryURL;
 
 /** A flat list of file URLs to scan. */
-@property (nonatomic, strong) NSArray *itemURLs;
+@property (nonatomic, strong) NSArray<NSURL *> *itemURLs;
 
 /** A reference to the file system presenter object so we may pause when causing file writes. */
 @property (nonatomic, strong) TOFileSystemPresenter *filePresenter;
@@ -46,10 +46,10 @@ NSString * const kTOFileSystemTrashFolderName = @"/.Trash/";
 @property (nonatomic, strong) NSFileManager *fileManager;
 
 /** When iterating through all the files, this array stores pending directories that need scanning*/
-@property (nonatomic, strong) NSMutableArray *pendingDirectories;
+@property (nonatomic, strong) NSMutableArray<NSURL *> *pendingDirectories;
 
 /** A list of items we've been instructed to skip. */
-@property (nonatomic, strong) NSArray *skippedItems;
+@property (nonatomic, strong) NSArray<NSString *> *skippedItems;
 
 /** A reference to the master list of items maintained by this observer. */
 @property (nonatomic, strong) TOFileSystemItemURLDictionary *allItems;

@@ -43,6 +43,7 @@
 #pragma mark - Class Creation -
 
 - (instancetype)initWithBaseURL:(NSURL *)baseURL {
+    NSParameterAssert(baseURL != nil);
     if (self = [super init]) {
         _baseURL    = baseURL.URLByDeletingLastPathComponent.URLByStandardizingPath;
         _uuidItems  = [NSMutableDictionary dictionary];

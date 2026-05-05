@@ -68,6 +68,8 @@
 
 - (instancetype)initWithItemAtFileURL:(NSURL *)fileURL
                    fileSystemObserver:(TOFileSystemObserver *)observer {
+    NSParameterAssert(fileURL != nil);
+    NSParameterAssert(observer != nil);
     if (self = [super init]) {
         _fileURL = fileURL;
         _fileSystemObserver = observer;

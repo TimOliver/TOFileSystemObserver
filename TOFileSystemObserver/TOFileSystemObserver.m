@@ -94,7 +94,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
 @property (nonatomic, strong) TOFileSystemItemMapTable *itemTable;
 
 /** A hash table containing all of the notification blocks/tokens registered to this observer. */
-@property (nonatomic, strong) NSHashTable *notificationTokens;
+@property (nonatomic, strong) NSHashTable<TOFileSystemNotificationToken *> *notificationTokens;
 
 @end
 
@@ -103,15 +103,11 @@ static TOFileSystemObserver *_sharedObserver = nil;
 #pragma mark - Object Lifecycle -
 
 - (instancetype)init {
-    if (self = [super init]) {
-        _directoryURL = [TOFileSystemPath documentsDirectoryURL].URLByStandardizingPath;
-        [self _setUp];
-    }
-
-    return self;
+    return [self initWithDirectoryURL:[TOFileSystemPath documentsDirectoryURL].URLByStandardizingPath];
 }
 
 - (instancetype)initWithDirectoryURL:(NSURL *)directoryURL {
+    NSParameterAssert(directoryURL != nil);
     if (self = [super init]) {
         _directoryURL = directoryURL;
         [self _setUp];
@@ -178,7 +174,9 @@ static TOFileSystemObserver *_sharedObserver = nil;
     // Set up the callback handler for when changes are detected
     __weak typeof(self) weakSelf = self;
     self.fileSystemPresenter.itemsDidChangeHandler = ^(NSArray *itemURLs) {
-        [weakSelf _updateObservingObjectsWithChangedItemURLs:itemURLs];
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf == nil) { return; }
+        [strongSelf _updateObservingObjectsWithChangedItemURLs:itemURLs];
     };
 }
 
@@ -250,6 +248,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
 }
 
 - (TOFileSystemNotificationToken *)addNotificationBlock:(TOFileSystemNotificationBlock)block {
+    NSParameterAssert(block != nil);
     TOFileSystemNotificationToken * const token = [TOFileSystemNotificationToken tokenWithObservingObject:self block:block];
     if (self.notificationTokens == nil) {
         self.notificationTokens = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory];
@@ -260,12 +259,14 @@ static TOFileSystemObserver *_sharedObserver = nil;
 
 /** Removes the notification from the observing object. */
 - (void)removeNotificationToken:(TOFileSystemNotificationToken *)token {
+    NSParameterAssert(token != nil);
     [self.notificationTokens removeObject:token];
 }
 
 #pragma mark - Creating and Observing Items -
 
 - (nullable NSString *)uuidForItemAtURL:(NSURL *)itemURL {
+    NSParameterAssert(itemURL != nil);
     // See if we already have a UUID entry for this file in the global store
     __block NSString *uuid = nil;
     uuid = [self.allItems uuidForItemWithURL:itemURL];
@@ -326,6 +327,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
 }
 
 - (TOFileSystemItem *)itemForFileAtURL:(NSURL *)fileURL {
+    NSParameterAssert(fileURL != nil);
     // Exit out if the URL is invalid
     if (![[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]) {
         return nil;

@@ -39,6 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
  dispatch to the main queue yourself.
  */
 NS_SWIFT_NAME(FileSystemObserver)
+__attribute__((objc_subclassing_restricted))
 @interface TOFileSystemObserver : NSObject
 
 /** Whether the observer is currently active and observing its target directory. */
@@ -80,7 +81,7 @@ NS_SWIFT_NAME(FileSystemObserver)
 @property (nonatomic, assign) BOOL broadcastsNotifications;
 
 /** Create a new instance of the observer with the base URL that will be observed. */
-- (instancetype)initWithDirectoryURL:(NSURL *)directoryURL;
+- (instancetype)initWithDirectoryURL:(NSURL *)directoryURL NS_DESIGNATED_INITIALIZER;
 
 /** A singleton instance that can be accessed globally. It is created the first time this is called. */
 + (instancetype)sharedObserver;

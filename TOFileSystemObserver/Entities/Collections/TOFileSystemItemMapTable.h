@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
  used to store re-usable instances of item and list
  objects.
  */
+__attribute__((objc_subclassing_restricted))
 @interface TOFileSystemItemMapTable : NSObject
 
 @property (nonatomic, readonly) NSInteger count;

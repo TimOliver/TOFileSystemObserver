@@ -32,7 +32,7 @@
 @property (nonatomic, strong) NSOperationQueue *eventsOperationQueue;
 
 /** The list of items currently detected. */
-@property (nonatomic, strong) NSMutableArray *items;
+@property (nonatomic, strong) NSMutableArray<NSURL *> *items;
 
 /** A serial queue for managing access to the list (including the timer) */
 @property (nonatomic, strong) dispatch_queue_t itemListAccessQueue;

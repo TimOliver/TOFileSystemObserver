@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
  when items in its target directory change, and exposes a UUID accessor
  backed by extended file attributes.
  */
+__attribute__((objc_subclassing_restricted))
 @interface TOFileSystemPresenter : NSObject <NSFilePresenter>
 
 /** The directory that will be observed by this presenter object */
