@@ -66,34 +66,39 @@
     return modificationDate;
 }
 
+// Decides whether a directory entry should count toward `to_numberOfSubItems`.
+// Hidden entries (leading dot) are always skipped. Regular files and directories
+// are counted via the d_type fast path. DT_UNKNOWN — which happens on filesystems
+// that don't fill d_type, like NFS or FAT — falls back to lstat. Exposed (not
+// static) so the DT_UNKNOWN branch can be exercised by unit tests, since it's
+// not reachable on APFS where readdir always reports a concrete type.
+BOOL TOFileSystemDirEntryIsCountable(const char *parentPath, const struct dirent *entry)
+{
+    if (entry->d_name[0] == '.') { return NO; }
+    if (entry->d_type == DT_REG || entry->d_type == DT_DIR) { return YES; }
+    if (entry->d_type != DT_UNKNOWN) { return NO; }
+
+    char fullPath[PATH_MAX];
+    int written = snprintf(fullPath, sizeof(fullPath), "%s/%s", parentPath, entry->d_name);
+    if (written <= 0 || written >= (int)sizeof(fullPath)) { return NO; }
+
+    struct stat st;
+    if (lstat(fullPath, &st) != 0) { return NO; }
+    return S_ISREG(st.st_mode) || S_ISDIR(st.st_mode);
+}
+
 - (NSInteger)to_numberOfSubItems
 {
-    NSInteger numberOfItems = 0;
-    DIR *directory;
-    struct dirent *entry;
-
     // Do it using POSIX APIs to avoid needing to load in all of the file names
     const char *path = [self.path cStringUsingEncoding:NSUTF8StringEncoding];
-    directory = opendir(path);
+    DIR *directory = opendir(path);
     if (directory == NULL) { return 0; }
+
+    NSInteger numberOfItems = 0;
+    struct dirent *entry;
     while ((entry = readdir(directory)) != NULL) {
-        if (entry->d_name[0] == '.') { continue; }
-        if (entry->d_type == DT_REG || entry->d_type == DT_DIR) {
+        if (TOFileSystemDirEntryIsCountable(path, entry)) {
             numberOfItems++;
-            continue;
-        }
-        // Some filesystems (NFS, FAT, others) report DT_UNKNOWN and require an
-        // actual stat to determine the type. APFS fills d_type reliably so this
-        // branch is rare in practice.
-        if (entry->d_type == DT_UNKNOWN) {
-            char fullPath[PATH_MAX];
-            int written = snprintf(fullPath, sizeof(fullPath), "%s/%s", path, entry->d_name);
-            if (written <= 0 || written >= (int)sizeof(fullPath)) { continue; }
-            struct stat st;
-            if (lstat(fullPath, &st) != 0) { continue; }
-            if (S_ISREG(st.st_mode) || S_ISDIR(st.st_mode)) {
-                numberOfItems++;
-            }
         }
     }
     closedir(directory);
