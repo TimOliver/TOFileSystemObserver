@@ -110,4 +110,4 @@ iOS device mockup art by [Pixeden](http://pixeden.com).
 
 # License
 
-`TOFileSystemObserver` is available under the MIT license. Please see the [LICENSE](LICENSE) file for more information. ![analytics](https://ga-beacon.appspot.com/UA-5643664-16/TOFileSystemObserver/README.md?pixel)
+`TOFileSystemObserver` is available under the MIT license. Please see the [LICENSE](LICENSE) file for more information. 
