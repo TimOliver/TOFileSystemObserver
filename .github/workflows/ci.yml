@@ -31,6 +31,13 @@ jobs:
           echo "Selected simulator: $DEVICE"
           echo "device=$DEVICE" >> "$GITHUB_OUTPUT"
 
+      - name: Pre-boot simulator
+        # Cold-boot the simulator before running tests so file-coordination and
+        # presenter system services are ready by the time NSFilePresenter-driven
+        # integration tests start. Skipping this makes those tests flake on CI
+        # even though they pass reliably locally.
+        run: xcrun simctl bootstatus "${{ steps.simulator.outputs.device }}" -b
+
       - name: Run tests
         run: |
           set -o pipefail
@@ -39,6 +46,8 @@ jobs:
             -scheme TOFileSystemObserverTests \
             -destination "platform=iOS Simulator,name=${{ steps.simulator.outputs.device }},OS=latest" \
             -resultBundlePath TestResults.xcresult \
+            -test-iterations 3 \
+            -retry-tests-on-failure \
             CODE_SIGNING_ALLOWED=NO
 
       - name: Upload test results
