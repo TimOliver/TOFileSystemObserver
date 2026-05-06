@@ -94,7 +94,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
 @property (nonatomic, strong) TOFileSystemItemMapTable *itemTable;
 
 /** A hash table containing all of the notification blocks/tokens registered to this observer. */
-@property (nonatomic, strong) NSHashTable *notificationTokens;
+@property (nonatomic, strong) NSHashTable<TOFileSystemNotificationToken *> *notificationTokens;
 
 @end
 
@@ -102,28 +102,21 @@ static TOFileSystemObserver *_sharedObserver = nil;
 
 #pragma mark - Object Lifecycle -
 
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _directoryURL = [TOFileSystemPath documentsDirectoryURL].URLByStandardizingPath;
-        [self setUp];
-    }
-
-    return self;
+- (instancetype)init {
+    return [self initWithDirectoryURL:[TOFileSystemPath documentsDirectoryURL].URLByStandardizingPath];
 }
 
-- (instancetype)initWithDirectoryURL:(NSURL *)directoryURL
-{
+- (instancetype)initWithDirectoryURL:(NSURL *)directoryURL {
+    NSParameterAssert(directoryURL != nil);
     if (self = [super init]) {
         _directoryURL = directoryURL;
-        [self setUp];
+        [self _setUp];
     }
 
     return self;
 }
 
-+ (instancetype)sharedObserver
-{
++ (instancetype)sharedObserver {
     if (_sharedObserver) { return _sharedObserver; }
     
     static dispatch_once_t onceToken;
@@ -135,8 +128,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
     return _sharedObserver;
 }
 
-+ (void)setSharedObserver:(TOFileSystemObserver *)observer
-{
++ (void)setSharedObserver:(TOFileSystemObserver *)observer {
     if (observer == _sharedObserver) { return; }
     if (_sharedObserver.isRunning) {
         [_sharedObserver stop];
@@ -145,8 +137,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
     _sharedObserver = observer;
 }
 
-- (void)setUp
-{
+- (void)_setUp {
     // Set-up default property values
     _isRunning = NO;
     _excludedItems = @[@"Inbox"];
@@ -169,36 +160,35 @@ static TOFileSystemObserver *_sharedObserver = nil;
     _copyingItems = [[TOFileSystemItemURLDictionary alloc] initWithBaseURL:self.directoryURL];
     
     // Change the UUID key name to match our app (for better visibility)
-    NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+    NSString * const bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
     [NSURL to_setKeyNamePrefix:bundleIdentifier];
 }
 
 #pragma mark - Observer Setup -
 
-- (void)configureFilePresenter
-{
+- (void)_configureFilePresenter {
     // Attach the root directory to the observer
-    NSURL *url = self.directoryURL;
+    NSURL * const url = self.directoryURL;
     self.fileSystemPresenter.directoryURL = url;
-    
+
     // Set up the callback handler for when changes are detected
     __weak typeof(self) weakSelf = self;
     self.fileSystemPresenter.itemsDidChangeHandler = ^(NSArray *itemURLs) {
-        [weakSelf updateObservingObjectsWithChangedItemURLs:itemURLs];
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf == nil) { return; }
+        [strongSelf _updateObservingObjectsWithChangedItemURLs:itemURLs];
     };
 }
 
-- (void)beginObservingBaseDirectory
-{
+- (void)_beginObservingBaseDirectory {
     // Configure the file presenter and start
-    [self configureFilePresenter];
+    [self _configureFilePresenter];
     [self.fileSystemPresenter start];
 }
 
 #pragma mark - Observer Lifecycle -
 
-- (void)start
-{
+- (void)start {
     if (self.isRunning) { return; }
 
     // Set the running state
@@ -209,14 +199,13 @@ static TOFileSystemObserver *_sharedObserver = nil;
     _baseDirectoryUUID = self.directoryItem.uuid;
 
     // Start the observer to watch for any system level changes
-    [self beginObservingBaseDirectory];
+    [self _beginObservingBaseDirectory];
     
     // Perform an initial scan of all of the files we will observe
-    [self performFullDirectoryScan];
+    [self _performFullDirectoryScan];
 }
 
-- (void)stop
-{
+- (void)stop {
     if (!self.isRunning) { return; }
     
     // Set the running state to off
@@ -229,30 +218,28 @@ static TOFileSystemObserver *_sharedObserver = nil;
     [self.fileSystemPresenter stop];
 }
 
-- (void)performFullDirectoryScan
-{
+- (void)_performFullDirectoryScan {
     // Create a new scan operation
-    TOFileSystemScanOperation *scanOperation = nil;
-    scanOperation = [[TOFileSystemScanOperation alloc] initForFullScanWithDirectoryAtURL:self.directoryURL
-                                                                           skippingItems:self.excludedItems
-                                                                      allItemsDictionary:self.allItems
-                                                                           filePresenter:self.fileSystemPresenter];
+    TOFileSystemScanOperation * const scanOperation =
+        [[TOFileSystemScanOperation alloc] initForFullScanWithDirectoryAtURL:self.directoryURL
+                                                               skippingItems:self.excludedItems
+                                                          allItemsDictionary:self.allItems
+                                                               filePresenter:self.fileSystemPresenter];
     scanOperation.subDirectoryLevelLimit = self.includedDirectoryLevels;
     scanOperation.delegate = self;
-    
+
     // Begin asynchronous execution
     [self.operationQueue addOperation:scanOperation];
 }
 
-- (void)updateObservingObjectsWithChangedItemURLs:(NSArray *)itemURLs
-{
+- (void)_updateObservingObjectsWithChangedItemURLs:(NSArray *)itemURLs {
     // Create a new scan operation to analyse what changed
-    TOFileSystemScanOperation *scanOperation = nil;
-    scanOperation = [[TOFileSystemScanOperation alloc] initForItemScanWithItemURLs:itemURLs
-                                                                           baseURL:self.directoryURL
-                                                                     skippingItems:self.excludedItems
-                                                                allItemsDictionary:self.allItems
-                                                                     filePresenter:self.fileSystemPresenter];
+    TOFileSystemScanOperation * const scanOperation =
+        [[TOFileSystemScanOperation alloc] initForItemScanWithItemURLs:itemURLs
+                                                               baseURL:self.directoryURL
+                                                         skippingItems:self.excludedItems
+                                                    allItemsDictionary:self.allItems
+                                                         filePresenter:self.fileSystemPresenter];
     scanOperation.subDirectoryLevelLimit = self.includedDirectoryLevels;
     scanOperation.delegate = self;
 
@@ -260,9 +247,9 @@ static TOFileSystemObserver *_sharedObserver = nil;
     [self.operationQueue addOperation:scanOperation];
 }
 
-- (TOFileSystemNotificationToken *)addNotificationBlock:(TOFileSystemNotificationBlock)block
-{
-    TOFileSystemNotificationToken *token = [TOFileSystemNotificationToken tokenWithObservingObject:self block:block];
+- (TOFileSystemNotificationToken *)addNotificationBlock:(TOFileSystemNotificationBlock)block {
+    NSParameterAssert(block != nil);
+    TOFileSystemNotificationToken * const token = [TOFileSystemNotificationToken tokenWithObservingObject:self block:block];
     if (self.notificationTokens == nil) {
         self.notificationTokens = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory];
     }
@@ -271,15 +258,15 @@ static TOFileSystemObserver *_sharedObserver = nil;
 }
 
 /** Removes the notification from the observing object. */
-- (void)removeNotificationToken:(TOFileSystemNotificationToken *)token
-{
+- (void)removeNotificationToken:(TOFileSystemNotificationToken *)token {
+    NSParameterAssert(token != nil);
     [self.notificationTokens removeObject:token];
 }
 
 #pragma mark - Creating and Observing Items -
 
-- (nullable NSString *)uuidForItemAtURL:(NSURL *)itemURL
-{
+- (nullable NSString *)uuidForItemAtURL:(NSURL *)itemURL {
+    NSParameterAssert(itemURL != nil);
     // See if we already have a UUID entry for this file in the global store
     __block NSString *uuid = nil;
     uuid = [self.allItems uuidForItemWithURL:itemURL];
@@ -296,13 +283,11 @@ static TOFileSystemObserver *_sharedObserver = nil;
     return [self.fileSystemPresenter uuidForItemAtURL:itemURL];
 }
 
-- (nullable NSString *)uuidForParentOfItemAtURL:(NSURL *)itemURL
-{
+- (nullable NSString *)uuidForParentOfItemAtURL:(NSURL *)itemURL {
     return [self uuidForItemAtURL:itemURL.URLByDeletingLastPathComponent];
 }
 
-- (TOFileSystemItemList *)itemListForDirectoryAtURL:(NSURL *)directoryURL
-{
+- (TOFileSystemItemList *)itemListForDirectoryAtURL:(NSURL *)directoryURL {
     // Default to the base directory if nil is supplied
     if (directoryURL == nil) {
         directoryURL = self.directoryURL;
@@ -314,7 +299,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
         @autoreleasepool {
             // Fetch the UUID for this item and see if we've cached it already
             NSString *uuid = [self uuidForItemAtURL:directoryURL];
-            uuid = [self verifiedUniqueUUIDForItemAtURL:directoryURL uuid:uuid];
+            uuid = [self _verifiedUniqueUUIDForItemAtURL:directoryURL uuid:uuid];
             itemList = self.itemListTable[uuid];
             if (itemList) { return; }
             
@@ -337,13 +322,12 @@ static TOFileSystemObserver *_sharedObserver = nil;
     return itemList;
 }
 
-- (TOFileSystemItem *)directoryItem
-{
+- (TOFileSystemItem *)directoryItem {
     return [self itemForFileAtURL:self.directoryURL];
 }
 
-- (TOFileSystemItem *)itemForFileAtURL:(NSURL *)fileURL
-{
+- (TOFileSystemItem *)itemForFileAtURL:(NSURL *)fileURL {
+    NSParameterAssert(fileURL != nil);
     // Exit out if the URL is invalid
     if (![[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]) {
         return nil;
@@ -355,7 +339,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
         @autoreleasepool {
             // Fetch the UUID for this item and see if we've cached it already
             NSString *uuid = [self uuidForItemAtURL:fileURL];
-            uuid = [self verifiedUniqueUUIDForItemAtURL:fileURL uuid:uuid];
+            uuid = [self _verifiedUniqueUUIDForItemAtURL:fileURL uuid:uuid];
             item = self.itemTable[uuid];
             if (item) { return; }
             
@@ -379,13 +363,12 @@ static TOFileSystemObserver *_sharedObserver = nil;
     return item;
 }
 
-- (NSString *)verifiedUniqueUUIDForItemAtURL:(NSURL *)itemURL uuid:(NSString *)uuid
-{
+- (NSString *)_verifiedUniqueUUIDForItemAtURL:(NSURL *)itemURL uuid:(NSString *)uuid {
     // If it was detected that there are two items with the same UUID
     // in the master list, regenerate the UUID for this one
-    
+
     // If this item isn't in the master list yet, then there is no chance for conflicts
-    NSURL *url = self.allItems[uuid];
+    NSURL * const url = self.allItems[uuid];
     if (url == nil) { return uuid; }
     
     // If an item does exist, check it is at the same location
@@ -412,40 +395,37 @@ static TOFileSystemObserver *_sharedObserver = nil;
 
 #pragma mark - Item Refreshing -
 
-- (BOOL)refreshItemAtURL:(NSURL *)itemURL
-                    uuid:(NSString *)uuid
-{
+- (BOOL)_refreshItemAtURL:(NSURL *)itemURL
+                    uuid:(NSString *)uuid {
     // Perform an update on the item and see if we need to trigger
     // any visual updates
-    BOOL hasChanges = [self.itemTable[uuid] refreshWithURL:itemURL];
-    
+    const BOOL hasChanges = [self.itemTable[uuid] refreshWithURL:itemURL];
+
     // If the item is also in memory as a list, update its list entry too
     [self.itemListTable[uuid] refreshWithURL:itemURL];
-    
+
     return hasChanges;
 }
 
-- (BOOL)refreshParentItemWithUUID:(NSString *)uuid
-{
+- (BOOL)_refreshParentItemWithUUID:(NSString *)uuid {
     // If the parent item is an item, do a check on it to see if it has changes
-    BOOL hasChanges = [self.itemTable[uuid] refreshWithURL:nil];
-    
+    const BOOL hasChanges = [self.itemTable[uuid] refreshWithURL:nil];
+
     // If the parent item has a list entry, perform an update on that too
     [self.itemListTable[uuid] refreshWithURL:nil];
-    
+
     return hasChanges;
 }
 
-- (void)startTimerForCopyingItems
-{
-    id block = ^{
+- (void)_startTimerForCopyingItems {
+    id const block = ^{
         // The timer is already counting down
         if (self.copyingTimer) { return; }
         
         // Create a new timer
         self.copyingTimer = [NSTimer timerWithTimeInterval:kTOFileSystemObserverCopyingTimeDelay
                                                     target:self
-                                                  selector:@selector(copyTimerCompleted)
+                                                  selector:@selector(_copyTimerCompleted)
                                                   userInfo:nil
                                                    repeats:NO];
         
@@ -460,25 +440,24 @@ static TOFileSystemObserver *_sharedObserver = nil;
     [[NSOperationQueue mainQueue] addOperationWithBlock:block];
 }
 
-- (void)copyTimerCompleted
-{
+- (void)_copyTimerCompleted {
     // Remove the timer
     self.copyingTimer = nil;
-    
-    id block =  ^{
+
+    id const block = ^{
         // Get all of the URLs still pending in the dictionary
-        NSArray *urls = self.copyingItems.allURLs;
+        NSArray * const urls = self.copyingItems.allURLs;
         if (urls == nil) { return; }
-        
+
         // Remove all the items we're about to test from the list,
         // as they'll be re-added on the subsequent callback if they're
         // still copying
         [self.copyingItems removeAllItems];
-        
+
         // Perform a scan to see if they've changed
-        [self updateObservingObjectsWithChangedItemURLs:urls];
+        [self _updateObservingObjectsWithChangedItemURLs:urls];
     };
-    
+
     [self.operationQueue addOperationWithBlock:block];
 }
 
@@ -486,24 +465,23 @@ static TOFileSystemObserver *_sharedObserver = nil;
 
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
  didDiscoverItemAtURL:(NSURL *)itemURL
-             withUUID:(NSString *)uuid
-{
+             withUUID:(NSString *)uuid {
     // Get the UUID of the parent so we can see if there is a list for it
-    NSString *parentUUID = [self uuidForParentOfItemAtURL:itemURL];
-    
+    NSString * const parentUUID = [self uuidForParentOfItemAtURL:itemURL];
+
     // Refresh all of the properties of this item and its parent
-    [self refreshItemAtURL:itemURL uuid:uuid];
-    [self refreshParentItemWithUUID:parentUUID];
-    
+    [self _refreshItemAtURL:itemURL uuid:uuid];
+    [self _refreshParentItemWithUUID:parentUUID];
+
     // Broadcast this event to all of the observers.
-    TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
+    TOFileSystemChanges * const changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
     if (scanOperation.isFullScan) { [changes setIsFullScan]; }
     [changes addDiscoveredItemWithUUID:uuid fileURL:itemURL];
-    [self postNotificationsWithChanges:changes];
-    
-    id mainBlock = ^{
+    [self _postNotificationsWithChanges:changes];
+
+    id const mainBlock = ^{
         // If this is a new item that belongs to an existing list, append it
-        TOFileSystemItemList *parentList = self.itemListTable[parentUUID];
+        TOFileSystemItemList * const parentList = self.itemListTable[parentUUID];
         if (parentList) { [parentList addItemWithUUID:uuid itemURL:itemURL]; }
     };
     [[NSOperationQueue mainQueue] addOperationWithBlock:mainBlock];
@@ -511,62 +489,60 @@ static TOFileSystemObserver *_sharedObserver = nil;
 
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
    itemDidChangeAtURL:(NSURL *)itemURL
-             withUUID:(NSString *)uuid
-{
+             withUUID:(NSString *)uuid {
     // If the item is still copying at this point (Potentially lag during the write?)
     // add it to our copying list so we can poll it again in a few seconds
     if (itemURL.to_isCopying) {
         [self.copyingItems setItemURL:itemURL forUUID:uuid];
-        [self startTimerForCopyingItems];
+        [self _startTimerForCopyingItems];
     }
-    
+
     // See if there is a list had been made for the parent, and add it
-    NSString *parentUUID = [self uuidForParentOfItemAtURL:itemURL];
-    [self refreshItemAtURL:itemURL uuid:uuid];
-    [self refreshParentItemWithUUID:parentUUID];
-    
+    NSString * const parentUUID = [self uuidForParentOfItemAtURL:itemURL];
+    [self _refreshItemAtURL:itemURL uuid:uuid];
+    [self _refreshParentItemWithUUID:parentUUID];
+
     // Broadcast this event to all of the observers.
-    TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
+    TOFileSystemChanges * const changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
     if (scanOperation.isFullScan) { [changes setIsFullScan]; }
     [changes addModifiedItemWithUUID:uuid fileURL:itemURL];
-    [self postNotificationsWithChanges:changes];
+    [self _postNotificationsWithChanges:changes];
 }
 
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
          itemWithUUID:(NSString *)uuid
         didMoveFromURL:(NSURL *)previousURL
-                toURL:(NSURL *)url
-{
+                toURL:(NSURL *)url {
     // If the movement occurred inside the same folder (eg, it was renamed),
     // cancel out here.
-    NSURL *oldParentURL = previousURL.URLByDeletingLastPathComponent.URLByStandardizingPath;
-    NSURL *newParentURL = url.URLByDeletingLastPathComponent.URLByStandardizingPath;
+    NSURL * const oldParentURL = previousURL.URLByDeletingLastPathComponent.URLByStandardizingPath;
+    NSURL * const newParentURL = url.URLByDeletingLastPathComponent.URLByStandardizingPath;
     if ([oldParentURL isEqual:newParentURL]) { return; }
-    
+
     // See if moved from, or into a new list
-    NSString *oldParentUUID = [oldParentURL to_fileSystemUUID];
-    NSString *newParentUUID = [newParentURL to_fileSystemUUID];
-    
+    NSString * const oldParentUUID = [oldParentURL to_fileSystemUUID];
+    NSString * const newParentUUID = [newParentURL to_fileSystemUUID];
+
     // Get the item and refresh its internal state with the new location
-    [self refreshItemAtURL:url uuid:uuid];
-    
+    [self _refreshItemAtURL:url uuid:uuid];
+
     // Refresh both of the parents to update the children counts in each
-    [self refreshParentItemWithUUID:oldParentUUID];
-    [self refreshParentItemWithUUID:newParentUUID];
+    [self _refreshParentItemWithUUID:oldParentUUID];
+    [self _refreshParentItemWithUUID:newParentUUID];
 
     // Broadcast this event to all of the observers.
-    TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
+    TOFileSystemChanges * const changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
     if (scanOperation.isFullScan) { [changes setIsFullScan]; }
     [changes addMovedItemWithUUID:uuid oldFileURL:previousURL newFileURL:url];
-    [self postNotificationsWithChanges:changes];
-    
-    id mainBlock = ^{
+    [self _postNotificationsWithChanges:changes];
+
+    id const mainBlock = ^{
         // If the item used to be in a list item, remove it from that list
-        TOFileSystemItemList *oldList = self.itemListTable[oldParentUUID];
+        TOFileSystemItemList * const oldList = self.itemListTable[oldParentUUID];
         [oldList removeItemWithUUID:uuid fileURL:url];
-        
+
         // If the destination also had a list, append it to that list
-        TOFileSystemItemList *newList = self.itemListTable[newParentUUID];
+        TOFileSystemItemList * const newList = self.itemListTable[newParentUUID];
         [newList addItemWithUUID:uuid itemURL:url];
     };
     [[NSOperationQueue mainQueue] addOperationWithBlock:mainBlock];
@@ -574,42 +550,40 @@ static TOFileSystemObserver *_sharedObserver = nil;
 
 - (void)scanOperation:(TOFileSystemScanOperation *)scanOperation
    didDeleteItemAtURL:(NSURL *)itemURL
-             withUUID:(NSString *)uuid
-{
-    NSString *parentUUID = [self uuidForParentOfItemAtURL:itemURL];
-    
+             withUUID:(NSString *)uuid {
+    NSString * const parentUUID = [self uuidForParentOfItemAtURL:itemURL];
+
     // Broadcast this event to all of the observers.
-    TOFileSystemChanges *changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
+    TOFileSystemChanges * const changes = [[TOFileSystemChanges alloc] initWithFileSystemObserver:self];
     if (scanOperation.isFullScan) { [changes setIsFullScan]; }
     [changes addDeletedItemWithUUID:uuid fileURL:itemURL];
-    [self postNotificationsWithChanges:changes];
-    
-    id mainBlock = ^{
+    [self _postNotificationsWithChanges:changes];
+
+    id const mainBlock = ^{
         // If we have this item in memory, remove it from everywhere
-        TOFileSystemItem *item = self.itemTable[uuid];
+        TOFileSystemItem * const item = self.itemTable[uuid];
         [item.list removeItemWithUUID:uuid fileURL:itemURL];
         [self.itemTable removeItemForUUID:uuid];
         [self.itemListTable removeItemForUUID:uuid];
-        
+
         // If this item is a child of a list, update that list
-        TOFileSystemItem *listItem = self.itemTable[parentUUID];
+        TOFileSystemItem * const listItem = self.itemTable[parentUUID];
         [listItem refreshWithURL:nil];
     };
     [[NSOperationQueue mainQueue] addOperationWithBlock:mainBlock];
 }
 
-- (void)scanOperationWillBeginFullScan:(TOFileSystemScanOperation *)scanOperation
-{
+- (void)scanOperationWillBeginFullScan:(TOFileSystemScanOperation *)scanOperation {
     // Perform the Notification Center broadcast
     if (self.broadcastsNotifications) {
-        NSDictionary *userInfo = [self userInfoDictionaryWithChanges:nil];
+        NSDictionary * const userInfo = [self _userInfoDictionaryWithChanges:nil];
         [[NSNotificationCenter defaultCenter] postNotificationName:TOFileSystemObserverWillBeginFullScanNotification
                                                             object:nil
                                                           userInfo:userInfo];
     }
-    
+
     // Inform all notification tokens registered
-    for (TOFileSystemNotificationToken *token in self.notificationTokens.allObjects) {
+    for (TOFileSystemNotificationToken * const token in self.notificationTokens.allObjects) {
         TOFileSystemObserverCallBlock(token.notificationBlock,
                                       self,
                                       TOFileSystemObserverNotificationTypeWillBeginFullScan,
@@ -617,23 +591,22 @@ static TOFileSystemObserver *_sharedObserver = nil;
     }
 }
 
-- (void)scanOperationDidCompleteFullScan:(TOFileSystemScanOperation *)scanOperation
-{
+- (void)scanOperationDidCompleteFullScan:(TOFileSystemScanOperation *)scanOperation {
     // Loop through the list one more time to remove any headless entries
-    for (TOFileSystemItemList *list in self.itemListTable.allItems) {
+    for (TOFileSystemItemList * const list in self.itemListTable.allItems) {
         [list synchronizeWithDisk];
     }
-    
+
     // Perform the Notification Center broadcast
     if (self.broadcastsNotifications) {
-        NSDictionary *userInfo = [self userInfoDictionaryWithChanges:nil];
+        NSDictionary * const userInfo = [self _userInfoDictionaryWithChanges:nil];
         [[NSNotificationCenter defaultCenter] postNotificationName:TOFileSystemObserverDidCompleteFullScanNotification
                                                             object:nil
                                                           userInfo:userInfo];
     }
-    
+
     // Inform all notification tokens registered
-    for (TOFileSystemNotificationToken *token in self.notificationTokens.allObjects) {
+    for (TOFileSystemNotificationToken * const token in self.notificationTokens.allObjects) {
         TOFileSystemObserverCallBlock(token.notificationBlock,
                                       self,
                                       TOFileSystemObserverNotificationTypeDidCompleteFullScan,
@@ -643,8 +616,7 @@ static TOFileSystemObserver *_sharedObserver = nil;
 
 #pragma mark - Notifications -
 
-- (NSDictionary *)userInfoDictionaryWithChanges:(TOFileSystemChanges *)changes
-{
+- (NSDictionary *)_userInfoDictionaryWithChanges:(TOFileSystemChanges *)changes {
     NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
     dictionary[TOFileSystemObserverUserInfoKey] = self;
     if (changes) {
@@ -654,22 +626,21 @@ static TOFileSystemObserver *_sharedObserver = nil;
     return [NSDictionary dictionaryWithDictionary:dictionary];
 }
 
-- (void)postNotificationsWithChanges:(TOFileSystemChanges *)changes
-{
+- (void)_postNotificationsWithChanges:(TOFileSystemChanges *)changes {
     if (!self.broadcastsNotifications && self.notificationTokens.count == 0) {
         return;
     }
-    
+
     // Perform the Notification Center broadcast
     if (self.broadcastsNotifications) {
-        NSDictionary *userInfo = [self userInfoDictionaryWithChanges:changes];
+        NSDictionary * const userInfo = [self _userInfoDictionaryWithChanges:changes];
         [[NSNotificationCenter defaultCenter] postNotificationName:TOFileSystemObserverDidChangeNotification
                                                             object:nil
                                                           userInfo:userInfo];
     }
-    
+
     // Inform all notification tokens registered
-    for (TOFileSystemNotificationToken *token in self.notificationTokens.allObjects) {
+    for (TOFileSystemNotificationToken * const token in self.notificationTokens.allObjects) {
         TOFileSystemObserverCallBlock(token.notificationBlock,
                                       self,
                                       TOFileSystemObserverNotificationTypeDidChange,

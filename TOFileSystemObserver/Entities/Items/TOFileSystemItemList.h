@@ -41,6 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
  the file system.
  */
 NS_SWIFT_NAME(FileSystemItemList)
+__attribute__((objc_subclassing_restricted))
 @interface TOFileSystemItemList : NSObject<NSFastEnumeration>
 
 /** The unique UUID string saved in the attributes of this directory. */

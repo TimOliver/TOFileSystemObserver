@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** Creates a new instance of an item for the target item. */
 - (instancetype)initWithItemAtFileURL:(NSURL *)fileURL
-                   fileSystemObserver:(TOFileSystemObserver *)observer;
+                   fileSystemObserver:(TOFileSystemObserver *)observer NS_DESIGNATED_INITIALIZER;
 
 /** Adds this item as a child of a list. */
 - (void)addToList:(TOFileSystemItemList *)list;

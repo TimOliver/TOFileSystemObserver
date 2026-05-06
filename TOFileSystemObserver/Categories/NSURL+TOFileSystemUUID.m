@@ -27,37 +27,35 @@ static NSString *kTOFileSystemAttributeKey = @"dev.tim.fileSystemObserver.UUID";
 
 @implementation NSURL (TOFileSystemUUID)
 
-+ (void)to_setKeyNamePrefix:(NSString *)prefix
-{
++ (void)to_setKeyNamePrefix:(NSString *)prefix {
     kTOFileSystemAttributeKey = [NSString stringWithFormat:@"%@.fileSystemObserver.UUID", prefix];
 }
 
-- (NSString *)to_fileSystemUUID
-{
-    const char *filePath = [self.path fileSystemRepresentation];
-    const char *keyName = kTOFileSystemAttributeKey.UTF8String;
+- (NSString *)to_fileSystemUUID {
+    const char * const filePath = [self.path fileSystemRepresentation];
+    const char * const keyName = kTOFileSystemAttributeKey.UTF8String;
 
     // Allocate a buffer for the value (UUID values are always 36 characters)
     char value[36];
 
     // Fetch the value from disk. A short read means there's no valid UUID stored.
-    ssize_t bytesRead = getxattr(filePath, keyName, value, sizeof(value), 0, 0);
+    const ssize_t bytesRead = getxattr(filePath, keyName, value, sizeof(value), 0, 0);
     if (bytesRead != (ssize_t)sizeof(value)) {
         return nil;
     }
 
     // Convert to a string, and return if successful
-    NSString *uuid = [[NSString alloc] initWithBytes:value length:bytesRead encoding:NSUTF8StringEncoding];
+    NSString * const uuid = [[NSString alloc] initWithBytes:value length:bytesRead encoding:NSUTF8StringEncoding];
     if (uuid.length == 0) {
         return nil;
     }
-    
+
     // Verify to make sure the provided value is a valid UUID string
-    NSString *uuidPattern = @"\\A[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}\\Z";
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:uuidPattern
-                                                                           options:NSRegularExpressionCaseInsensitive
-                                                                             error:nil];
-    NSRange range = [regex rangeOfFirstMatchInString:uuid options:0 range:NSMakeRange(0, uuid.length)];
+    NSString * const uuidPattern = @"\\A[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}\\Z";
+    NSRegularExpression * const regex = [NSRegularExpression regularExpressionWithPattern:uuidPattern
+                                                                                  options:NSRegularExpressionCaseInsensitive
+                                                                                    error:nil];
+    const NSRange range = [regex rangeOfFirstMatchInString:uuid options:0 range:NSMakeRange(0, uuid.length)];
     
     // A valid regex was found.
     if (range.location == NSNotFound) {
@@ -67,8 +65,7 @@ static NSString *kTOFileSystemAttributeKey = @"dev.tim.fileSystemObserver.UUID";
     return uuid;
 }
 
-- (BOOL)to_setFileSystemUUID:(NSString *)uuid
-{
+- (BOOL)to_setFileSystemUUID:(NSString *)uuid {
     if (uuid.length == 0) { return NO; }
     if (uuid.length != 36) {
         @throw [NSException exceptionWithName:NSInternalInconsistencyException
@@ -77,19 +74,18 @@ static NSString *kTOFileSystemAttributeKey = @"dev.tim.fileSystemObserver.UUID";
     }
 
     // Determine the file path and destination key
-    const char *filePath = [self.path fileSystemRepresentation];
-    const char *keyName = kTOFileSystemAttributeKey.UTF8String;
+    const char * const filePath = [self.path fileSystemRepresentation];
+    const char * const keyName = kTOFileSystemAttributeKey.UTF8String;
 
     // Convert the string to a C byte string
-    const char *uuidString = [uuid cStringUsingEncoding:NSUTF8StringEncoding];
+    const char * const uuidString = [uuid cStringUsingEncoding:NSUTF8StringEncoding];
     if (uuidString == NULL) { return NO; }
 
     // Save it to this file. UUID strings are always 36 ASCII bytes.
     return setxattr(filePath, keyName, uuidString, 36, 0, 0) == 0;
 }
 
-- (BOOL)to_setFileSystemUUIDIfAbsent:(NSString *)uuid
-{
+- (BOOL)to_setFileSystemUUIDIfAbsent:(NSString *)uuid {
     if (uuid.length == 0) { return NO; }
     if (uuid.length != 36) {
         @throw [NSException exceptionWithName:NSInternalInconsistencyException
@@ -97,9 +93,9 @@ static NSString *kTOFileSystemAttributeKey = @"dev.tim.fileSystemObserver.UUID";
                                      userInfo:nil];
     }
 
-    const char *filePath = [self.path fileSystemRepresentation];
-    const char *keyName = kTOFileSystemAttributeKey.UTF8String;
-    const char *uuidString = [uuid cStringUsingEncoding:NSUTF8StringEncoding];
+    const char * const filePath = [self.path fileSystemRepresentation];
+    const char * const keyName = kTOFileSystemAttributeKey.UTF8String;
+    const char * const uuidString = [uuid cStringUsingEncoding:NSUTF8StringEncoding];
     if (uuidString == NULL) { return NO; }
 
     // XATTR_CREATE makes setxattr fail with EEXIST if the attribute is already
@@ -108,9 +104,8 @@ static NSString *kTOFileSystemAttributeKey = @"dev.tim.fileSystemObserver.UUID";
     return setxattr(filePath, keyName, uuidString, 36, 0, XATTR_CREATE) == 0;
 }
 
-- (NSString *)to_generateFileSystemUUID
-{
-    NSString *uuid = [NSUUID UUID].UUIDString;
+- (NSString *)to_generateFileSystemUUID {
+    NSString * const uuid = [NSUUID UUID].UUIDString;
     if (![self to_setFileSystemUUID:uuid]) { return nil; }
     return uuid;
 }

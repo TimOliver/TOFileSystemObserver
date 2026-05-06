@@ -67,8 +67,9 @@
 #pragma mark - Class Creation -
 
 - (instancetype)initWithItemAtFileURL:(NSURL *)fileURL
-                   fileSystemObserver:(TOFileSystemObserver *)observer
-{
+                   fileSystemObserver:(TOFileSystemObserver *)observer {
+    NSParameterAssert(fileURL != nil);
+    NSParameterAssert(observer != nil);
     if (self = [super init]) {
         _fileURL = fileURL;
         _fileSystemObserver = observer;
@@ -82,9 +83,9 @@
         
         // If this item represents a deleted file, skip gathering the data
         if (!self.isDeleted) {
-            [self performWithLock:^{
-                [self configureUUID];
-                [self refreshFromItemAtURL:fileURL];
+            [self _performWithLock:^{
+                [self _configureUUID];
+                [self _refreshFromItemAtURL:fileURL];
             }];
         }
     }
@@ -94,14 +95,12 @@
 
 #pragma mark - Update Properties -
 
-- (void)configureUUID
-{
-    TOFileSystemPresenter *presenter = self.fileSystemObserver.fileSystemPresenter;
+- (void)_configureUUID {
+    TOFileSystemPresenter * const presenter = self.fileSystemObserver.fileSystemPresenter;
     _uuid = [presenter uuidForItemAtURL:_fileURL];
 }
 
-- (BOOL)refreshFromItemAtURL:(NSURL *)url
-{
+- (BOOL)_refreshFromItemAtURL:(NSURL *)url {
     BOOL hasChanges = NO;
     
     // Copy the new URL to this item
@@ -110,45 +109,45 @@
     }
     
     // Copy the name of the item
-    NSString *name = [_fileURL lastPathComponent];
+    NSString * const name = [_fileURL lastPathComponent];
     if (_name.length == 0 || ![name isEqualToString:_name]) {
         _name = name;
         hasChanges = YES;
     }
 
     // Check if it is a file or directory
-    TOFileSystemItemType type = _fileURL.to_isDirectory ? TOFileSystemItemTypeDirectory :
-                                                        TOFileSystemItemTypeFile;
+    const TOFileSystemItemType type = _fileURL.to_isDirectory ? TOFileSystemItemTypeDirectory :
+                                                                TOFileSystemItemTypeFile;
     if (type != _type) {
         _type = type;
         hasChanges = YES;
     }
 
     // Get its creation date
-    NSDate *creationDate = _fileURL.to_creationDate;
+    NSDate * const creationDate = _fileURL.to_creationDate;
     if (![_creationDate isEqualToDate:creationDate]) {
         _creationDate = creationDate;
         hasChanges = YES;
     }
-    
+
     // Get its modification date
-    NSDate *modificationDate = _fileURL.to_modificationDate;
+    NSDate * const modificationDate = _fileURL.to_modificationDate;
     if (![_modificationDate isEqualToDate:modificationDate]) {
         _modificationDate = modificationDate;
         hasChanges = YES;
     }
-    
+
     // If the type is a file
     if (_type == TOFileSystemItemTypeFile) {
         // Fetch the item file size
-        long long fileSize = _fileURL.to_size;
+        const long long fileSize = _fileURL.to_size;
         if (fileSize != _size) {
             _size = fileSize;
             hasChanges = YES;
         }
-        
+
         // Check to see if it is copying
-        BOOL isCopying = _fileURL.to_isCopying;
+        const BOOL isCopying = _fileURL.to_isCopying;
         if (isCopying != _isCopying) {
             _isCopying = isCopying;
             hasChanges = YES;
@@ -156,7 +155,7 @@
     }
     else {
         // Else, it's a directory, count the number of items inside
-        NSInteger numberOfChildItems = [_fileURL to_numberOfSubItems];
+        const NSInteger numberOfChildItems = [_fileURL to_numberOfSubItems];
         if (_numberOfSubItems != numberOfChildItems) {
             _numberOfSubItems = numberOfChildItems;
             hasChanges = YES;
@@ -166,23 +165,21 @@
     return hasChanges;
 }
 
-- (BOOL)isDeleted
-{
+- (BOOL)isDeleted {
     return ![[NSFileManager defaultManager] fileExistsAtPath:self.fileURL.path];
 }
 
 #pragma mark - Lists -
 
-- (BOOL)refreshWithURL:(nullable NSURL *)itemURL
-{
+- (BOOL)refreshWithURL:(nullable NSURL *)itemURL {
     // Perform a re-fetch of all of the properties of the
     // item from disk, and re-populate all of the properties.
     
     // A lock needs to be used as this operation will ideally be done
     // in the background due to how heavy it could potentially be
     __block BOOL hasChanges = NO;
-    [self performWithLock:^{
-        hasChanges = [self refreshFromItemAtURL:itemURL];
+    [self _performWithLock:^{
+        hasChanges = [self _refreshFromItemAtURL:itemURL];
     }];
     
     // If it was detected one or more of the properties were
@@ -198,29 +195,25 @@
     return hasChanges;
 }
 
-- (void)addToList:(TOFileSystemItemList *)list
-{
+- (void)addToList:(TOFileSystemItemList *)list {
     self.list = list;
 }
 
-- (void)removeFromList
-{
+- (void)removeFromList {
     self.list = nil;
 }
 
 #pragma mark - Equality -
 
-- (BOOL)isEqual:(id)object
-{
+- (BOOL)isEqual:(id)object {
     if (self == object) { return YES; }
     if (![object isKindOfClass:TOFileSystemItem.class]) { return NO; }
-    
-    TOFileSystemItem *item = (TOFileSystemItem *)object;
+
+    TOFileSystemItem * const item = (TOFileSystemItem *)object;
     return [item.uuid isEqualToString:self.uuid];
 }
 
-- (NSUInteger)hash
-{
+- (NSUInteger)hash {
     return self.uuid.hash;
 }
 
@@ -228,39 +221,36 @@
 
 // To ensure thread safety, fetch the value of an object
 // on the barrier queue
-- (id)fetchValueForObject:(NSString *)objectName
-{
+- (id)_fetchValueForObject:(NSString *)objectName {
     __block id objectValue = nil;
-    [self performWithLock:^{
+    [self _performWithLock:^{
         objectValue = [self valueForKey:objectName];
     }];
     
     return objectValue;
 }
 
-- (long long)fetchValueForInteger:(NSString *)integerName
-{
+- (long long)_fetchValueForInteger:(NSString *)integerName {
     __block long long intValue = 0;
-    [self performWithLock:^{
+    [self _performWithLock:^{
         intValue = [[self valueForKey:integerName] longLongValue];
     }];
     
     return intValue;
 }
 
-- (NSURL *)fileURL { return (NSURL *)[self fetchValueForObject:@"_fileURL"]; }
-- (NSString *)uuid { return (NSString *)[self fetchValueForObject:@"_uuid"]; }
-- (NSString *)name { return (NSString *)[self fetchValueForObject:@"_name"]; }
-- (long long)size { return (long long)[self fetchValueForInteger:@"_size"]; }
-- (NSDate *)creationDate { return (NSDate *)[self fetchValueForObject:@"_creationDate"]; }
-- (NSDate *)modificationDate { return (NSDate *)[self fetchValueForObject:@"_modificationDate"]; }
-- (BOOL)isCopying { return (BOOL)[self fetchValueForInteger:@"_isCopying"]; }
-- (NSInteger)numberOfSubItems { return (NSInteger)[self fetchValueForInteger:@"_numberOfSubItems"]; }
+- (NSURL *)fileURL { return (NSURL *)[self _fetchValueForObject:@"_fileURL"]; }
+- (NSString *)uuid { return (NSString *)[self _fetchValueForObject:@"_uuid"]; }
+- (NSString *)name { return (NSString *)[self _fetchValueForObject:@"_name"]; }
+- (long long)size { return (long long)[self _fetchValueForInteger:@"_size"]; }
+- (NSDate *)creationDate { return (NSDate *)[self _fetchValueForObject:@"_creationDate"]; }
+- (NSDate *)modificationDate { return (NSDate *)[self _fetchValueForObject:@"_modificationDate"]; }
+- (BOOL)isCopying { return (BOOL)[self _fetchValueForInteger:@"_isCopying"]; }
+- (NSInteger)numberOfSubItems { return (NSInteger)[self _fetchValueForInteger:@"_numberOfSubItems"]; }
 
 #pragma mark - Thread Safe Access -
 
-- (void)performWithLock:(void (^)(void))block;
-{
+- (void)_performWithLock:(void (^)(void))block; {
     // Lock the current thread
     if (@available(iOS 10.0, *)) {
         os_unfair_lock_lock(&_unfairLock);
@@ -280,15 +270,14 @@
 
 #pragma mark - Debugging -
 
-- (NSString *)description
-{
-    NSString *description = @"TOFileSystem Item - \n"
-                            @"Name:     %@\n"
-                            @"UUID:     %@\n"
-                            @"Type:     %@\n"
-                            @"Size:     %d\n"
-                            @"Created:  %@\n"
-                            @"Modified: %@\n";
+- (NSString *)description {
+    NSString * const description = @"TOFileSystem Item - \n"
+                                   @"Name:     %@\n"
+                                   @"UUID:     %@\n"
+                                   @"Type:     %@\n"
+                                   @"Size:     %d\n"
+                                   @"Created:  %@\n"
+                                   @"Modified: %@\n";
     
     return [NSString stringWithFormat:description,
             self.name,

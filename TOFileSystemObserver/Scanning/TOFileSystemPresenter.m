@@ -32,7 +32,7 @@
 @property (nonatomic, strong) NSOperationQueue *eventsOperationQueue;
 
 /** The list of items currently detected. */
-@property (nonatomic, strong) NSMutableArray *items;
+@property (nonatomic, strong) NSMutableArray<NSURL *> *items;
 
 /** A serial queue for managing access to the list (including the timer) */
 @property (nonatomic, strong) dispatch_queue_t itemListAccessQueue;
@@ -46,17 +46,15 @@
 
 #pragma mark - Class Lifecycle -
 
-- (instancetype)init
-{
+- (instancetype)init {
     if (self = [super init]) {
-        [self commonInit];
+        [self _commonInit];
     }
 
     return self;
 }
 
-- (void)commonInit
-{
+- (void)_commonInit {
     // Create the queue to receive events
     _eventsOperationQueue = [[NSOperationQueue alloc] init];
     _eventsOperationQueue.qualityOfService = NSQualityOfServiceBackground;
@@ -71,15 +69,13 @@
     _timerInterval = 0.1f;
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
     [self stop];
 }
 
 #pragma mark - Timer Handling -
 
-- (void)beginTimer
-{
+- (void)_beginTimer {
     // When the timer finishes, create a copy of the items,
     // and then flush what we currently have in the main item list
     id completionBlock = ^{
@@ -87,7 +83,7 @@
         self.isTiming = NO;
 
         @autoreleasepool {
-            NSArray *items = [self.items copy];
+            NSArray * const items = [self.items copy];
             [self.items removeAllObjects];
             if (items.count == 0) { return; }
 
@@ -112,8 +108,7 @@
 
 #pragma mark - Item Handling -
 
-- (void)addItemToList:(NSURL *)itemURL
-{
+- (void)_addItemToList:(NSURL *)itemURL {
     // Add the new item to the items list in a barrier queue access.
     dispatch_async(self.itemListAccessQueue, ^{
         [self.items addObject:itemURL];
@@ -122,15 +117,13 @@
 
 #pragma mark - Public Control -
 
-- (void)start
-{
+- (void)start {
     if (self.isRunning) { return; }
     [NSFileCoordinator addFilePresenter:self];
     self.isRunning = YES;
 }
 
-- (void)stop
-{
+- (void)stop {
     if (!self.isRunning) { return; }
     [NSFileCoordinator removeFilePresenter:self];
     self.isRunning = NO;
@@ -144,8 +137,7 @@
     });
 }
 
-- (nullable NSString *)uuidForItemAtURL:(NSURL *)itemURL
-{
+- (nullable NSString *)uuidForItemAtURL:(NSURL *)itemURL {
     // Fast path: the file already has a UUID attribute.
     NSString *uuid = [itemURL to_fileSystemUUID];
     if (uuid.length) { return uuid; }
@@ -164,19 +156,16 @@
 
 #pragma mark - NSFilePresenter Delegate Events -
 
-- (void)presentedSubitemDidChangeAtURL:(NSURL *)url
-{
-    [self addItemToList:url];
-    [self beginTimer];
+- (void)presentedSubitemDidChangeAtURL:(NSURL *)url {
+    [self _addItemToList:url];
+    [self _beginTimer];
 }
 
-- (NSURL *)presentedItemURL
-{
+- (NSURL *)presentedItemURL {
     return self.directoryURL;
 }
 
-- (NSOperationQueue *)presentedItemOperationQueue
-{
+- (NSOperationQueue *)presentedItemOperationQueue {
     return self.eventsOperationQueue;
 }
 

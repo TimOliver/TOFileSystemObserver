@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
  or folder on disk.
  */
 NS_SWIFT_NAME(FileSystemItem)
+__attribute__((objc_subclassing_restricted))
 @interface TOFileSystemItem : NSObject
 
 /** The absolute URL path to this item. */

@@ -28,21 +28,20 @@
 #pragma mark - Class Creation -
 
 + (instancetype)tokenWithObservingObject:(id<TOFileSystemNotifying>)observingObject
-                                   block:(id)block
-{
-    TOFileSystemNotificationToken *token = [[TOFileSystemNotificationToken alloc] init];
+                                   block:(id)block {
+    NSParameterAssert(observingObject != nil);
+    NSParameterAssert(block != nil);
+    TOFileSystemNotificationToken * const token = [[TOFileSystemNotificationToken alloc] init];
     token.observingObject = observingObject;
     token.notificationBlock = block;
     return token;
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
     [self invalidate];
 }
 
-- (void)invalidate
-{
+- (void)invalidate {
     [self.observingObject removeNotificationToken:self];
 }
 

@@ -34,8 +34,7 @@
 
 @implementation TOFileSystemItemMapTable
 
-- (instancetype)init
-{
+- (instancetype)init {
     if (self = [super init]) {
         _mapTable = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsStrongMemory
                                           valueOptions:NSPointerFunctionsWeakMemory];
@@ -45,8 +44,7 @@
     return self;
 }
 
-- (NSInteger)count
-{
+- (NSInteger)count {
     __block NSInteger count = 0;
     dispatch_sync(self.dispatchQueue, ^{
         count = self.mapTable.count;
@@ -55,15 +53,13 @@
     return count;
 }
 
-- (void)setItem:(id)object forUUID:(NSString *)uuid
-{
+- (void)setItem:(id)object forUUID:(NSString *)uuid {
     dispatch_barrier_async(self.dispatchQueue, ^{
         [self.mapTable setObject:object forKey:uuid];
     });
 }
 
-- (id)itemForUUID:(NSString *)uuid
-{
+- (id)itemForUUID:(NSString *)uuid {
     __block id item = nil;
     dispatch_sync(self.dispatchQueue, ^{
         @autoreleasepool {
@@ -74,15 +70,13 @@
     return item;
 }
 
-- (void)removeItemForUUID:(NSString *)uuid
-{
+- (void)removeItemForUUID:(NSString *)uuid {
     dispatch_barrier_async(self.dispatchQueue, ^{
         [self.mapTable removeObjectForKey:uuid];
     });
 }
 
-- (NSArray *)allItems
-{
+- (NSArray *)allItems {
     __block NSArray *items = nil;
     dispatch_sync(self.dispatchQueue, ^{
         @autoreleasepool {
@@ -92,13 +86,11 @@
     return items ?: @[];
 }
 
-- (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key
-{
+- (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSString *)key {
     [self setItem:object forUUID:key];
 }
 
-- (nullable id)objectForKeyedSubscript:(NSString *)key
-{
+- (nullable id)objectForKeyedSubscript:(NSString *)key {
     return [self itemForUUID:key];
 }
 

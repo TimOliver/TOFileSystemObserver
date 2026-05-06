@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
  remove itself from the observing object when deallocated.
  */
 NS_SWIFT_NAME(FileSystemNotificationToken)
+__attribute__((objc_subclassing_restricted))
 @interface TOFileSystemNotificationToken : NSObject
 
 /**

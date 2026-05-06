@@ -35,13 +35,14 @@ NS_ASSUME_NONNULL_BEGIN
  The URLs are converted to and stored as relative URLs to
  save memory, and are converted back to absolute URLs when retrieved.
  */
+__attribute__((objc_subclassing_restricted))
 @interface TOFileSystemItemURLDictionary : NSObject
 
 /** The number of items currently in the dictionary. */
 @property (nonatomic, readonly) NSUInteger count;
 
 /** Create a new instance with the base URL that all items will be relatively saved against. */
-- (instancetype)initWithBaseURL:(NSURL *)baseURL;
+- (instancetype)initWithBaseURL:(NSURL *)baseURL NS_DESIGNATED_INITIALIZER;
 
 /** Adds an item URL to the dictionary. May be called from multiple threads. */
 - (void)setItemURL:(nullable NSURL *)itemURL forUUID:(nullable NSString *)uuid;

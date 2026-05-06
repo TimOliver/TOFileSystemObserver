@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
  A static class to centralize all file path
  manipulation logic.
  */
+__attribute__((objc_subclassing_restricted))
 @interface TOFileSystemPath : NSObject
 
 /** The path to the application sandbox. */
